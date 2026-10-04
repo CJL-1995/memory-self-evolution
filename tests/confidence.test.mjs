@@ -457,6 +457,8 @@ test('三端 Stop 续轮都要求按 sessionID 调用 memory_resolve', async t =
   assert.doesNotMatch(model, /Skipped.*decision=discard/)
   assert.match(model, /弹窗标题写「记忆确认·插件」/)
   assert.match(model, /禁止调用 memory_propose、update_memory 工具来分析、更新记忆/)
+  assert.match(model, /落成，使用推荐标签 rule「新规则」/)
+  assert.match(model, /落成，把标签改为 project「新规则」/)
   assert.doesNotMatch(model, /memory_persist|memory_reinforce|memory_merge/)
   const workbuddyModel = side.buildFollowup('workbuddy', [{ id: 'j_test', proposal }])
   assert.match(workbuddyModel, /禁止调用 memory_propose、update_memory 工具来分析、更新记忆/)
