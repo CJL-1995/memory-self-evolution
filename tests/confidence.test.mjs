@@ -371,6 +371,42 @@ test('Stop 只弹出当前客户端当前会话的待确认任务', async t => {
   assert.doesNotMatch(codebuddyA.reason, /Cursor A 记忆|Cursor B 记忆/)
 })
 
+test('免确认已写入的结果在 Stop 时原样交给模型，不弹确认', async t => {
+  const h = await createMemoryHarness(t)
+  h.settings.confirm = false
+  const side = await h.load('lib/core/sidepath.mjs')
+  const jobs = path.join(h.root, 'side')
+  await fsp.mkdir(jobs)
+  await fsp.writeFile(path.join(jobs, 's_direct.json'), JSON.stringify({
+    id: 's_direct', agent: 'codebuddy', sessionKey: 'session-a', status: 'ready',
+    prompted: false, applied: true, startedAt: '2026-10-06T17:22:13.000Z',
+    notice: '强化了一条记忆：旧文案，置信度 +0.1',
+    proposal: {
+      action: 'reinforce', category: 'rule', text: '新说法',
+      targetText: '解释 Android 关键字时先讲本意，再类比 iOS。',
+    },
+  }))
+  const out = await side.takeSideFollowup('codebuddy', { session_id: 'session-a' }, 0)
+  const sentence = '记忆插件memory-self-evolution强化了一条记忆："解释 Android 关键字时先讲本意，再类比 iOS。"。'
+  assert.equal(out.decision, 'block')
+  assert.match(out.reason, new RegExp(sentence.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')))
+  assert.match(out.reason, /不要做其他任何操作/)
+  assert.doesNotMatch(out.reason, /是否落成记忆|ask_followup_question/)
+  assert.equal(JSON.parse(await fsp.readFile(path.join(jobs, 's_direct.json'), 'utf8')).prompted, true)
+  assert.equal(await side.takeSideFollowup('codebuddy', { session_id: 'session-a' }, 0), null)
+
+  h.settings.confirm = true
+  await fsp.writeFile(path.join(jobs, 's_confirm.json'), JSON.stringify({
+    id: 's_confirm', agent: 'codebuddy', sessionKey: 'session-a', status: 'ready',
+    prompted: false, applied: false, startedAt: '2026-10-06T17:30:00.000Z',
+    proposal: { action: 'create', category: 'rule', text: '确认模式的新规则' },
+  }))
+  const confirm = await side.takeSideFollowup('codebuddy', { session_id: 'session-a' }, 0)
+  assert.match(confirm.reason, /是否落成记忆/)
+  assert.match(confirm.reason, /确认模式的新规则/)
+  assert.doesNotMatch(confirm.reason, /记忆插件memory-self-evolution新增了一条记忆/)
+})
+
 test('memory_resolve 按 sessionID 统一执行五种旁路决策', async t => {
   const h = await createMemoryHarness(t)
   await h.seed('rule', [memory('old', { text: '旧规则' })])
