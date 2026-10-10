@@ -99,8 +99,8 @@ const TOOLS = [
         sessionID: { type: 'string', description: '插件为本次记忆分析颁发的 sessionID' },
         decision: {
           type: 'string',
-          enum: ['create_rule', 'create_project', 'reinforce', 'merge', 'discard'],
-          description: '用户最终选择的新建规则、新建项目事实、强化、合并或不落成',
+          enum: ['create_rule', 'create_project', 'reinforce', 'merge', 'replace', 'discard'],
+          description: '用户最终选择的新建规则、新建项目事实、强化、合并、替换冲突记忆或不落成',
         },
       },
       required: ['sessionID', 'decision'],

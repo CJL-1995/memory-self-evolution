@@ -451,6 +451,40 @@ test('memory_resolve 按 sessionID 统一执行五种旁路决策', async t => {
   assert.equal((await side.resolvePendingSession('j_8', 'reinforce', 'cursor')).ok, false)
 })
 
+test('判重冲突走 replace，写入时只用新陈述覆盖旧正文', async t => {
+  const h = await createMemoryHarness(t)
+  await h.seed('rule', [memory('old', { text: '未经用户许可不得执行编译命令' })])
+  const side = await h.load('lib/core/sidepath.mjs')
+  assert.equal(JSON.stringify(side.parseDedup('{"action":"replace","id":"old"}', ['old'])), '{"action":"replace","id":"old"}')
+  assert.equal(side.parseDedup('{"action":"replace","id":"ghost"}', ['old']), null)
+
+  const proposal = {
+    action: 'replace', text: '改完代码必须自行编译验证', category: 'rule',
+    targetId: 'old', targetText: '未经用户许可不得执行编译命令', mergedText: '',
+  }
+  const model = side.buildFollowup('cursor', [{ id: 'j_replace', proposal }])
+  assert.match(model, /替换已有记忆 「未经用户许可不得执行编译命令」/)
+  assert.match(model, /替换选 replace/)
+  const replaceNotice = '记忆插件memory-self-evolution替换了一条记忆：新记忆："改完代码必须自行编译验证"。旧记忆："未经用户许可不得执行编译命令"。'
+  assert.equal(side.formatNotice(proposal), replaceNotice)
+  assert.equal(side.formatDirectNotice(proposal), replaceNotice)
+
+  const jobs = path.join(h.root, 'side')
+  await fsp.mkdir(jobs)
+  const job = (id, body) => fsp.writeFile(path.join(jobs, `${id}.json`), JSON.stringify({
+    id, agent: 'cursor', status: 'ready', prompted: true, applied: false, startedAt: '2026-10-10T00:00:00.000Z', proposal: body,
+  }))
+  await job('j_replace', { ...proposal, mergedText: '模型拼接的矛盾正文' })
+  assert.equal((await side.resolvePendingSession('j_replace', 'merge', 'cursor')).ok, false)
+  assert.equal((await side.resolvePendingSession('j_replace', 'replace', 'cursor')).ok, true)
+  const replaced = (await h.records()).find(item => item.id === 'old')
+  assert.equal(replaced.text, '改完代码必须自行编译验证')
+  assert.equal(replaced.confidence, 0.6)
+
+  await job('j_create', { action: 'create', text: '无关新规则', category: 'rule' })
+  assert.equal((await side.resolvePendingSession('j_create', 'replace', 'cursor')).ok, false)
+})
+
 test('旁路只暴露统一的 memory_resolve 工具', async t => {
   const h = await createMemoryHarness(t, { argv: ['--agent', 'cursor'] })
   h.settings.sideJudge = true
@@ -473,7 +507,7 @@ test('旁路只暴露统一的 memory_resolve 工具', async t => {
   assert.equal(tools.some(tool => tool.name === 'memory_merge'), false)
   const resolve = tools.find(tool => tool.name === 'memory_resolve')
   assert.deepEqual(resolve.inputSchema.required, ['sessionID', 'decision'])
-  assert.deepEqual(resolve.inputSchema.properties.decision.enum, ['create_rule', 'create_project', 'reinforce', 'merge', 'discard'])
+  assert.deepEqual(resolve.inputSchema.properties.decision.enum, ['create_rule', 'create_project', 'reinforce', 'merge', 'replace', 'discard'])
   const result = await call('tools/call', { name: 'memory_resolve', arguments: { sessionID: 'missing', decision: 'discard' } })
   assert.match(result.result.content[0].text, /未找到可处理的记忆分析会话/)
   await assert.rejects(fsp.access(path.join(h.root, 'rule.jsonl')))
