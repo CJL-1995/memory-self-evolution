@@ -181,7 +181,7 @@ npm run build-background                      # 重新生成背景均值，换�
 - 每轮 hook 端到端 **0.23 秒**，其中模型冷启动 104ms、单条编码 5.2ms
 - 1 万条记忆时的相似度计算 **6.2ms**——瓶颈不在算法，在索引的读盘与解析
 
-功能回归使用 `npm test`：当前包含 80 项隔离测试，覆盖置信度、HMAC sessionID 幂等、客户端与会话隔离、Skip/取消兜底、每日僵尸任务清理、每日实际衰减、衰减天数配置、时间戳重置、跨会话去重、CLI/MCP/旁路入口、旧数据兼容、召回边界、并发更新与锁恢复，不读取个人记忆或请求模型 API。`npm run verify` 是另一套依赖当前用户记忆池的召回评测，用例需按自己的记忆库写在 `~/.memory-self-evolution/verify-cases.json`，格式见 `tools/verify-gate.mjs` 头部注释。
+功能回归使用 `npm test`：当前包含 86 项隔离测试，覆盖置信度、HMAC sessionID 幂等、客户端与会话隔离、Skip/取消兜底、每日僵尸任务清理、每日实际衰减、衰减天数配置、时间戳重置、跨会话去重、CLI/MCP/旁路入口、旧数据兼容、召回边界、并发更新与锁恢复，不读取个人记忆或请求模型 API（旁路接口用假的实现代替）。`npm run verify` 是另一套依赖当前用户记忆池的召回评测，用例需按自己的记忆库写在 `~/.memory-self-evolution/verify-cases.json`，格式见 `tools/verify-gate.mjs` 头部注释。
 
 ## 已知限制
 
