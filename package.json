@@ -21,7 +21,8 @@
     "setup": "node tools/setup.mjs",
     "uninstall": "node tools/uninstall.mjs",
     "verify": "node tools/verify-gate.mjs",
-    "rebuild-index": "node tools/rebuild-index.mjs"
+    "rebuild-index": "node tools/rebuild-index.mjs",
+    "build-background": "node tools/build-background.mjs"
   },
   "license": "MIT",
   "repository": {

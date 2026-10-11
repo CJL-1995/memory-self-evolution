@@ -89,7 +89,7 @@ node bin/memory.mjs rule add "所有异常处理处都需要添加日志"
 
 - **阻塞模式**：保留规则列表、项目概览、沉淀规则及候选提示，由主模型判重并选择动作。
 - **规则上限**：两种模式都从未废弃的 `rule` 中按已存储置信度降序选前 50 条，同分时最近活跃的在前。每轮语义召回仍从全部未废弃的 `rule` 和 `project` 中检索，不受该 50 条限制。
-- **记忆很少时**：有效记忆（`rule` 加 `project`）少于 5 条时，两种模式的 `sessionStart` 都会把 `project` 也全部列出。记忆池只有 1 条时每轮召回必然为空，2 到 4 条时命中率也偏低；每轮召回照常运行，只是不再是唯一的通路。
+- **每轮召回**：`rule` 和 `project` 分别召回，各自过自己的阈值、各自最多 3 条，注入时分「规则」「项目事实」两组列出，不合并排序；两类都没有过线时不注入。打分减的是随仓库分发的固定背景均值，不依赖记忆池，所以只有 1 条记忆时也能召回。项目事实不在 `sessionStart` 注入，只通过每轮召回进入上下文。
 
 ## 置信度与旧数据兼容
 
@@ -124,13 +124,14 @@ node bin/memory.mjs read project          # 看项目事实
 node bin/memory.mjs rule add "<规则>"      # 直接新增规则
 node bin/memory.mjs review                # 待确认候选
 node bin/memory.mjs config                # 查看配置
-node bin/memory.mjs config recallTopK 15  # 改配置
+node bin/memory.mjs config recallTopK 5   # 改配置，下一轮输入即生效
 npm run setup                                 # 交互安装并注册 Cursor / codebuddy / WorkBuddy
 npm run uninstall                             # 卸掉模型、hook、MCP 和配置，保留记忆与插件仓库
 node tools/setup.mjs sidepath                 # 切到旁路，确认模型缓存并重新注册
 node tools/setup.mjs blocking                 # 切到阻塞，确认模型缓存并重新注册
 npm test                                      # 隔离回归：置信度、工具入口、并发、旧数据兼容
-npm run verify                                # 用当前用户的记忆池验证召回门控并输出阈值扫描，可能补建索引
+npm run verify                                # 用当前用户的记忆池验证召回门控并按类输出阈值扫描，可能补建索引
+npm run build-background                      # 重新生成背景均值，换模型或改编码后必须重跑
 ```
 
 ## MCP 工具
@@ -157,8 +158,9 @@ npm run verify                                # 用当前用户的记忆池验�
 | 键 | 默认 | 说明 |
 |---|---|---|
 | `enabled` | `true` | 关掉后不注入任何记忆 |
-| `recallTopK` | `10` | 每轮召回条数**上限**（不是配额，不相关时一条都不注入） |
-| `recallMinScore` | `0.22` | 每条召回的绝对下限，`-1` 关闭。实际保留线是 `max(该值, top1 × 0.6)`，再截到 `recallTopK` |
+| `recallTopK` | `3` | `rule` 和 `project` 每轮**各自**最多召回几条，正整数。是上限不是配额，不相关时一条都不注入 |
+| `recallMinScore` | `0.22` | `rule` 的召回下限，`-1` 关闭。实际保留线是 `max(该值, rule 的 top1 × 0.6)`，再截到 `recallTopK` |
+| `recallMinScoreProject` | `0.29` | `project` 的召回下限，规则同上，用 `project` 自己的 top1 算保留线。比 `rule` 高，是为了不让无关输入带出项目事实 |
 | `recallMinMargin` | `-1` | 对第二名的领先幅度下限，默认关闭 |
 | `confirm` | `true` | 写盘前是否弹确认。旁路和阻塞都适用。关掉后：旁路直接写入，`stop` 只展示结果；阻塞模式在分组明确时直接落盘，信号缺失时仍弹确认 |
 | `sideJudge` | `true` | `true` 为旁路，`false` 为阻塞。两条通路互斥。不能用 `memory_config` 改，只能运行 `node tools/setup.mjs sidepath` 或 `node tools/setup.mjs blocking`，然后重启客户端 |
@@ -175,16 +177,19 @@ npm run verify                                # 用当前用户的记忆池验�
 
 - 相关召回 **14/16**，无关误放行 2/11，其中真正污染上下文的（拉进 `project` 记忆的）**0 条**
 - 2026-10-11 在 47 条记忆上重新标定（46 条相关 + 51 条无关输入）：相关召回 **42/46**，无关误放行 13/51，拉进 `project` 的仍是 **0 条**，阈值保持 0.22
+- 同日召回改为两类分别召回、打分减固定背景均值：相关召回 **43/46**，无关误放行 11/51，拉进 `project` 的 **0 条**；记忆池只有 1 条时相关召回 95%，改造前是 0%
 - 每轮 hook 端到端 **0.23 秒**，其中模型冷启动 104ms、单条编码 5.2ms
 - 1 万条记忆时的相似度计算 **6.2ms**——瓶颈不在算法，在索引的读盘与解析
 
-功能回归使用 `npm test`：当前包含 73 项隔离测试，覆盖置信度、HMAC sessionID 幂等、客户端与会话隔离、Skip/取消兜底、每日僵尸任务清理、每日实际衰减、衰减天数配置、时间戳重置、跨会话去重、CLI/MCP/旁路入口、旧数据兼容、召回边界、并发更新与锁恢复，不读取个人记忆或请求模型 API。`npm run verify` 是另一套依赖当前用户记忆池的召回评测，用例需按自己的记忆库写在 `~/.memory-self-evolution/verify-cases.json`，格式见 `tools/verify-gate.mjs` 头部注释。
+功能回归使用 `npm test`：当前包含 80 项隔离测试，覆盖置信度、HMAC sessionID 幂等、客户端与会话隔离、Skip/取消兜底、每日僵尸任务清理、每日实际衰减、衰减天数配置、时间戳重置、跨会话去重、CLI/MCP/旁路入口、旧数据兼容、召回边界、并发更新与锁恢复，不读取个人记忆或请求模型 API。`npm run verify` 是另一套依赖当前用户记忆池的召回评测，用例需按自己的记忆库写在 `~/.memory-self-evolution/verify-cases.json`，格式见 `tools/verify-gate.mjs` 头部注释。
 
 ## 已知限制
 
 规则首次注入和分类读取均有 50 条上限，`memory_read` 暂无分页；未注入的规则只能依赖后续相关召回，不能保证所有规则同时生效。置信度有上限且每天只加一次，常用的记忆会在十天左右都到 `1`：它只区分在用和闲置，不反映使用频率的高低。遗忘只对没被召回的记忆生效，不准确但常被召回的记忆不会自己消失。
 
 正文写得不自包含的记忆召不回来。比如正文只有「tab 的接入文档链接为…」而不说自己是关于什么的，问「实验设置的文档」就匹配不上。沉淀时正文必须能脱离当时的对话独立读懂。
+
+背景均值来自 60 句通用陈述句，阈值是在一份记忆库上标定的。换掉一半背景句时相关召回基本不变，但无关输入带出 `rule` 的次数会明显波动；改动 `tools/background-sentences.json` 后要重跑 `npm run build-background` 和 `npm run verify`。
 
 向量索引用 jsonl 存，每个浮点数占约 20 字节、比 float32 二进制膨胀 5 倍。到约 3.4 万条记忆时会撞上 V8 单字符串长度上限，读写都会抛 `RangeError`。届时需要换二进制格式。
 

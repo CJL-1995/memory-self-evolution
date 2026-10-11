@@ -31,6 +31,27 @@ test('config.json中的非法decayDays回退为30', async () => {
   }
 })
 
+test('召回配置的默认值：每类上限3，rule下限0.22，project下限0.29', async () => {
+  const settings = await (await freshSettings()).loadSettings()
+  assert.equal(settings.recallTopK, 3)
+  assert.equal(settings.recallMinScore, 0.22)
+  assert.equal(settings.recallMinScoreProject, 0.29)
+})
+
+test('recallTopK可在config.json中改为正整数，改完重新加载即生效，非法值回退为3', async () => {
+  assert.equal((await (await freshSettings({ recallTopK: 5, recallMinScoreProject: 0.33 })).loadSettings()).recallTopK, 5)
+  assert.equal((await (await freshSettings({ recallTopK: 5, recallMinScoreProject: 0.33 })).loadSettings()).recallMinScoreProject, 0.33)
+  for (const recallTopK of [0, -1, 2.5, '5']) {
+    assert.equal((await (await freshSettings({ recallTopK })).loadSettings()).recallTopK, 3)
+  }
+  const settings = await freshSettings()
+  assert.equal((await settings.updateSetting('recallTopK', '4')).ok, true)
+  assert.equal((await settings.updateSetting('recallTopK', '0')).ok, false)
+  assert.equal(JSON.parse(await fsp.readFile(configFile, 'utf8')).recallTopK, 4)
+  assert.equal((await settings.updateSetting('recallMinScoreProject', '0.31')).ok, true)
+  assert.equal((await settings.loadSettings()).recallMinScoreProject, 0.31)
+})
+
 test('通过updateSetting修改decayDays，非法值被拒绝且不写入', async () => {
   const settings = await freshSettings()
   assert.equal((await settings.updateSetting('decayDays', '14')).ok, true)

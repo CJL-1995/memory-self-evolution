@@ -92,7 +92,7 @@ function centroidOf(vecs) {
   return c
 }
 
-// 中心化 + 余弦，与 recall.mjs 的做法一致：逐条减均值、归一化、点积
+// 减均值 + 余弦：逐条减均值、归一化、点积。recall.mjs 现在减的是固定背景均值，不再每次算池均值
 function scoreAll(vecs, mu, q) {
   let best = -Infinity
   for (const v of vecs) {

@@ -19,7 +19,7 @@ export async function createMemoryHarness(t, options = {}) {
     constructor(...args) { super(...(args.length ? args : [clock.now ?? Date.now()])) }
     static now() { return clock.now ?? Date.now() }
   }
-  const settings = { enabled: true, sideJudge: true, confirm: true, recallTopK: 10, recallMinScore: 0.22, recallMinMargin: -1, decayDays: 30 }
+  const settings = { enabled: true, sideJudge: true, confirm: true, recallTopK: 3, recallMinScore: 0.22, recallMinScoreProject: 0.29, recallMinMargin: -1, decayDays: 30 }
   const stdin = new EventEmitter()
   stdin.setEncoding = () => {}
   const output = []

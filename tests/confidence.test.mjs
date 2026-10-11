@@ -142,44 +142,33 @@ test('会话开始按置信度选前 50 条，但不会因为注入而加分', a
   }
 })
 
-test('有效记忆少于 5 条时会话开始把项目事实全部列出，不加分也不改文件', async t => {
-  const h = await createMemoryHarness(t)
-  await h.seed('rule', [memory('r1')])
-  await h.seed('project', [
-    memory('p1', { category: 'project', text: '灰度配置放在 config/gray.yaml' }),
-    memory('p2', { category: 'project', text: '日志上报走 Bugly', confidence: 0.7 }),
-    memory('gone', { category: 'project', text: '已经废弃的事实', deprecated: true }),
-  ])
-  const before = await fsp.readFile(path.join(h.root, 'project.jsonl'), 'utf8')
-  const render = await h.load('lib/core/render.mjs')
-  for (const sideJudge of [true, false]) {
-    h.settings.sideJudge = sideJudge
-    const text = await render.renderSessionStart()
-    assert.match(text, /项目事实（共 2 条）/)
-    assert.match(text, /1\. 日志上报走 Bugly（置信度 0\.7）\n2\. 灰度配置放在 config\/gray\.yaml（置信度 0\.5）/)
-    assert.doesNotMatch(text, /已经废弃的事实/)
-    assert.doesNotMatch(text, /每轮输入时自动召回，无需主动读取/)
-  }
-  assert.equal(await fsp.readFile(path.join(h.root, 'project.jsonl'), 'utf8'), before)
-})
-
-test('只有 1 条项目事实时也会列出；有效记忆达到 5 条后不再全量列出', async t => {
+test('会话开始不列出项目事实，记忆再少也一样', async t => {
   const h = await createMemoryHarness(t)
   await h.seed('project', [memory('only', { category: 'project', text: '唯一的一条项目事实' })])
   const render = await h.load('lib/core/render.mjs')
-  for (const sideJudge of [true, false]) {
-    h.settings.sideJudge = sideJudge
-    assert.match(await render.renderSessionStart(), /1\. 唯一的一条项目事实（置信度 0\.5）/)
-  }
-  await h.seed('rule', [memory('r1'), memory('r2'), memory('r3'), memory('r4')])
   h.settings.sideJudge = true
-  const side = await render.renderSessionStart()
-  assert.doesNotMatch(side, /项目事实|唯一的一条项目事实/)
+  assert.doesNotMatch(await render.renderSessionStart(), /项目事实|唯一的一条项目事实/)
   h.settings.sideJudge = false
   const blocking = await render.renderSessionStart()
   assert.match(blocking, /项目事实（共 1 条）/)
   assert.match(blocking, /每轮输入时自动召回，无需主动读取/)
   assert.doesNotMatch(blocking, /唯一的一条项目事实/)
+})
+
+test('每轮召回按 rule 和 project 分两组列出，没有命中的一组不出现', async t => {
+  const h = await createMemoryHarness(t, { now: START })
+  await h.seed('rule', [memory('r1'), memory('r2')])
+  await h.seed('project', [memory('p1', { category: 'project', text: '项目事实 p1' })])
+  const render = await h.load('lib/core/render.mjs')
+  h.state.hits = ['p1', 'r1']
+  const both = await render.renderRecall(['问题'])
+  assert.match(both, /## 规则\n\n- 规则 r1（置信度 0\.55，相关度 0\.90）\n\n## 项目事实\n\n- 项目事实 p1（置信度 0\.55，相关度 0\.90）/)
+  assert.doesNotMatch(both, /规则 r2/)
+  h.clock.now += DAY
+  h.state.hits = ['p1']
+  const onlyProject = await render.renderRecall(['第二天的问题'])
+  assert.match(onlyProject, /## 项目事实\n\n- 项目事实 p1（置信度 0\.6/)
+  assert.doesNotMatch(onlyProject, /## 规则/)
 })
 
 test('通用召回用于判重或评测时没有置信度副作用', async t => {

@@ -4,9 +4,10 @@
 // 标注方式：每条输入标一个「期望命中的记忆正文片段」。标签概念已移除，
 // 所以不再用标签做弱标签，直接按正文匹配，判定更严格也更贴近实际效果。
 //
-// 阈值不是常数，它是「模型 × 编码方式 × 记忆池」的函数。
-// 换模型、改编码、记忆池构成变化后都必须重跑本脚本重新标定。
-// 末尾的分数分布和阈值扫描就是标定用的：同一批输入在不同 recallMinScore 下的命中与放行。
+// rule 和 project 分别召回，各有各的阈值（recallMinScore / recallMinScoreProject）。
+// 阈值不是常数，它是「模型 × 编码方式 × 背景均值」的函数。
+// 换模型、改编码、重新生成背景均值后都必须重跑本脚本重新标定；记忆池明显变大后也值得重跑。
+// 末尾按类输出的分数分布和阈值扫描就是标定用的：同一批输入在不同阈值下的命中与放行。
 //
 // 相关输入依赖各自的记忆池，放在 ~/.memory-self-evolution/verify-cases.json，不随仓库分发：
 //   { "relevant": [["用户口吻的输入", "期望命中的记忆正文片段"]], "irrelevant": ["..."], "minHit": 14 }
@@ -17,9 +18,9 @@
 
 import fs from 'node:fs'
 import path from 'node:path'
-import { ROOT } from '../lib/core/config.mjs'
+import { GROUPS, ROOT } from '../lib/core/config.mjs'
 import { readAllMemories } from '../lib/core/store.mjs'
-import { applyGate, recall } from '../lib/core/recall.mjs'
+import { gateByGroup, recall } from '../lib/core/recall.mjs'
 import { loadSettings } from '../lib/core/settings.mjs'
 
 const CASES_FILE = path.join(ROOT, 'verify-cases.json')
@@ -108,10 +109,18 @@ const IRRELEVANT = Array.isArray(cases.irrelevant) && cases.irrelevant.length > 
 const settings = await loadSettings()
 const pool = await readAllMemories()
 
-// 每条输入只编码一次，拿到不过门控的完整排序。不同阈值下的结果都由 applyGate 从这份排序算出，
+// 每条输入只编码一次，拿到不过门控的完整排序。不同阈值下的结果都由 gateByGroup 从这份排序算出，
 // 和 recall() 走的是同一个函数，所以扫描出来的数字就是线上行为。
 const rankAll = (q) => recall([q], pool, { gate: false, topK: pool.length })
-const keptAt = (ranked, minScore) => applyGate(ranked, { topK: settings.recallTopK, minScore, minMargin: settings.recallMinMargin })
+const THRESHOLD_KEY = { rule: 'minScore', project: 'minScoreProject' }
+const currentGate = {
+  topK: settings.recallTopK,
+  minScore: settings.recallMinScore,
+  minScoreProject: settings.recallMinScoreProject,
+  minMargin: settings.recallMinMargin,
+}
+// override 用来在扫描时只改某一类的阈值，另一类保持当前配置。
+const keptAt = (ranked, override = {}) => gateByGroup(ranked, { ...currentGate, ...override })
 
 const stale = []
 const relevant = []
@@ -125,19 +134,20 @@ for (const [q, expect] of cases.relevant) {
 const irrelevant = []
 for (const q of IRRELEVANT) irrelevant.push({ q, ranked: await rankAll(q) })
 
-const isHit = (c, minScore) => keptAt(c.ranked, minScore).some((h) => h.memory.text.includes(c.expect))
+const isHit = (c, override) => keptAt(c.ranked, override).some((h) => h.memory.text.includes(c.expect))
 const hasProject = (hits) => hits.some((h) => h.memory.category === 'project')
+const best = (hits) => hits.reduce((a, b) => (b.score > a.score ? b : a))
 
-const current = settings.recallMinScore
-console.log(`召回池 ${pool.length} 条，相关输入 ${relevant.length} 条，无关输入 ${irrelevant.length} 条，当前阈值 ${current}\n`)
+console.log(`召回池 ${pool.length} 条，相关输入 ${relevant.length} 条，无关输入 ${irrelevant.length} 条`)
+console.log(`当前配置：rule 下限 ${currentGate.minScore}，project 下限 ${currentGate.minScoreProject}，每类最多 ${currentGate.topK} 条\n`)
 
-const misses = relevant.filter((c) => !isHit(c, current))
+const misses = relevant.filter((c) => !isHit(c))
 const hit = relevant.length - misses.length
 
 // 误放行分两种，代价差别很大：
 //   命中 rule —— rule 在会话开始已无条件注入，重复出现一次成本很低，可容忍
 //   命中 project —— 往上下文里塞进本轮完全不需要的项目事实，这才是真污染
-const leaks = irrelevant.map((c) => ({ ...c, hits: keptAt(c.ranked, current) })).filter((c) => c.hits.length > 0)
+const leaks = irrelevant.map((c) => ({ ...c, hits: keptAt(c.ranked) })).filter((c) => c.hits.length > 0)
 const harmful = leaks.filter((c) => hasProject(c.hits)).length
 
 console.log(`相关输入正确召回：${hit}/${relevant.length}`)
@@ -153,7 +163,7 @@ if (misses.length) {
 if (leaks.length) {
   console.log('\n误放行的无关输入：')
   for (const l of leaks) {
-    const top = l.hits[0]
+    const top = best(l.hits)
     console.log(`  ${hasProject(l.hits) ? '[真污染]' : '[可容忍]'} 「${l.q}」-> [${top.memory.category}] ${top.score.toFixed(3)} ${top.memory.text.slice(0, 24)}`)
   }
 }
@@ -162,34 +172,36 @@ if (stale.length) {
   for (const s of stale) console.log(`  「${s.q}」期望含「${s.expect}」`)
 }
 
-// 标定用：分数分布与阈值扫描。
+// 标定用：按类输出分数分布与阈值扫描。两类的分数不跨类比较，所以各看各的。
 const sorted = (xs) => xs.slice().sort((a, b) => a - b)
 const span = (xs) => {
   const s = sorted(xs)
   return s.length ? `${s[0].toFixed(3)} ~ ${s.at(-1).toFixed(3)}，中位 ${s[Math.floor(s.length / 2)].toFixed(3)}` : '无'
 }
-const targetScores = relevant.map((c) => c.ranked.find((h) => h.memory.text.includes(c.expect)).score)
-const irrelevantTops = irrelevant.filter((c) => c.ranked.length).map((c) => c.ranked[0].score)
-const projectTops = irrelevant.map((c) => c.ranked.find((h) => h.memory.category === 'project')).filter(Boolean).map((h) => h.score)
-
-console.log('\n分数分布')
-console.log(`  相关输入的目标分数          ${span(targetScores)}`)
-console.log(`  无关输入的 top1             ${span(irrelevantTops)}`)
-console.log(`  无关输入的最高 project 分   ${projectTops.length ? Math.max(...projectTops).toFixed(3) : '无 project 记忆'}（阈值要留在它之上）`)
-
 const grid = Array.from({ length: 10 }, (_, i) => Math.round((0.16 + i * 0.02) * 100) / 100)
-const thresholds = sorted([...new Set(current >= 0 ? [...grid, current] : grid)])
-console.log('\n阈值扫描（其余门控参数取当前配置）')
-console.log('  阈值    相关命中    无关放行    其中带 project')
-for (const t of thresholds) {
-  const hits = relevant.filter((c) => isHit(c, t)).length
-  const kept = irrelevant.map((c) => keptAt(c.ranked, t)).filter((h) => h.length > 0)
-  const mark = t === current ? '  <- 当前' : ''
-  console.log(`  ${t.toFixed(2)}    ${String(hits).padStart(3)}/${relevant.length}      ${String(kept.length).padStart(3)}/${irrelevant.length}      ${kept.filter(hasProject).length}${mark}`)
+for (const group of GROUPS) {
+  const inGroup = (h) => h.memory.category === group
+  // 期望命中的记忆落在这一类里的相关输入；同一条输入的期望片段可能两类都有，那就两边都算。
+  const mine = relevant.filter((c) => c.ranked.some((h) => inGroup(h) && h.memory.text.includes(c.expect)))
+  const targetScores = mine.map((c) => c.ranked.find((h) => inGroup(h) && h.memory.text.includes(c.expect)).score)
+  const irrelevantTops = irrelevant.map((c) => c.ranked.find(inGroup)).filter(Boolean).map((h) => h.score)
+  const key = THRESHOLD_KEY[group]
+  const current = currentGate[key]
+  console.log(`\n[${group}] 分数分布`)
+  console.log(`  相关输入的目标分数          ${span(targetScores)}`)
+  console.log(`  无关输入在这一类里的最高分  ${span(irrelevantTops)}${group === 'project' ? '（project 的下限要留在这个区间的上沿之上）' : ''}`)
+  console.log(`[${group}] 阈值扫描（另一类和其余参数取当前配置）`)
+  console.log('  阈值    相关命中    无关放行')
+  for (const t of sorted([...new Set(current >= 0 ? [...grid, current] : grid)])) {
+    const override = { [key]: t }
+    const hits = mine.filter((c) => keptAt(c.ranked, override).some((h) => inGroup(h) && h.memory.text.includes(c.expect))).length
+    const leaked = irrelevant.filter((c) => keptAt(c.ranked, override).some(inGroup)).length
+    console.log(`  ${t.toFixed(2)}    ${String(hits).padStart(3)}/${mine.length}      ${String(leaked).padStart(3)}/${irrelevant.length}${t === current ? '  <- 当前' : ''}`)
+  }
 }
 
-// 下限随记忆池变化：中心化的语料均值依赖池子构成，增删记忆会让所有分数平移，
-// 所以这个数字是「当前池子下的已知可达值」，不是恒定目标。调整前先看清失败项是真退步还是池子变了。
+// minHit 是「当前记忆库和用例下的已知可达值」，不是恒定目标：记忆增删、合并后期望片段可能变化。
+// 调整前先看清失败项是真退步还是用例过期了。
 const MIN_HIT = Number.isInteger(cases.minHit) ? Math.min(cases.minHit, relevant.length) : relevant.length
 const MAX_HARMFUL = 0
 let failed = false
