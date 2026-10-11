@@ -95,7 +95,7 @@ test('判别模型没给分组或给了无效值时退回字面信号', async t 
 })
 
 test('请求带 JSON 模式；接口不认这个参数时去掉重试，同一进程内不再带', async t => {
-  const answer = body => (body.messages[0].content.includes('判重器') ? completion('{"action":"create"}') : remembered({ category: 'rule', text: '新规则。' }))
+  const answer = body => (body.messages[0].content.includes('判重器') ? completion('{"action":"create"}') : remembered({ category: 'rule', text: '这是一条新规则。' }))
 
   const supported = await sideHarness(t)
   await supported.h.seed('rule', [memory('old')])
@@ -113,12 +113,55 @@ test('请求带 JSON 模式；接口不认这个参数时去掉重试，同一�
     ? { ok: false, status: 400, text: async () => '{"error":"unknown field response_format, key test-key"}' }
     : answer(body)))
   assert.equal(job.status, 'ready')
-  assert.equal(job.proposal.text, '新规则。')
+  assert.equal(job.proposal.text, '这是一条新规则。')
   // 第一次带参数被拒，第二次去掉后成功；随后的判重调用不再带。
   assert.deepEqual(rejecting.calls.map(call => Boolean(call.body.response_format)), [true, false, false])
   const retryLog = rejecting.h.errors.find(line => line.includes('去掉后重试'))
   assert.ok(retryLog.includes('400'))
   assert.equal(retryLog.includes('test-key'), false)
+})
+
+test('判别给出的正文太短或太长时不写入；合并正文不合要求时改按拿不准处理', async t => {
+  const direct = await sideHarness(t, { confirm: false })
+  for (const text of ['用中文', '长'.repeat(401)]) {
+    const job = await direct.run('记住这一条很重要的约定', () => remembered({ category: 'rule', text }))
+    assert.equal(job.status, 'none')
+    assert.equal(job.reason, 'text-rejected')
+  }
+  assert.equal(await exists(path.join(direct.h.root, 'rule.jsonl')), false)
+  assert.ok(direct.h.errors.some(line => line.includes('不合要求，不写入') && line.includes('不足 6 个字')))
+
+  const confirmed = await sideHarness(t)
+  await confirmed.h.seed('rule', [memory('old', { text: '原有的一条规则' })])
+  confirmed.h.state.hits = ['old']
+  const job = await confirmed.run('记住这一条很重要的约定', body => (body.messages[0].content.includes('判重器')
+    ? completion(JSON.stringify({ action: 'merge', id: 'old', text: '长'.repeat(401) }))
+    : remembered({ category: 'rule', text: '一条正常长度的新规则。' })))
+  assert.equal(job.status, 'ready')
+  assert.equal(job.proposal.action, 'unsure')
+  assert.equal(job.proposal.mergedText, '')
+  assert.equal(job.proposal.targetId, 'old')
+})
+
+test('发给判别模型的是预处理后的输入：代码块被去掉，密钥被抹掉，太长的不发', async t => {
+  const h = await createMemoryHarness(t)
+  const side = await h.load('lib/core/sidepath.mjs')
+  const jobs = path.join(h.root, 'side')
+  const start = (promptText, generation) => side.maybeStartSideJob({ agent: 'cursor', payload: { conversation_id: 'conversation-a', generation_id: generation }, promptText })
+  const promptOf = async id => JSON.parse(await fsp.readFile(path.join(jobs, `${id}.json`), 'utf8')).prompt
+
+  const withCode = await start('以后日志都按这个格式打：\n```js\nlogger.info({ err_code, msg })\nconst secret = "sk-abcdefghijklmnopqrstuvwx"\n```\n别再用 console.log 了', 'g1')
+  assert.equal(await promptOf(withCode), '以后日志都按这个格式打：\n别再用 console.log 了')
+
+  const withSecret = await start('记住测试环境的账号是 tester，密码 Passw0rd123，token 是 abc123def456', 'g2')
+  assert.equal(await promptOf(withSecret), '记住测试环境的账号是 tester，密码 [已隐去]，token 是 [已隐去]')
+
+  // 去掉代码后只剩几个字，或者去掉之后仍然很长，都不启动判别。
+  assert.equal(await start('看下\n```\n' + 'x = 1\n'.repeat(50) + '```', 'g3'), undefined)
+  assert.equal(await start('这是一大段粘贴进来的文档内容。'.repeat(40), 'g4'), undefined)
+  assert.equal(h.state.spawns.length, 2)
+  assert.equal((await fsp.readdir(jobs)).filter(name => name.endsWith('.json')).length, 2)
+  assert.ok(h.errors.some(line => line.includes('旁路判别跳过') && line.includes('按粘贴内容处理')))
 })
 
 test('鉴权失败不属于参数不支持，不重试', async t => {
