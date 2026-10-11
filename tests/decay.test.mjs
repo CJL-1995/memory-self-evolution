@@ -199,7 +199,7 @@ test('强化或合并废弃记忆后仍不高于0.4时不能恢复', async t => 
   const writer = await h.load('lib/core/writer.mjs')
   assert.equal((await writer.reinforceMemory('a')).deprecated, true)
   h.clock.now += DAY
-  assert.equal((await writer.mergeMemory('a', '更新')).deprecated, true)
+  assert.equal((await writer.mergeMemory('a', '更新后的规则正文')).deprecated, true)
   h.clock.now += DAY
   const boundary = await writer.reinforceMemory('a')
   assert.equal(boundary.confidence, 0.4)

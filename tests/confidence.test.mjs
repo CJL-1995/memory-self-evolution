@@ -211,7 +211,7 @@ test('同进程并发的新建、强化、合并、召回与废弃刷新不丢�
     ...ids.map(id => writer.reinforceMemory(id)),
     ...ids.map(id => writer.rewardRecalledMemories([id])),
     writer.mergeMemory('a0', '合并后的正文'),
-    writer.persistMemory({ text: '新规则', category: 'rule' }),
+    writer.persistMemory({ text: '并发写入的新规则', category: 'rule' }),
     writer.decayMemoriesOncePerDay(),
   ])
   const rules = await h.records()
@@ -295,6 +295,24 @@ test('MCP 不暴露 confidence 入参，旧客户端传值也不能改变初始�
   const merged = await call('tools/call', { name: 'memory_merge', arguments: { id: mem.id, text: 'MCP合并记忆' } })
   assert.match(merged.result.content[0].text, /MCP合并记忆（置信度 0.6/)
   assert.doesNotMatch(JSON.stringify([reinforced, merged]), /观测|召回频率/)
+})
+
+test('记忆正文不足 6 个字或超过 400 个字时拒绝写入，新建与合并一致', async t => {
+  const h = await createMemoryHarness(t)
+  await h.seed('rule', [memory('old', { text: '原有的一条规则' })])
+  const writer = await h.load('lib/core/writer.mjs')
+  const tooLong = '长'.repeat(401)
+  for (const text of ['用中文', '五个字不够', tooLong]) {
+    await assert.rejects(writer.persistMemory({ text, category: 'rule' }), /记忆正文(不足 6|超过 400) 个字/)
+    await assert.rejects(writer.mergeMemory('old', text), /记忆正文(不足 6|超过 400) 个字/)
+  }
+  // 前后的空白不计入长度，边界值本身可以写入。
+  await assert.rejects(writer.persistMemory({ text: '  五个字不够  ', category: 'rule' }), /不足 6 个字/)
+  assert.equal((await writer.persistMemory({ text: '刚好六个字的', category: 'rule' })).text, '刚好六个字的')
+  assert.equal((await writer.mergeMemory('old', '长'.repeat(400))).text.length, 400)
+  const rules = await h.records()
+  assert.equal(rules.length, 2)
+  assert.equal(writer.memoryTextProblem('一条正常长度的记忆'), '')
 })
 
 test('CLI 直接新建同样固定 0.5', async t => {
@@ -546,13 +564,13 @@ test('memory_resolve 按 sessionID 统一执行五种旁路决策', async t => {
     }))
   }
 
-  await proposal('j_1', 'cursor', 'create', '', '新规则')
+  await proposal('j_1', 'cursor', 'create', '', '这是一条新规则')
   assert.equal((await side.resolvePendingSession('j_1', 'create_rule', 'cursor')).ok, true)
-  assert.equal((await h.records()).find(item => item.text === '新规则').category, 'rule')
+  assert.equal((await h.records()).find(item => item.text === '这是一条新规则').category, 'rule')
 
-  await proposal('j_2', 'cursor', 'create', '', '项目事实')
+  await proposal('j_2', 'cursor', 'create', '', '这是一条项目事实')
   assert.equal((await side.resolvePendingSession('j_2', 'create_project', 'cursor')).ok, true)
-  assert.equal((await h.records('project'))[0].text, '项目事实')
+  assert.equal((await h.records('project'))[0].text, '这是一条项目事实')
 
   await proposal('j_3', 'cursor', 'reinforce', 'old', '旧规则')
   assert.equal((await side.resolvePendingSession('j_3', 'reinforce', 'cursor')).ok, true)
