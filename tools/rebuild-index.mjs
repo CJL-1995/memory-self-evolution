@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // 按当前模型重建 ~/.memory-self-evolution/embeddings.jsonl。
-// 换 embedding 模型后插件本来会在下次 analyzeSession 自动重建，
-// 但那之前有一轮会降级成「最近 N 条」兜底；离线预建可以免掉这一轮。
+// 换模型或改编码（递增 EMBED_VERSION）后，旧向量在加载时被丢弃，下一次召回会当场补建全部向量。
+// 那一次发生在每轮输入的 hook 里，要现算全部记忆的向量，记忆越多越慢；离线预建可以免掉。
+// 手动改过记忆正文后也要跑：索引按 id 缓存，正文变了不会自己重新编码。
 // 用法：node tools/rebuild-index.mjs
 
 import fs from 'node:fs'
@@ -12,7 +13,7 @@ import { readAllMemories } from '../lib/core/store.mjs'
 
 const INDEX_FILE = paths.embeddings
 
-// 含已废弃条目：它们不注入但仍可被 memory_read 查阅，向量缺失会导致召回时反复重建
+// 含已废弃条目：召回不用它们的向量，但废弃记忆被强化或合并后可以恢复，预先建好省得恢复后那一轮现算
 const memories = await readAllMemories({ includeDeprecated: true })
 
 if (memories.length === 0) {
