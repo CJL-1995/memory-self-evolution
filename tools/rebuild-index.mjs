@@ -26,7 +26,7 @@ if (fs.existsSync(INDEX_FILE)) {
   console.log(`已备份旧索引 -> ${path.basename(backup)}`)
 }
 
-// 索引存原始向量，中心化在检索时按当前语料实时计算（与 recall.mjs 一致）
+// 索引存原始向量，减背景均值在检索时做（与 recall.mjs 一致）
 // 编码文本统一走 docText，与所有写索引的调用方保持一致
 const vecs = await embed(memories.map(docText))
 const lines = memories.map((m, i) => JSON.stringify({ id: m.id, v: vecs[i], ev: EMBED_VERSION }))
