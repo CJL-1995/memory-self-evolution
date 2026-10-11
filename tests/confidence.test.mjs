@@ -359,6 +359,57 @@ test('持锁进程退出后自动恢复，空的遗留锁目录也不阻塞', as
   assert.equal((await h.records())[0].confidence, 0.6)
 })
 
+test('写锁被活着的进程占用时，召回加分只等一小会儿就放弃，召回内容照常返回', async t => {
+  const h = await createMemoryHarness(t)
+  await h.seed('rule', [memory('a')])
+  h.state.hits = ['a']
+  const render = await h.load('lib/core/render.mjs')
+  const lock = path.join(h.root, '.memory-write.lock')
+  const owner = path.join(lock, `owner-${process.pid}-held`)
+  await fsp.mkdir(lock)
+  await fsp.writeFile(owner, '')
+
+  const startedAt = Date.now()
+  const text = await render.renderRecall(['问题'])
+  const elapsed = Date.now() - startedAt
+  assert.match(text, /规则 a（置信度 0\.5，/)
+  assert.ok(elapsed >= 250 && elapsed < 2000, `等了 ${elapsed} 毫秒`)
+  assert.equal((await h.records())[0].confidence, 0.5)
+  assert.ok(h.errors.some(line => line.includes('写锁被占用，放弃本次召回加分') && line.includes('ids=a')))
+  assert.equal(h.errors.some(line => line.includes('召回置信度更新失败') || line.includes('记忆写事务失败')), false)
+  // 没有抢走别人的锁，也没有留下自己的准备目录。
+  assert.deepEqual(await fsp.readdir(lock), [path.basename(owner)])
+  assert.equal((await fsp.readdir(h.root)).some(name => name.startsWith('.memory-write-')), false)
+
+  // 锁放开之后，当天下一次命中会把这次没加上的分补上。
+  await fsp.rm(lock, { recursive: true })
+  assert.match(await render.renderRecall(['再问一次']), /规则 a（置信度 0\.55，/)
+})
+
+test('写锁存在超过 15 秒视为残留，占锁的进程号还活着也回收；不到 15 秒不回收', async t => {
+  const h = await createMemoryHarness(t)
+  await h.seed('rule', [memory('a')])
+  const writer = await h.load('lib/core/writer.mjs')
+  const lock = path.join(h.root, '.memory-write.lock')
+  const hold = async secondsAgo => {
+    await fsp.mkdir(lock)
+    await fsp.writeFile(path.join(lock, `owner-${process.pid}-stuck`), '')
+    const at = new Date(Date.now() - secondsAgo * 1000)
+    await fsp.utimes(lock, at, at)
+  }
+
+  await hold(14)
+  assert.equal((await writer.rewardRecalledMemories(['a'])).length, 0)
+  assert.equal((await h.records())[0].confidence, 0.5)
+  assert.equal(h.errors.some(line => line.includes('回收超过')), false)
+  await fsp.rm(lock, { recursive: true })
+
+  await hold(16)
+  assert.equal((await writer.reinforceMemory('a')).confidence, 0.6)
+  assert.ok(h.errors.some(line => line.includes('回收超过 15 秒未释放的记忆写锁') && line.includes(`owner-${process.pid}-stuck`)))
+  assert.equal((await fsp.readdir(h.root)).some(name => name.startsWith('.memory-write')), false)
+})
+
 test('同一本地日内先召回后强化只补到 0.1，加满后不再写盘，跨天重新计', async t => {
   const h = await createMemoryHarness(t, { now: START })
   await h.seed('rule', [memory('a')])
