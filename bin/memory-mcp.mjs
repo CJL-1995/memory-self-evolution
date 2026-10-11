@@ -67,7 +67,7 @@ const TOOLS = [
   },
   {
     name: 'memory_reinforce',
-    description: '强化一条已有记忆（置信度 +0.1）。阻塞模式在用户确认强化后调用。',
+    description: '强化一条已有记忆（置信度 +0.1，上限 1；同一条记忆每天合计最多加 0.1）。阻塞模式在用户确认强化后调用。',
     inputSchema: {
       type: 'object',
       properties: {
@@ -79,7 +79,7 @@ const TOOLS = [
   },
   {
     name: 'memory_merge',
-    description: '用合并后的正文替换一条已有记忆，丢掉旧向量并重新编码，同时做一次强化（置信度 +0.1）。',
+    description: '用合并后的正文替换一条已有记忆，丢掉旧向量并重新编码，同时做一次强化（置信度 +0.1，上限 1；同一条记忆每天合计最多加 0.1，当天已加满时只替换正文）。',
     inputSchema: {
       type: 'object',
       properties: {

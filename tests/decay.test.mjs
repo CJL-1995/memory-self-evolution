@@ -49,16 +49,16 @@ test('decayDays改为7时按7天判断满周期', async t => {
   assert.equal(rows.get('recent').lastSeen, recent)
 })
 
-test('连续三个闲置周期实际为0.45、0.4、0.35，废弃后不再自动恢复或继续扣分', async t => {
+test('连续两个闲置周期实际为0.45、0.4，降到0.4即废弃，之后不再自动恢复或继续扣分', async t => {
   const h = await createMemoryHarness(t, { now: START })
   await h.seed('rule', [memory('a', { lastSeen: daysAgo(h, 30) })])
   const writer = await h.load('lib/core/writer.mjs')
-  for (const expected of [0.45, 0.4, 0.35]) {
+  for (const expected of [0.45, 0.4]) {
     assert.equal(await writer.decayMemoriesOncePerDay(), 1)
     const mem = (await h.records())[0]
     assert.equal(mem.confidence, expected)
     assert.equal(mem.lastSeen, stamp(h))
-    assert.equal(mem.deprecated, expected < 0.4)
+    assert.equal(mem.deprecated, expected <= 0.4)
     h.clock.now += 30 * DAY
   }
   const before = await fsp.readFile(path.join(h.root, 'rule.jsonl'), 'utf8')
@@ -167,12 +167,12 @@ for (const [operation, increment] of [['rewardRecalledMemories', 0.05], ['reinfo
   })
 }
 
-test('低于0.4和已标记废弃的记忆不参与召回、判重、编码或中心化', async t => {
+test('不高于0.4和已标记废弃的记忆不参与召回、判重、编码或中心化', async t => {
   const h = await createMemoryHarness(t, { now: START, realRecall: true })
   await h.seed('rule', [
-    memory('low', { text: '低强度记忆', confidence: 0.39, lastSeen: START }),
+    memory('low', { text: '低强度记忆', confidence: 0.4, lastSeen: START }),
     memory('deprecated', { text: '废弃记忆', confidence: 0.9, deprecated: true, lastSeen: START }),
-    memory('valid', { text: '有效记忆', confidence: 0.4, lastSeen: START }),
+    memory('valid', { text: '有效记忆', confidence: 0.45, lastSeen: START }),
   ])
   const store = await h.load('lib/core/store.mjs')
   assert.deepEqual([...(await store.readAllMemories())].map(mem => mem.id), ['valid'])
@@ -193,15 +193,42 @@ test('低于0.4和已标记废弃的记忆不参与召回、判重、编码或�
   assert.equal((await h.records()).find(mem => mem.id === 'low').deprecated, true)
 })
 
-test('强化或合并废弃记忆后仍低于0.4时不能恢复', async t => {
+test('强化或合并废弃记忆后仍不高于0.4时不能恢复', async t => {
   const h = await createMemoryHarness(t, { now: START })
   await h.seed('rule', [memory('a', { confidence: 0.1, deprecated: true, lastSeen: START })])
   const writer = await h.load('lib/core/writer.mjs')
   assert.equal((await writer.reinforceMemory('a')).deprecated, true)
+  h.clock.now += DAY
   assert.equal((await writer.mergeMemory('a', '更新')).deprecated, true)
+  h.clock.now += DAY
+  const boundary = await writer.reinforceMemory('a')
+  assert.equal(boundary.confidence, 0.4)
+  assert.equal(boundary.deprecated, true)
+  h.clock.now += DAY
   const restored = await writer.reinforceMemory('a')
-  assert.equal(restored.confidence, 0.4)
+  assert.equal(restored.confidence, 0.5)
   assert.equal(restored.deprecated, false)
+})
+
+test('新记忆一次都没被用到时第30天0.45、第60天0.4并被遗忘', async t => {
+  const h = await createMemoryHarness(t, { now: START })
+  const writer = await h.load('lib/core/writer.mjs')
+  const store = await h.load('lib/core/store.mjs')
+  await writer.persistMemory({ text: '没人再提起的记忆', category: 'project' })
+  const current = async () => (await h.records('project'))[0]
+  h.clock.now += 29 * DAY
+  assert.equal(await writer.decayMemoriesOncePerDay(), 0)
+  h.clock.now += DAY
+  assert.equal(await writer.decayMemoriesOncePerDay(), 1)
+  assert.equal((await current()).confidence, 0.45)
+  assert.equal((await store.readAllMemories()).length, 1)
+  h.clock.now += 29 * DAY
+  assert.equal(await writer.decayMemoriesOncePerDay(), 0)
+  h.clock.now += DAY
+  assert.equal(await writer.decayMemoriesOncePerDay(), 1)
+  assert.equal((await current()).confidence, 0.4)
+  assert.equal((await current()).deprecated, true)
+  assert.equal((await store.readAllMemories()).length, 0)
 })
 
 for (const failingFile of ['project.jsonl', 'decay-state.json']) {
