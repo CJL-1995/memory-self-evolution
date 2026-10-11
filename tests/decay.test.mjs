@@ -298,12 +298,10 @@ for (const agent of ['cursor', 'codebuddy', 'workbuddy']) {
       assert.equal((await h.records()).find(mem => mem.id === 'expired').deprecated, true)
       const stopped = await createMemoryHarness(t, { home: h.home, now: new Date(h.clock.now + 31 * DAY).toISOString(), argv: ['hook', '--agent', agent] })
       stopped.settings.sideJudge = sideJudge
-      const transcript = path.join(h.home, 'empty-transcript.txt')
-      await fsp.writeFile(transcript, '')
       const stop = stopped.load('bin/memory.mjs')
       for (let i = 0; i < 1000 && !stopped.stdin.listenerCount('end'); i++) await delay(1)
       assert.ok(stopped.stdin.listenerCount('end'))
-      stopped.stdin.emit('data', JSON.stringify({ hook_event_name: agent === 'cursor' ? 'stop' : 'Stop', transcript_path: transcript }))
+      stopped.stdin.emit('data', JSON.stringify({ hook_event_name: agent === 'cursor' ? 'stop' : 'Stop' }))
       stopped.stdin.emit('end')
       await stop
       assert.equal((await readState(h)).lastRunAt, START)

@@ -3,23 +3,20 @@
 // 人工也可直接用 list / read / rule 等子命令管理记忆库。
 //
 // 用法：
-//   memory-self-evolution hook [--agent cursor|codebuddy|workbuddy]   从 stdin 读 hook 事件，按事件类型注入或收集候选
+//   memory-self-evolution hook [--agent cursor|codebuddy|workbuddy]   从 stdin 读 hook 事件，按事件类型注入记忆或取回旁路结果
 //   memory-self-evolution list                              列出两组记忆的条数
 //   memory-self-evolution read <rule|project>               打印该组记忆
 //   memory-self-evolution rule add "<规则>"                  直接新增一条规则，不经模型判断
 //   memory-self-evolution config [key] [value]              查看或修改配置
-//   memory-self-evolution review                            列出待确认候选
 //
-// hook 按事件分派：session-start 注入 rule 全量，prompt 注入 Top-K 召回，stop 收集候选。
+// hook 按事件分派：session-start 注入 rule，prompt 注入每轮召回并启动旁路判别，stop 取回旁路的结果。
 //
 // 风控约定：hook 模式下任何异常都输出空 JSON 并以 0 退出。
 // 记忆功能失效可以接受，阻塞用户发送 prompt 不可接受。
 
-import fsp from 'node:fs/promises'
 import { GROUPS, READ_LIMIT } from '../lib/core/config.mjs'
 import { fmtConfidence, readAllGroups, readGroup } from '../lib/core/store.mjs'
 import { renderRecall, renderSessionStart } from '../lib/core/render.mjs'
-import { collectCandidates, extractUserQueries, listCandidates } from '../lib/core/candidates.mjs'
 import { persistMemory } from '../lib/core/writer.mjs'
 import { describeSettings, loadSettings, updateSetting } from '../lib/core/settings.mjs'
 import { CONFIRM_MARK, hiddenNoticeForPrompt, isUserNotice, maybeStartSideJob, runSideJob, takeSideFollowup } from '../lib/core/sidepath.mjs'
@@ -77,31 +74,6 @@ function wrapInjection(agent, event, text) {
   return { additional_context: text }
 }
 
-// stop 事件：读 transcript 收集候选。不注入任何内容，输出空对象。
-async function handleStop(payload) {
-  const settings = await loadSettings()
-  if (!settings.enabled) return
-
-  const file = String(payload.transcript_path || '').trim()
-  if (!file) {
-    console.error('[memory] stop 事件未提供 transcript_path，跳过候选收集')
-    return
-  }
-  let content
-  try {
-    content = await fsp.readFile(file, 'utf-8')
-  } catch (e) {
-    console.error(`[memory] 读取 transcript 失败，跳过候选收集: ${e.message}`)
-    return
-  }
-  const queries = extractUserQueries(content).filter((query) => !isUserNotice(query))
-  if (queries.length === 0) return
-  const r = await collectCandidates(queries, String(payload.session_id || ''))
-  if (r.added || r.reinforced) {
-    console.error(`[memory] 候选池更新：新增 ${r.added} 条，强化 ${r.reinforced} 条`)
-  }
-}
-
 async function runHook(argv) {
   const raw = await readStdin()
   let payload = {}
@@ -123,7 +95,6 @@ async function runHook(argv) {
   }
 
   if (kind === 'stop') {
-    await handleStop(payload)
     let followup = null
     try {
       const settings = await loadSettings()
@@ -219,19 +190,6 @@ async function runConfig(key, value) {
   if (!r.ok) process.exitCode = 1
 }
 
-async function runReview() {
-  const items = await listCandidates()
-  if (items.length === 0) {
-    console.log('没有待确认的候选记忆')
-    return
-  }
-  console.log(`${items.length} 条待确认候选（按出现次数降序）：`)
-  items.forEach((c, i) => {
-    console.log(`${i + 1}. ${c.text}`)
-    console.log(`   出现 ${c.observations} 次，最近 ${String(c.lastSeen).slice(0, 10)}，指纹 ${c.fingerprint}`)
-  })
-}
-
 const argv = process.argv.slice(2)
 const cmd = argv[0]
 
@@ -246,12 +204,10 @@ try {
     await runRuleAdd(argv.slice(2).join(' ').trim())
   } else if (cmd === 'config') {
     await runConfig(argv[1], argv[2])
-  } else if (cmd === 'review') {
-    await runReview()
   } else if (cmd === 'side-run') {
     await runSideJob(argv[1])
   } else {
-    console.error('用法：memory-self-evolution <hook|list|read|rule add|config|review> [参数]')
+    console.error('用法：memory-self-evolution <hook|list|read|rule add|config> [参数]')
     process.exitCode = 1
   }
 } catch (e) {

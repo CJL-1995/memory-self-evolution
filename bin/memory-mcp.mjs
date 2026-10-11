@@ -7,7 +7,6 @@ import { GROUPS, READ_LIMIT } from '../lib/core/config.mjs'
 import { fmtConfidence, readAllGroups, readAllMemories, readGroup } from '../lib/core/store.mjs'
 import { recall } from '../lib/core/recall.mjs'
 import { inferGroup, mergeMemory, persistMemory, reinforceMemory } from '../lib/core/writer.mjs'
-import { dropCandidate, listCandidates } from '../lib/core/candidates.mjs'
 import { describeSettings, loadSettings, updateSetting } from '../lib/core/settings.mjs'
 import { resolvePendingSession } from '../lib/core/sidepath.mjs'
 
@@ -104,24 +103,6 @@ const TOOLS = [
         },
       },
       required: ['sessionID', 'decision'],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: 'memory_review',
-    description: '列出从历史会话累积的待确认候选记忆（按出现次数降序）。用户说要处理候选、或会话开始提示有待确认候选时调用。',
-    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
-  },
-  {
-    name: 'memory_discard',
-    description: '丢弃一条候选记忆。reject 为 true 时在 30 天内不再就同一内容提问。',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        fingerprint: { type: 'string', description: 'memory_review 返回的候选指纹' },
-        reject: { type: 'boolean', description: '是否同时加入拒绝名单' },
-      },
-      required: ['fingerprint'],
       additionalProperties: false,
     },
   },
@@ -318,24 +299,6 @@ async function memoryResolve(args) {
   return text(result.message)
 }
 
-async function memoryReview() {
-  const settings = await loadSettings()
-  const items = await listCandidates()
-  if (items.length === 0) return text('没有待确认的候选记忆')
-  const body = items
-    .map((c, i) => `${i + 1}. ${c.text}\n   出现 ${c.observations} 次，最近 ${String(c.lastSeen).slice(0, 10)}，指纹 ${c.fingerprint}`)
-    .join('\n')
-  const tail = settings.sideJudge
-    ? '旁路模式没有 memory_propose，候选不能从这里落成。丢弃用 memory_discard。'
-    : '请整理成编号列表询问用户：沉淀哪些、归到哪个标签、哪些丢弃。确认后对沉淀项调 memory_persist，对丢弃项调 memory_discard。'
-  return text(`${items.length} 条待确认候选（按出现次数降序）：\n${body}\n\n${tail}`)
-}
-
-async function memoryDiscard(args) {
-  const ok = await dropCandidate(String(args.fingerprint || '').trim(), { reject: !!args.reject })
-  return text(ok ? '候选已丢弃' : '未找到该候选，可能已被处理')
-}
-
 async function memoryConfig(args) {
   if (!args.key) {
     const items = await describeSettings()
@@ -358,8 +321,6 @@ const HANDLERS = {
   memory_reinforce: memoryReinforce,
   memory_merge: memoryMerge,
   memory_resolve: memoryResolve,
-  memory_review: memoryReview,
-  memory_discard: memoryDiscard,
   memory_config: memoryConfig,
 }
 

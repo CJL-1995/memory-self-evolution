@@ -58,7 +58,7 @@ npm run uninstall
 
 插件仓库保留。它会删掉安装时落下的向量模型、三端里本插件的 hook，以及 `mcp.json` 里的 `memory-self-evolution`。其他 hook 和 MCP 不动。
 
-`~/.memory-self-evolution/` 目录保留。`rule.jsonl`、`project.jsonl`、`memories.md`、`embeddings.jsonl`、`candidates.json`、`project-memory` 保留。`config.json`、`side-secret.json`、`session-secret` 和 `side/` 删除。重新安装时再跑 `npm run setup`，模型会重新下载，配置和本地密钥会在需要时重新生成。卸完后重启三个客户端，MCP 才会从已经打开的会话里消失。
+`~/.memory-self-evolution/` 目录保留。`rule.jsonl`、`project.jsonl`、`memories.md`、`embeddings.jsonl`、`project-memory` 保留。`config.json`、`side-secret.json`、`session-secret` 和 `side/` 删除。重新安装时再跑 `npm run setup`，模型会重新下载，配置和本地密钥会在需要时重新生成。卸完后重启三个客户端，MCP 才会从已经打开的会话里消失。
 
 ## 怎么让它记住东西
 
@@ -76,7 +76,7 @@ npm run uninstall
 node bin/memory.mjs rule add "所有异常处理处都需要添加日志"
 ```
 
-**从历史会话里捞。** 关键词候选池仍然保留：带「以后」「记住」「别再」「一律」的原话会累计出现次数。用 `memory_review` 或 `node bin/memory.mjs review` 查看并确认。
+早期版本还有一条关键词候选池通路（从历史会话里按信号词捞原话），已经移除：旁路有判别模型，阻塞模式由主模型主动提交，两条通路都不依赖它。旧版本留下的 `~/.memory-self-evolution/candidates.json` 不再被读写，可以自行删除。
 
 ## 注入与主模型职责
 
@@ -111,7 +111,7 @@ node bin/memory.mjs rule add "所有异常处理处都需要添加日志"
 
 实际置信度降到 `0.4` 及以下即标记废弃。新记忆 `0.5` 起步，一次都没被召回或重述时，第 30 天 `0.45`、第 60 天 `0.4` 并废弃，这是默认配置下最短的遗忘时间；到过上限 `1` 的记忆要连续闲置 12 个周期才废弃。废弃记忆不参与规则注入、召回和判重相似度比较，不继续日常衰减，也不自动删除。显式强化或合并后高于 `0.4` 可以恢复。已扣分数不会因再次使用而还原，例如 `0.7` 衰减为 `0.65` 后召回一次变成 `0.7`。日检失败不会标记当天完成，下一次会话会重试。
 
-旧记忆保留历史置信度，但超过上限 `1` 的值会在下一次日检时压到 `1`；读取时忽略旧 `observations`，组文件下次因内容、强度或废弃状态变化而重写时清除该字段，不在读取时批量迁移。候选池的出现次数保留，仅用于整理待确认表达，不参与正式记忆强度或排名。卸载重装不会重置历史置信度。
+旧记忆保留历史置信度，但超过上限 `1` 的值会在下一次日检时压到 `1`；读取时忽略旧 `observations`，组文件下次因内容、强度或废弃状态变化而重写时清除该字段，不在读取时批量迁移。卸载重装不会重置历史置信度。
 
 正式记忆变更共用跨进程写锁，召回加分按组批量更新，不额外调用模型或重建已有向量；命中的记忆当天都已加过分时，这一轮不拿锁也不写盘。加分失败记录日志，但仍返回召回内容。更新代码后应重启各客户端的 MCP，避免旧进程继续使用旧规则。
 
@@ -122,7 +122,6 @@ node bin/memory.mjs list                  # 两组各有多少条
 node bin/memory.mjs read rule             # 看规则
 node bin/memory.mjs read project          # 看项目事实
 node bin/memory.mjs rule add "<规则>"      # 直接新增规则
-node bin/memory.mjs review                # 待确认候选
 node bin/memory.mjs config                # 查看配置
 node bin/memory.mjs config recallTopK 5   # 改配置，下一轮输入即生效
 npm run setup                                 # 交互安装并注册 Cursor / codebuddy / WorkBuddy
@@ -145,8 +144,6 @@ npm run build-background                      # 重新生成背景均值，换�
 | `memory_reinforce` | 强化已有记忆（置信度 +0.1，同一条记忆每天合计最多 0.1，上限 1） |
 | `memory_merge` | 用合并后的正文替换已有记忆，重新向量化，并强化一次 |
 | `memory_resolve` | 旁路模式统一处理 sessionID 对应的新增、强化、合并或不落成决策 |
-| `memory_review` | 列出待确认候选 |
-| `memory_discard` | 丢弃候选 |
 | `memory_config` | 查看或修改配置 |
 
 `memory_propose`、`memory_persist`、`memory_reinforce`、`memory_merge` 只在阻塞模式出现；`memory_resolve` 只在旁路模式出现。`memory_propose` 不落盘：它返回最相近的两条记忆和相似度，让主模型判断新建、强化或合并。相似度越高，越应当强化，而不是新建。
