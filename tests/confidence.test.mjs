@@ -8,6 +8,8 @@ import { setTimeout as delay } from 'node:timers/promises'
 import { createMemoryHarness, memory } from './helpers/memory.mjs'
 
 const exec = promisify(execFile)
+const DAY = 86400000
+const START = '2026-09-29T04:00:00.000Z'
 
 test('所有新建入口的底层初始值固定 0.5，不接受外部置信度', async t => {
   const h = await createMemoryHarness(t)
@@ -22,39 +24,48 @@ test('所有新建入口的底层初始值固定 0.5，不接受外部置信度'
   assert.ok((await h.records()).every(mem => !mem.deprecated))
 })
 
-test('强化和合并各加 0.1，无次数统计、无浮点累加误差、可超过 1', async t => {
-  const h = await createMemoryHarness(t)
+test('强化和合并每个本地日合计最多加 0.1，封顶 1，无次数统计、无浮点累加误差', async t => {
+  const h = await createMemoryHarness(t, { now: START })
   const writer = await h.load('lib/core/writer.mjs')
   const created = await writer.persistMemory({ text: '日志包含原因', category: 'project' })
-  assert.equal((await writer.reinforceMemory(created.id)).confidence, 0.6)
+  h.clock.now += DAY
+  const reinforced = await writer.reinforceMemory(created.id)
+  assert.equal(reinforced.confidence, 0.6)
+  assert.equal(reinforced.gained, 0.1)
   const merged = await writer.mergeMemory(created.id, '日志包含原因与排查线索')
-  assert.equal(merged.confidence, 0.7)
+  assert.equal(merged.confidence, 0.6)
+  assert.equal(merged.gained, 0)
   assert.equal(merged.id, created.id)
   assert.equal(merged.text, '日志包含原因与排查线索')
   assert.equal(h.state.vectorRefreshes, 1)
-  for (let i = 0; i < 6; i++) await writer.reinforceMemory(created.id)
-  assert.equal((await h.records('project'))[0].confidence, 1.3)
+  for (let i = 0; i < 6; i++) {
+    h.clock.now += DAY
+    await writer.reinforceMemory(created.id)
+  }
+  const stored = (await h.records('project'))[0]
+  assert.equal(stored.confidence, 1)
+  assert.equal('gained' in stored, false)
   assert.doesNotMatch(await fsp.readFile(path.join(h.root, 'memories.md'), 'utf8'), /观测|召回频率/)
 })
 
 test('旧正式记忆兼容读取，保留历史置信度，更新时清理 observations', async t => {
   const h = await createMemoryHarness(t)
-  await h.seed('rule', [memory('old', { confidence: 1.15, observations: 20, evidence: '原始证据' })])
+  await h.seed('rule', [memory('old', { confidence: 0.75, observations: 20, evidence: '原始证据' })])
   const store = await h.load('lib/core/store.mjs')
   const old = (await store.readGroup('rule'))[0]
-  assert.equal(old.confidence, 1.15)
+  assert.equal(old.confidence, 0.75)
   assert.equal('observations' in old, false)
   assert.equal((await h.records())[0].observations, 20)
   const writer = await h.load('lib/core/writer.mjs')
   await writer.reinforceMemory('old')
   const updated = (await h.records())[0]
-  assert.equal(updated.confidence, 1.25)
+  assert.equal(updated.confidence, 0.85)
   assert.equal(updated.evidence, '原始证据')
   assert.equal('observations' in updated, false)
 })
 
-test('批量实际召回每 id 加 0.05，去重且忽略失效或已删除记录', async t => {
-  const h = await createMemoryHarness(t)
+test('批量实际召回每 id 每天加一次 0.05，去重且忽略失效或已删除记录', async t => {
+  const h = await createMemoryHarness(t, { now: START })
   await h.seed('rule', [memory('a'), memory('untouched'), memory('deprecated', { deprecated: true })])
   await h.seed('project', [memory('p', { category: 'project', lastSeen: '2020-01-01T00:00:00.000Z' })])
   const writer = await h.load('lib/core/writer.mjs')
@@ -66,6 +77,9 @@ test('批量实际召回每 id 加 0.05，去重且忽略失效或已删除记�
   assert.equal(rules.get('deprecated').confidence, 0.5)
   assert.equal(rules.get('deprecated').deprecated, true)
   assert.ok((await h.records('project'))[0].lastSeen > '2020-01-01T00:00:00.000Z')
+  assert.equal((await writer.rewardRecalledMemories(['a'])).length, 0)
+  assert.equal((await h.records()).find(mem => mem.id === 'a').confidence, 0.55)
+  h.clock.now += DAY
   await writer.rewardRecalledMemories(['a'])
   assert.equal((await h.records()).find(mem => mem.id === 'a').confidence, 0.6)
   assert.equal(h.state.vectorRefreshes, 0)
@@ -75,7 +89,7 @@ test('批量实际召回每 id 加 0.05，去重且忽略失效或已删除记�
 for (const sideJudge of [true, false]) {
   for (const confirm of [true, false]) {
     test(`实际召回输出加分，sideJudge=${sideJudge} confirm=${confirm}`, async t => {
-      const h = await createMemoryHarness(t)
+      const h = await createMemoryHarness(t, { now: START })
       Object.assign(h.settings, { sideJudge, confirm })
       await h.seed('rule', [memory('hit'), memory('miss')])
       h.state.hits = ['hit', 'hit']
@@ -84,7 +98,10 @@ for (const sideJudge of [true, false]) {
       assert.match(text, /置信度 0.55/)
       assert.equal(text.split('规则 hit').length - 1, 1)
       assert.equal((await h.records()).find(mem => mem.id === 'miss').confidence, 0.5)
-      await render.renderRecall(['用户下一轮问题'])
+      assert.match(await render.renderRecall(['用户下一轮问题']), /置信度 0.55/)
+      assert.equal((await h.records()).find(mem => mem.id === 'hit').confidence, 0.55)
+      h.clock.now += DAY
+      assert.match(await render.renderRecall(['第二天的问题']), /置信度 0.6/)
       assert.equal((await h.records()).find(mem => mem.id === 'hit').confidence, 0.6)
     })
   }
@@ -109,7 +126,7 @@ test('关闭功能、空输入、无命中和召回失败不加分', async t => 
 
 test('会话开始按置信度选前 50 条，但不会因为注入而加分', async t => {
   const h = await createMemoryHarness(t)
-  const rules = Array.from({ length: 52 }, (_, i) => memory(`r${i}`, { confidence: 0.5 + i / 100 }))
+  const rules = Array.from({ length: 52 }, (_, i) => memory(`r${i}`, { confidence: 0.45 + i / 100 }))
   rules.push(memory('deleted', { confidence: 9, deprecated: true }))
   await h.seed('rule', rules)
   const before = await fsp.readFile(path.join(h.root, 'rule.jsonl'), 'utf8')
@@ -158,32 +175,35 @@ test('置信度写入失败仍返回召回正文，并保留排查日志、释�
 
 test('同进程并发的新建、强化、合并、召回与废弃刷新不丢更新', async t => {
   const h = await createMemoryHarness(t)
-  await h.seed('rule', [memory('a')])
+  const ids = Array.from({ length: 8 }, (_, i) => `a${i}`)
+  await h.seed('rule', ids.map(id => memory(id)))
   const writer = await h.load('lib/core/writer.mjs')
   await Promise.all([
-    ...Array.from({ length: 8 }, () => writer.reinforceMemory('a')),
-    ...Array.from({ length: 8 }, () => writer.rewardRecalledMemories(['a'])),
-    writer.mergeMemory('a', '合并后的正文'),
+    ...ids.map(id => writer.reinforceMemory(id)),
+    ...ids.map(id => writer.rewardRecalledMemories([id])),
+    writer.mergeMemory('a0', '合并后的正文'),
     writer.persistMemory({ text: '新规则', category: 'rule' }),
     writer.decayMemoriesOncePerDay(),
   ])
   const rules = await h.records()
-  assert.equal(rules.length, 2)
-  assert.equal(rules.find(mem => mem.id === 'a').confidence, 1.8)
-  assert.equal(rules.find(mem => mem.id === 'a').text, '合并后的正文')
+  assert.equal(rules.length, 9)
+  // 每条记忆当天先后被召回和强化，无论顺序都应合计 +0.1；少于它说明有更新被覆盖。
+  for (const id of ids) assert.equal(rules.find(mem => mem.id === id).confidence, 0.6)
+  assert.equal(rules.find(mem => mem.id === 'a0').text, '合并后的正文')
   assert.ok(rules.every(mem => !mem.deprecated))
 })
 
 test('跨进程并发加分不丢失', async t => {
   const h = await createMemoryHarness(t)
-  await h.seed('rule', [memory('a')])
+  await h.seed('rule', Array.from({ length: 8 }, (_, i) => memory(`a${i}`)))
   const helper = new URL('./helpers/memory.mjs', import.meta.url).href
-  const child = `import { createMemoryHarness } from ${JSON.stringify(helper)}; const h = await createMemoryHarness(null, { home: process.argv[1] }); const writer = await h.load('lib/core/writer.mjs'); for (let i = 0; i < 8; i++) await writer[process.argv[2]](process.argv[2] === 'reinforceMemory' ? 'a' : ['a']);`
+  const child = `import { createMemoryHarness } from ${JSON.stringify(helper)}; const h = await createMemoryHarness(null, { home: process.argv[1] }); const writer = await h.load('lib/core/writer.mjs'); for (let i = 0; i < 8; i++) await writer[process.argv[2]](process.argv[2] === 'reinforceMemory' ? 'a' + i : ['a' + i]);`
   await Promise.all(['reinforceMemory', 'rewardRecalledMemories'].map(operation => exec(process.execPath, ['--experimental-vm-modules', '--input-type=module', '-e', child, h.home, operation])))
-  assert.equal((await h.records())[0].confidence, 1.7)
+  // 两个进程对同一批记忆分别强化和召回，每条当天合计 +0.1；少于它说明跨进程丢了更新。
+  assert.deepEqual((await h.records()).map(mem => mem.confidence), Array(8).fill(0.6))
 })
 
-test('新记忆未衰减时有效，满 30 天实际扣分，低于 0.4 才废弃', async t => {
+test('新记忆未衰减时有效，满 30 天实际扣分，不高于 0.4 即废弃', async t => {
   const h = await createMemoryHarness(t)
   await h.seed('rule', [memory('new'), memory('old', { confidence: 0.4, lastSeen: new Date(Date.now() - 31 * 86400000).toISOString() })])
   const writer = await h.load('lib/core/writer.mjs')
@@ -207,18 +227,20 @@ test('候选池的出现次数仍保留，不再作为正式记忆强度', async
   assert.equal(list[0].observations, 2)
 })
 
-test('旁路通知只展示置信度，不展示旧 observations', async t => {
+test('旁路通知展示实际加分，不展示旧 observations', async t => {
   const h = await createMemoryHarness(t)
   const side = await h.load('lib/core/sidepath.mjs')
   for (const action of ['reinforce', 'merge']) {
-    const text = side.formatNotice({ action, targetText: '旧规则', mergedText: '新规则', observations: 10 })
-    assert.match(text, /置信度 \+0.1/)
-    assert.doesNotMatch(text, /观测|召回频率/)
+    const base = { action, targetText: '旧规则', mergedText: '新规则', observations: 10 }
+    assert.match(side.formatNotice({ ...base, gained: 0.1 }), /置信度 \+0.1$/)
+    assert.match(side.formatNotice({ ...base, gained: 0.05 }), /置信度 \+0.05$/)
+    assert.match(side.formatNotice({ ...base, gained: 0 }), /置信度不变/)
+    assert.doesNotMatch(side.formatNotice({ ...base, gained: 0.1 }), /观测|召回频率/)
   }
 })
 
 test('MCP 不暴露 confidence 入参，旧客户端传值也不能改变初始值', async t => {
-  const h = await createMemoryHarness(t)
+  const h = await createMemoryHarness(t, { now: START })
   h.settings.sideJudge = false
   await h.load('bin/memory-mcp.mjs')
   let sequence = 0
@@ -238,10 +260,11 @@ test('MCP 不暴露 confidence 入参，旧客户端传值也不能改变初始�
   const persisted = await call('tools/call', { name: 'memory_persist', arguments: { text: 'MCP新记忆', category: 'rule', confidence: 9 } })
   assert.match(persisted.result.content[0].text, /置信度 0.5/)
   const mem = (await h.records())[0]
+  h.clock.now += DAY
   const reinforced = await call('tools/call', { name: 'memory_reinforce', arguments: { id: mem.id } })
   assert.match(reinforced.result.content[0].text, /置信度 0.6/)
   const merged = await call('tools/call', { name: 'memory_merge', arguments: { id: mem.id, text: 'MCP合并记忆' } })
-  assert.match(merged.result.content[0].text, /置信度 0.7/)
+  assert.match(merged.result.content[0].text, /MCP合并记忆（置信度 0.6/)
   assert.doesNotMatch(JSON.stringify([reinforced, merged]), /观测|召回频率/)
 })
 
@@ -251,13 +274,13 @@ test('CLI 直接新建同样固定 0.5', async t => {
   assert.equal((await h.records())[0].confidence, 0.5)
 })
 
-test('实际置信度恰好减至 0.4 时不因浮点误差废弃', async t => {
+test('实际置信度恰好减至 0.4 时废弃，不因浮点误差漏判', async t => {
   const h = await createMemoryHarness(t)
   await h.seed('rule', [memory('boundary', { confidence: 0.45, lastSeen: new Date(Date.now() - 31 * 86400000).toISOString() })])
   const writer = await h.load('lib/core/writer.mjs')
   assert.equal(await writer.decayMemoriesOncePerDay(), 1)
   assert.equal((await h.records())[0].confidence, 0.4)
-  assert.equal((await h.records())[0].deprecated, false)
+  assert.equal((await h.records())[0].deprecated, true)
 })
 
 test('持锁进程退出后自动恢复，空的遗留锁目录也不阻塞', async t => {
@@ -273,8 +296,81 @@ test('持锁进程退出后自动恢复，空的遗留锁目录也不阻塞', as
   assert.equal((await h.records())[0].confidence, 0.55)
   assert.ok(h.errors.some(line => line.includes('回收已退出进程')))
   await fsp.mkdir(lock)
-  await writer.rewardRecalledMemories(['a'])
+  await writer.reinforceMemory('a')
   assert.equal((await h.records())[0].confidence, 0.6)
+})
+
+test('同一本地日内先召回后强化只补到 0.1，加满后不再写盘，跨天重新计', async t => {
+  const h = await createMemoryHarness(t, { now: START })
+  await h.seed('rule', [memory('a')])
+  const writer = await h.load('lib/core/writer.mjs')
+  const file = path.join(h.root, 'rule.jsonl')
+  await writer.rewardRecalledMemories(['a'])
+  assert.equal((await h.records())[0].confidence, 0.55)
+  const topped = await writer.reinforceMemory('a')
+  assert.equal(topped.confidence, 0.6)
+  assert.equal(topped.gained, 0.05)
+  const before = await fsp.readFile(file, 'utf8')
+  assert.equal((await writer.reinforceMemory('a')).gained, 0)
+  assert.equal((await writer.rewardRecalledMemories(['a'])).length, 0)
+  assert.equal(await fsp.readFile(file, 'utf8'), before)
+  h.clock.now += DAY
+  assert.equal((await writer.reinforceMemory('a')).gained, 0.1)
+  assert.equal((await writer.rewardRecalledMemories(['a'])).length, 0)
+  assert.equal((await h.records())[0].confidence, 0.7)
+})
+
+test('新建当天不再加分，次日起正常', async t => {
+  const h = await createMemoryHarness(t, { now: START })
+  const writer = await h.load('lib/core/writer.mjs')
+  const created = await writer.persistMemory({ text: '新建的项目事实', category: 'project' })
+  assert.equal((await writer.rewardRecalledMemories([created.id])).length, 0)
+  assert.equal((await writer.reinforceMemory(created.id)).gained, 0)
+  assert.equal((await h.records('project'))[0].confidence, 0.5)
+  h.clock.now += DAY
+  await writer.rewardRecalledMemories([created.id])
+  assert.equal((await h.records('project'))[0].confidence, 0.55)
+})
+
+test('置信度封顶 1，到顶后的召回仍刷新衰减起点，日检把超过上限的历史值压回上限', async t => {
+  const h = await createMemoryHarness(t, { now: START })
+  const ago = days => new Date(h.clock.now - days * DAY).toISOString()
+  const old = ago(29)
+  await h.seed('rule', [
+    memory('top', { confidence: 1, lastSeen: old }),
+    memory('legacy', { confidence: 3.95, lastSeen: old }),
+    memory('legacy-idle', { confidence: 2, lastSeen: ago(40) }),
+  ])
+  const writer = await h.load('lib/core/writer.mjs')
+  await writer.rewardRecalledMemories(['top'])
+  const rows = async () => new Map((await h.records()).map(mem => [mem.id, mem]))
+  assert.equal((await rows()).get('top').confidence, 1)
+  assert.equal((await rows()).get('top').lastSeen, START)
+  assert.equal(await writer.decayMemoriesOncePerDay(), 2)
+  assert.equal((await rows()).get('legacy').confidence, 1)
+  assert.equal((await rows()).get('legacy').lastSeen, old)
+  assert.equal((await rows()).get('legacy-idle').confidence, 0.95)
+  h.clock.now += DAY
+  assert.equal(await writer.decayMemoriesOncePerDay(), 1)
+  assert.equal((await rows()).get('legacy').confidence, 0.95)
+  assert.equal((await rows()).get('top').confidence, 1)
+})
+
+test('当天已加过分的召回不进写锁、不写盘', async t => {
+  const h = await createMemoryHarness(t, { now: START })
+  await h.seed('rule', [memory('a')])
+  h.state.hits = ['a']
+  const render = await h.load('lib/core/render.mjs')
+  const file = path.join(h.root, 'rule.jsonl')
+  const reads = () => h.state.reads.get(file) || 0
+  assert.match(await render.renderRecall(['第一次']), /置信度 0.55/)
+  const before = await fsp.readFile(file, 'utf8')
+  const readsBefore = reads()
+  assert.match(await render.renderRecall(['同一天第二次']), /规则 a（置信度 0.55/)
+  // 只剩读召回池那一次；加分路径会在写锁内再读一遍分组文件。
+  assert.equal(reads() - readsBefore, 1)
+  assert.equal(await fsp.readFile(file, 'utf8'), before)
+  assert.equal((await fsp.readdir(h.root)).some(name => name.startsWith('.memory-write')), false)
 })
 
 test('HMAC sessionID 对同一轮输入稳定且不同输入不可复用', async t => {
