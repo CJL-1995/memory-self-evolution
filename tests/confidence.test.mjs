@@ -246,14 +246,25 @@ test('新记忆未衰减时有效，满 30 天实际扣分，不高于 0.4 即�
   assert.equal((await h.records()).find(mem => mem.id === 'old').deprecated, false)
 })
 
-test('候选池的出现次数仍保留，不再作为正式记忆强度', async t => {
-  const h = await createMemoryHarness(t)
-  const candidates = await h.load('lib/core/candidates.mjs')
-  await candidates.collectCandidates(['以后必须记录详细的异常日志'], 'test-session')
-  await candidates.collectCandidates(['以后必须记录详细的异常日志'], 'test-session')
-  const list = await candidates.listCandidates()
-  assert.equal(list.length, 1)
-  assert.equal(list[0].observations, 2)
+test('候选池已移除：Stop 不读对话记录，遗留的 candidates.json 不被读取也不被改动', async t => {
+  const h = await createMemoryHarness(t, { argv: ['hook', '--agent', 'codebuddy'] })
+  h.settings.sideJudge = false
+  await h.seed('rule', [memory('r1')])
+  const leftover = path.join(h.root, 'candidates.json')
+  const body = JSON.stringify({ candidates: [{ fingerprint: 'x', text: '以后都用中文回答', observations: 9, sessions: ['s'] }], rejected: [] })
+  await fsp.writeFile(leftover, body)
+  const running = h.load('bin/memory.mjs')
+  for (let i = 0; i < 1000 && !h.stdin.listenerCount('end'); i++) await delay(1)
+  h.stdin.emit('data', JSON.stringify({ hook_event_name: 'Stop', session_id: 's', transcript_path: path.join(h.home, 'missing-transcript.jsonl') }))
+  h.stdin.emit('end')
+  await running
+  assert.equal(h.output.join(''), '{}')
+  assert.equal(h.errors.some(line => /transcript|候选/.test(line)), false)
+  const blocking = await (await h.load('lib/core/render.mjs')).renderSessionStart()
+  assert.match(blocking, /规则 r1/)
+  assert.doesNotMatch(blocking, /待确认候选|memory_review/)
+  assert.equal(h.state.reads.has(leftover), false)
+  assert.equal(await fsp.readFile(leftover, 'utf8'), body)
 })
 
 test('旁路通知展示实际加分，不展示旧 observations', async t => {
@@ -285,6 +296,7 @@ test('MCP 不暴露 confidence 入参，旧客户端传值也不能改变初始�
   }
   const tools = (await call('tools/list')).result.tools
   assert.equal(tools.some(tool => tool.name === 'memory_resolve'), false)
+  assert.equal(tools.some(tool => tool.name === 'memory_review' || tool.name === 'memory_discard'), false)
   assert.equal('confidence' in tools.find(tool => tool.name === 'memory_persist').inputSchema.properties, false)
   const persisted = await call('tools/call', { name: 'memory_persist', arguments: { text: 'MCP新记忆', category: 'rule', confidence: 9 } })
   assert.match(persisted.result.content[0].text, /置信度 0.5/)
@@ -648,6 +660,10 @@ test('旁路只暴露统一的 memory_resolve 工具', async t => {
   assert.equal(tools.some(tool => tool.name === 'memory_persist'), false)
   assert.equal(tools.some(tool => tool.name === 'memory_reinforce'), false)
   assert.equal(tools.some(tool => tool.name === 'memory_merge'), false)
+  assert.equal(tools.some(tool => tool.name === 'memory_review' || tool.name === 'memory_discard'), false)
+  const removed = await call('tools/call', { name: 'memory_review', arguments: {} })
+  assert.equal(removed.result.isError, true)
+  assert.match(removed.result.content[0].text, /未知工具/)
   const resolve = tools.find(tool => tool.name === 'memory_resolve')
   assert.deepEqual(resolve.inputSchema.required, ['sessionID', 'decision'])
   assert.deepEqual(resolve.inputSchema.properties.decision.enum, ['create_rule', 'create_project', 'reinforce', 'merge', 'replace', 'discard'])
