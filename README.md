@@ -8,14 +8,14 @@
 
 同一条偏好反复讲。换个会话又要重新交代项目背景。规则说过但模型下次就忘了。
 
-这个工具的做法是：把这类内容落盘，然后在**两个时机**把它送回模型的上下文——会话开始时无条件注入规则，每轮输入时按语义相关性召回项目事实。
+这个工具的做法是：把这类内容落盘，然后在**两个时机**把它送回模型的上下文——会话开始时无条件注入规则，每轮输入时按语义相关性分别召回规则和项目事实。
 
 ## 记忆分两类
 
 | 类别 | 注入方式 | 典型内容 |
 |---|---|---|
-| `rule` | 会话开始按置信度注入未废弃规则的前 50 条，不依赖语义匹配 | 「回答用中文」「改完代码不要自动 commit」 |
-| `project` | 每轮按语义相关性召回 | 「支付页新流程的灰度开关是 xxx」「ImageLoader 负责图片加载与缓存」 |
+| `rule` | 会话开始按置信度注入未废弃规则的前 50 条，不依赖语义匹配；每轮输入时，相关的规则还会再被召回一次 | 「回答用中文」「改完代码不要自动 commit」 |
+| `project` | 只在每轮输入时按语义相关性召回，会话开始不注入 | 「支付页新流程的灰度开关是 xxx」「ImageLoader 负责图片加载与缓存」 |
 
 这一刀是按**怎么用**划分的，不是按主题。规则必须无条件注入，因为向量召回按语义相关性触发，覆盖不了「用户没提及但规则本该生效」的情况——你说「帮我改下这个函数」时，「改完不要自动 commit」和这句话在语义上并不相似，实测这类输入的召回分数只有 0.12~0.24，和无关输入完全重叠。这是机制上的边界，不是召回质量问题。
 
@@ -30,7 +30,7 @@ npm install
 npm run setup
 ```
 
-已经 clone 过时，在仓库目录重新执行 `npm install && npm run setup`。`npm run setup` 必须在终端里跑，它会按下面的顺序做完。
+已经 clone 过时，在仓库目录重新执行 `npm install && npm run setup`。`npm run setup` 要在终端里跑，它会按下面的顺序做完。没有终端时它不提问、不改已有配置，后面的下载和注册照做。
 
 1. 只问三件事，其余配置用默认值。
    - 旁路式还是阻塞式。直接回车默认旁路式。
@@ -48,7 +48,7 @@ npm run setup
 
 三端各自启动同一套 MCP 程序，共享本机记忆文件，不是共用一个常驻进程。旁路还是阻塞不改变装上去的程序，只改变 `config.json` 里的 `sideJudge`。进程启动后读这个值：旁路只列出统一确认工具 `memory_resolve`，不列出 `memory_propose`、`memory_persist`、`memory_reinforce`、`memory_merge`；阻塞模式列出后四个，不列出 `memory_resolve`。hook 两组模式都装，和通路无关。
 
-注册完成后重启 Cursor、codebuddy 和 WorkBuddy，MCP 才会加载。之后只改通路时运行 `node tools/setup.mjs sidepath` 或 `node tools/setup.mjs blocking`，不再提问，同样会先确认模型缓存再重新注册；重新注册会清理旧版本遗留的本插件工具后 Hook，不影响其他插件。WorkBuddy 的 `UserPromptSubmit` 超时 10 秒，宿主会等 hook 返回后再把本轮交给模型，和 codebuddy 相同。
+注册完成后重启 Cursor、codebuddy 和 WorkBuddy，MCP 才会加载。之后只改通路时运行 `node tools/setup.mjs sidepath` 或 `node tools/setup.mjs blocking`，不再提问，同样会先确认模型缓存再重新注册；重新注册会清理旧版本遗留的本插件工具后 Hook，不影响其他插件。注册的 hook 超时：会话开始 10 秒，回答结束 20 秒；每轮输入的 hook 在 Cursor 是 5 秒，在 codebuddy 和 WorkBuddy 是 10 秒，宿主会等它返回后再把本轮交给模型。
 
 ## 卸载
 
@@ -58,13 +58,13 @@ npm run uninstall
 
 插件仓库保留。它会删掉安装时落下的向量模型、三端里本插件的 hook，以及 `mcp.json` 里的 `memory-self-evolution`。其他 hook 和 MCP 不动。
 
-`~/.memory-self-evolution/` 目录保留。`rule.jsonl`、`project.jsonl`、`memories.md`、`embeddings.jsonl`、`project-memory` 保留。`config.json`、`side-secret.json`、`session-secret` 和 `side/` 删除。重新安装时再跑 `npm run setup`，模型会重新下载，配置和本地密钥会在需要时重新生成。卸完后重启三个客户端，MCP 才会从已经打开的会话里消失。
+`~/.memory-self-evolution/` 目录保留。里面只删 `config.json`、`side-secret.json`、`session-secret` 和 `side/`，其余都不动：记忆 `rule.jsonl` 和 `project.jsonl`、向量索引 `embeddings.jsonl`、给人核对的快照 `memories.md`、日检记录 `decay-state.json`、评测用例 `verify-cases.json`。重新安装时再跑 `npm run setup`，模型会重新下载，配置和本地密钥会在需要时重新生成。卸完后重启三个客户端，MCP 才会从已经打开的会话里消失。
 
 ## 怎么让它记住东西
 
 沉淀只走一条通路，由 `sideJudge` 决定。`confirm` 只决定写盘前弹不弹确认，两条通路都适用。
 
-**旁路（`sideJudge=true`，安装时直接回车即此项）。** hook 在后台判断这句该不该记，不挡住本轮回答。工具列表只提供 `memory_resolve(sessionID, decision)`。`confirm=false` 时后台直接写入、强化或合并，`stop` 只让主模型把结果原样展示出来。`confirm=true` 时，`stop` 让主模型弹出确认，先不写；插件为每条提案给出 sessionID，用户点选后主模型调用一次 `memory_resolve`。decision 统一为 `create_rule`、`create_project`、`reinforce`、`merge`、`discard`。插件只消费 sessionID 对应的当前客户端待确认提案，正文、目标记忆和合并正文不能由主模型覆盖；无效、跨客户端、已处理或动作不匹配的 sessionID 会被拒绝，新一次弹窗会作废同一客户端之前问过但没点选的提案。sessionID 使用本地 256 位密钥，对 `agent + conversation_id + generation_id + SHA256(prompt) + version` 做 HMAC-SHA256；同一 Hook 重试得到同一个 sessionID，并通过排他建档只启动一次分析。已结束任务保留 24 小时作为幂等墓碑。密钥首次使用时自动生成到 `~/.memory-self-evolution/session-secret`，权限 600，不经 MCP 或上下文返回。使用 CodeBuddy IDE 自定义智能体时，工具白名单里必须包含 `ask_followup_question`，否则无法弹窗。三端共用同一条旁路：请求 `sideApiBase/chat/completions`。`sideApiBase`、`sideApiModel` 和 `side-secret.json` 中的 `apiKey` 都没有缺省值，缺任何一项这一轮不写、也不弹窗。
+**旁路（`sideJudge=true`，安装时直接回车即此项）。** hook 在后台判断这句该不该记，不挡住本轮回答。判别模型一次给出该不该记、记忆正文和分组（`rule` 或 `project`），输出不是 JSON 的按不记处理；要记的再和最相近的 3 条已有记忆比一次，定出新增、强化、合并还是替换。工具列表只提供 `memory_resolve(sessionID, decision)`。`confirm=false` 时后台直接新增、强化、合并或替换，`stop` 只让主模型把结果原样展示出来。`confirm=true` 时，`stop` 让主模型弹出确认，先不写；插件为每条提案给出 sessionID，用户点选后主模型调用一次 `memory_resolve`。decision 统一为 `create_rule`、`create_project`、`reinforce`、`merge`、`replace`、`discard`。`replace` 用在新说法和已有记忆冲突时，用新正文整条换掉旧记忆。新建和 `discard` 总是可选，`reinforce`、`merge`、`replace` 只在这条提案给出了对应选项时才接受。插件只消费 sessionID 对应的当前客户端待确认提案，正文、目标记忆和合并正文不能由主模型覆盖；无效、跨客户端、已处理或动作不匹配的 sessionID 会被拒绝，新一次弹窗会作废同一客户端同一会话之前问过但没点选的提案。sessionID 使用本地 256 位密钥，对 `agent + sessionKey + generation_id + SHA256(prompt) + version` 做 HMAC-SHA256；同一 Hook 重试得到同一个 sessionID，并通过排他建档只启动一次分析。已结束任务保留 24 小时作为幂等墓碑。密钥首次使用时自动生成到 `~/.memory-self-evolution/session-secret`，权限 600，不经 MCP 或上下文返回。使用 CodeBuddy IDE 自定义智能体时，工具白名单里必须包含 `ask_followup_question`，否则无法弹窗。三端共用同一条旁路：请求 `sideApiBase/chat/completions`。`sideApiBase`、`sideApiModel` 和 `side-secret.json` 中的 `apiKey` 都没有缺省值，缺任何一项这一轮不写、也不弹窗。
 
 旁路任务按 `agent + sessionKey` 强制隔离。Cursor 的 sessionKey 取 `conversation_id`，CodeBuddy / WorkBuddy 取 `session_id`。每次 Stop 只等待、展示和作废当前客户端当前会话的任务；其他会话或其他客户端的任务继续留在池中，等自己的 Stop 处理。Cursor 用于还原隐藏确认指令的临时文件也按客户端和会话分别保存。宿主没有提供稳定会话 ID 时 fail closed：本轮不启动旁路分析并记录原因，避免空 ID 串会话。正式落盘后的 `rule` / `project` 仍是跨会话共享的长期记忆。
 
@@ -80,14 +80,14 @@ node bin/memory.mjs rule add "所有异常处理处都需要添加日志"
 
 ## 注入与主模型职责
 
-- **旁路模式**：`sessionStart` 只注入规则列表和职责边界，不附项目读取说明、沉淀规则、候选提示或 `confirm` 状态。记忆提取、判重和沉淀由后台负责，包括用户明确要求「记住」的情况；主模型专注当前任务，仅按插件后续指令执行确认或授权写入。
+- **旁路模式**：`sessionStart` 只注入规则列表和职责边界，不附项目读取说明、沉淀规则或 `confirm` 状态。记忆提取、判重和沉淀由后台负责，包括用户明确要求「记住」的情况；主模型专注当前任务，只在收到插件后续指令时按指令执行，不重新判断或改写提案。
 - **每轮旁路输入**：插件启用时，即使没有召回结果，也会追加以下提醒；确认续轮、结果通知和空输入不重复追加。阻塞模式不注入此提醒，也不受 `confirm` 值影响。
 
   > 记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。
 
   插件发起的确认弹窗标题固定为「记忆确认·插件」。三端只在用户明确点选后调用 `memory_resolve`；明确选择「不落成」时传入同一 sessionID，并使用 `discard` 结束本次分析。提问工具自动返回 `Skipped`，或用户关闭/取消弹窗时不要调用 `memory_resolve`，未处理任务由下一次每日僵尸清理兜底。
 
-- **阻塞模式**：保留规则列表、项目概览、沉淀规则及候选提示，由主模型判重并选择动作。
+- **阻塞模式**：`sessionStart` 注入规则列表、项目事实的条数和读取方法、沉淀规则，由主模型判重并选择动作。
 - **规则上限**：两种模式都从未废弃的 `rule` 中按已存储置信度降序选前 50 条，同分时最近活跃的在前。每轮语义召回仍从全部未废弃的 `rule` 和 `project` 中检索，不受该 50 条限制。
 - **每轮召回**：`rule` 和 `project` 分别召回，各自过自己的阈值、各自最多 3 条，注入时分「规则」「项目事实」两组列出，不合并排序；两类都没有过线时不注入。打分减的是随仓库分发的固定背景均值，不依赖记忆池，所以只有 1 条记忆时也能召回。项目事实不在 `sessionStart` 注入，只通过每轮召回进入上下文。
 
@@ -128,8 +128,9 @@ npm run setup                                 # 交互安装并注册 Cursor / c
 npm run uninstall                             # 卸掉模型、hook、MCP 和配置，保留记忆与插件仓库
 node tools/setup.mjs sidepath                 # 切到旁路，确认模型缓存并重新注册
 node tools/setup.mjs blocking                 # 切到阻塞，确认模型缓存并重新注册
-npm test                                      # 隔离回归：置信度、工具入口、并发、旧数据兼容
+npm test                                      # 隔离回归，不读个人记忆、不请求模型接口
 npm run verify                                # 用当前用户的记忆池验证召回门控并按类输出阈值扫描，可能补建索引
+npm run rebuild-index                         # 备份旧索引后按当前模型重建全部向量，换模型或手改过记忆正文后用
 npm run build-background                      # 重新生成背景均值，换模型或改编码后必须重跑
 ```
 
@@ -138,12 +139,12 @@ npm run build-background                      # 重新生成背景均值，换�
 | 工具 | 作用 |
 |---|---|
 | `memory_list` | 两组记忆的条数 |
-| `memory_read` | 按置信度返回某一组的前 50 条记忆，目前无分页 |
+| `memory_read` | 按置信度返回某一组的前 50 条记忆，已废弃的也列出并标注，目前无分页 |
 | `memory_propose` | 提交待沉淀内容，返回相近记忆与分组建议，不写正式记忆、不增加置信度（可能补建向量索引） |
 | `memory_persist` | 正式写入，初始置信度固定 0.5 |
 | `memory_reinforce` | 强化已有记忆（置信度 +0.1，同一条记忆每天合计最多 0.1，上限 1） |
 | `memory_merge` | 用合并后的正文替换已有记忆，重新向量化，并强化一次 |
-| `memory_resolve` | 旁路模式统一处理 sessionID 对应的新增、强化、合并或不落成决策 |
+| `memory_resolve` | 旁路模式统一处理 sessionID 对应的新增、强化、合并、替换或不落成决策 |
 | `memory_config` | 查看或修改配置 |
 
 `memory_propose`、`memory_persist`、`memory_reinforce`、`memory_merge` 只在阻塞模式出现；`memory_resolve` 只在旁路模式出现。`memory_propose` 不落盘：它返回最相近的两条记忆和相似度，让主模型判断新建、强化或合并。相似度越高，越应当强化，而不是新建。
@@ -154,7 +155,7 @@ npm run build-background                      # 重新生成背景均值，换�
 
 | 键 | 默认 | 说明 |
 |---|---|---|
-| `enabled` | `true` | 关掉后不注入任何记忆 |
+| `enabled` | `true` | 关掉后 hook 不注入任何记忆，旁路判别也不启动。命令行和阻塞模式的写工具不受影响 |
 | `recallTopK` | `3` | `rule` 和 `project` 每轮**各自**最多召回几条，正整数。是上限不是配额，不相关时一条都不注入 |
 | `recallMinScore` | `0.22` | `rule` 的召回下限，`-1` 关闭。实际保留线是 `max(该值, rule 的 top1 × 0.6)`，再截到 `recallTopK` |
 | `recallMinScoreProject` | `0.29` | `project` 的召回下限，规则同上，用 `project` 自己的 top1 算保留线。比 `rule` 高，是为了不让无关输入带出项目事实 |
@@ -170,15 +171,17 @@ npm run build-background                      # 重新生成背景均值，换�
 
 ## 实测数据
 
-以下为历史标定结果，基于当时的 24 条真实记忆、16 条相关输入 + 11 条无关输入；不代表加入召回加分和写锁后的最新端到端耗时：
+2026-10-11 在一份 47 条的真实记忆库（`rule` 28 条、`project` 19 条）上测得，输入是 46 条相关 + 51 条无关：
 
-- 相关召回 **14/16**，无关误放行 2/11，其中真正污染上下文的（拉进 `project` 记忆的）**0 条**
-- 2026-10-11 在 47 条记忆上重新标定（46 条相关 + 51 条无关输入）：相关召回 **42/46**，无关误放行 13/51，拉进 `project` 的仍是 **0 条**，阈值保持 0.22
-- 同日召回改为两类分别召回、打分减固定背景均值：相关召回 **43/46**，无关误放行 11/51，拉进 `project` 的 **0 条**；记忆池只有 1 条时相关召回 95%，改造前是 0%
-- 每轮 hook 端到端 **0.23 秒**，其中模型冷启动 104ms、单条编码 5.2ms
-- 1 万条记忆时的相似度计算 **6.2ms**——瓶颈不在算法，在索引的读盘与解析
+- 相关召回 **43/46**；无关输入有 11/51 带出了记忆，带出的都是 `rule`，真正污染上下文的（带出 `project` 的）**0 条**
+- 记忆库只有 1 条时相关召回 95%
+- 每轮输入的 hook 端到端 **0.22~0.24 秒**，进程启动、加载模型、编码、打分、给命中的记忆加分并写盘都在内；有没有命中相差约 10 毫秒
+- 模型选型时单独测得的冷启动是 104ms，单条编码 5.2ms
+- 1 万条记忆时的相似度计算 **6.2ms**（合成数据）——瓶颈不在算法，在索引的读盘与解析
 
-功能回归使用 `npm test`：当前包含 95 项隔离测试，覆盖置信度、HMAC sessionID 幂等、客户端与会话隔离、Skip/取消兜底、每日僵尸任务清理、每日实际衰减、衰减天数配置、时间戳重置、跨会话去重、CLI/MCP/旁路入口、旧数据兼容、召回边界、并发更新与锁恢复，不读取个人记忆或请求模型 API（旁路接口用假的实现代替）。`npm run verify` 是另一套依赖当前用户记忆池的召回评测，用例需按自己的记忆库写在 `~/.memory-self-evolution/verify-cases.json`，格式见 `tools/verify-gate.mjs` 头部注释。
+改造前（两类合在一起排序、打分减当前记忆池的均值）同一批输入是 42/46 和 13/51，记忆库只有 1 条时召不回。阈值不是常数：换模型、改编码或重新生成背景均值后都要用 `npm run verify` 重新标定，记忆库明显变大后也值得重跑一次。
+
+功能回归使用 `npm test`：全部是隔离测试，覆盖置信度、HMAC sessionID 幂等、客户端与会话隔离、Skip/取消兜底、每日僵尸任务清理、每日实际衰减、衰减天数配置、时间戳重置、跨会话去重、CLI/MCP/旁路入口、旧数据兼容、召回边界、并发更新与锁恢复，不读取个人记忆或请求模型 API（旁路接口用假的实现代替）。`npm run verify` 是另一套依赖当前用户记忆池的召回评测，用例需按自己的记忆库写在 `~/.memory-self-evolution/verify-cases.json`，格式见 `tools/verify-gate.mjs` 头部注释。
 
 ## 已知限制
 
@@ -188,10 +191,10 @@ npm run build-background                      # 重新生成背景均值，换�
 
 记忆正文限制在 6 到 400 个字，新建、合并、替换都按它检查，超出的拒绝写入；免确认模式下被拒不会有提示，只留日志。密钥经旁路沉淀时已被替换成 `[已隐去]`，要存这类内容只能用 `node bin/memory.mjs rule add`。
 
+没有删除或改分组的命令。正文可以靠重新说一遍、走合并或替换来改；要删掉一条记忆或把它换到另一组，只能等它衰减，或者手动改 `rule.jsonl`、`project.jsonl`（换组时记录里的 `category` 字段要一起改）。手改正文后向量不会跟着更新，要再跑一次 `npm run rebuild-index`。
+
+hook 每次都重新读 `config.json`，MCP 进程只在启动时读一次。MCP 进程自己通过 `memory_config` 改的值立即生效，但用命令行、手改文件或在另一个客户端里改的值，要重启客户端它才看得到。受影响的是 `sideJudge` 和 `confirm`：比如启动后把 `confirm` 从 `false` 改成 `true`，hook 会开始弹确认，而 `memory_resolve` 仍按旧值认为没有待确认的提案。另外，用命令或 `memory_config` 改过任意一项后，全部配置项都会按当时的值写进文件，之后仓库更新的默认值不会自动生效。
+
 背景均值来自 60 句通用陈述句，阈值是在一份记忆库上标定的。换掉一半背景句时相关召回基本不变，但无关输入带出 `rule` 的次数会明显波动；改动 `tools/background-sentences.json` 后要重跑 `npm run build-background` 和 `npm run verify`。
 
 向量索引用 jsonl 存，每个浮点数占约 20 字节、比 float32 二进制膨胀 5 倍。到约 3.4 万条记忆时会撞上 V8 单字符串长度上限，读写都会抛 `RangeError`。届时需要换二进制格式。
-
-## 设计文档
-
-本仓库版本对应的置信度演化、召回策略、判重和遗忘机制说明，见 [DESIGN.md](./DESIGN.md)。

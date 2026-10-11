@@ -10,7 +10,6 @@
   "files": [
     "bin",
     "lib",
-    "DESIGN.md",
     "README.md"
   ],
   "engines": {
