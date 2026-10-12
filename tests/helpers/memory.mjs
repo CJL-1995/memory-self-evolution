@@ -19,7 +19,9 @@ export async function createMemoryHarness(t, options = {}) {
     constructor(...args) { super(...(args.length ? args : [clock.now ?? Date.now()])) }
     static now() { return clock.now ?? Date.now() }
   }
-  const settings = { enabled: true, sideJudge: true, confirm: true, recallTopK: 3, recallMinScore: 0.22, recallMinScoreProject: 0.29, recallMinMargin: -1, decayDays: 30 }
+  // 默认是一台配好旁路接口的机器。要测没配齐的情况，把 settings.sideApiBase 清空。
+  const settings = { enabled: true, confirm: true, recallTopK: 3, recallMinScore: 0.22, recallMinScoreProject: 0.29, recallMinMargin: -1, decayDays: 30, sideApiBase: 'https://side.invalid/v1', sideApiModel: 'judge-model' }
+  await fsp.writeFile(path.join(root, 'side-secret.json'), JSON.stringify({ apiKey: 'test-key' }))
   const stdin = new EventEmitter()
   stdin.setEncoding = () => {}
   const output = []

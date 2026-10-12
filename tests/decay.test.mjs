@@ -122,6 +122,9 @@ test('每日遗忘扫描顺带清理前一天已弹窗但未处理的僵尸任�
   assert.equal(JSON.parse(await fsp.readFile(path.join(jobs, 'zombie-old.json'), 'utf8')).reason, 'daily-zombie-cleanup')
   assert.equal(JSON.parse(await fsp.readFile(path.join(jobs, 'pending-today.json'), 'utf8')).status, 'ready')
   assert.equal(JSON.parse(await fsp.readFile(path.join(jobs, 'not-prompted.json'), 'utf8')).status, 'ready')
+  // 判别完成但一直没弹出的旧提案不清理，只留一条日志。
+  assert.equal(JSON.parse(await fsp.readFile(path.join(jobs, 'not-prompted.json'), 'utf8')).prompted, false)
+  assert.equal(h.errors.filter(line => line.includes('1 条前一天及更早判别完成的记忆提案还没弹出确认')).length, 1)
 
   await write('zombie-after-scan', {})
   await render.renderSessionStart()
@@ -280,34 +283,30 @@ test('损坏日检标记会重做检查，但时间戳防止当天再次扣分',
 })
 
 for (const agent of ['cursor', 'codebuddy', 'workbuddy']) {
-  for (const sideJudge of [true, false]) {
-    test(`${agent} sideJudge=${sideJudge} 会话开始先衰减再注入，Stop不衰减`, async t => {
-      const h = await createMemoryHarness(t, { now: START, argv: ['hook', '--agent', agent] })
-      h.settings.sideJudge = sideJudge
-      await h.seed('rule', [memory('expired', { confidence: 0.4, lastSeen: daysAgo(h, 30) }), memory('active', { lastSeen: daysAgo(h, 30) })])
-      const running = h.load('bin/memory.mjs')
-      for (let i = 0; i < 1000 && !h.stdin.listenerCount('end'); i++) await delay(1)
-      assert.ok(h.stdin.listenerCount('end'))
-      h.stdin.emit('data', JSON.stringify({ hook_event_name: agent === 'cursor' ? 'sessionStart' : 'SessionStart' }))
-      h.stdin.emit('end')
-      await running
-      const result = JSON.parse(h.output.join(''))
-      const text = agent === 'cursor' ? result.additional_context : result.hookSpecificOutput.additionalContext
-      assert.match(text, /规则 active（置信度 0.45/)
-      assert.doesNotMatch(text, /规则 expired/)
-      assert.equal((await h.records()).find(mem => mem.id === 'expired').deprecated, true)
-      const stopped = await createMemoryHarness(t, { home: h.home, now: new Date(h.clock.now + 31 * DAY).toISOString(), argv: ['hook', '--agent', agent] })
-      stopped.settings.sideJudge = sideJudge
-      const stop = stopped.load('bin/memory.mjs')
-      for (let i = 0; i < 1000 && !stopped.stdin.listenerCount('end'); i++) await delay(1)
-      assert.ok(stopped.stdin.listenerCount('end'))
-      stopped.stdin.emit('data', JSON.stringify({ hook_event_name: agent === 'cursor' ? 'stop' : 'Stop' }))
-      stopped.stdin.emit('end')
-      await stop
-      assert.equal((await readState(h)).lastRunAt, START)
-      assert.equal((await h.records()).find(mem => mem.id === 'active').confidence, 0.45)
-    })
-  }
+  test(`${agent} 会话开始先衰减再注入，Stop不衰减`, async t => {
+    const h = await createMemoryHarness(t, { now: START, argv: ['hook', '--agent', agent] })
+    await h.seed('rule', [memory('expired', { confidence: 0.4, lastSeen: daysAgo(h, 30) }), memory('active', { lastSeen: daysAgo(h, 30) })])
+    const running = h.load('bin/memory.mjs')
+    for (let i = 0; i < 1000 && !h.stdin.listenerCount('end'); i++) await delay(1)
+    assert.ok(h.stdin.listenerCount('end'))
+    h.stdin.emit('data', JSON.stringify({ hook_event_name: agent === 'cursor' ? 'sessionStart' : 'SessionStart' }))
+    h.stdin.emit('end')
+    await running
+    const result = JSON.parse(h.output.join(''))
+    const text = agent === 'cursor' ? result.additional_context : result.hookSpecificOutput.additionalContext
+    assert.match(text, /规则 active（置信度 0.45/)
+    assert.doesNotMatch(text, /规则 expired/)
+    assert.equal((await h.records()).find(mem => mem.id === 'expired').deprecated, true)
+    const stopped = await createMemoryHarness(t, { home: h.home, now: new Date(h.clock.now + 31 * DAY).toISOString(), argv: ['hook', '--agent', agent] })
+    const stop = stopped.load('bin/memory.mjs')
+    for (let i = 0; i < 1000 && !stopped.stdin.listenerCount('end'); i++) await delay(1)
+    assert.ok(stopped.stdin.listenerCount('end'))
+    stopped.stdin.emit('data', JSON.stringify({ hook_event_name: agent === 'cursor' ? 'stop' : 'Stop' }))
+    stopped.stdin.emit('end')
+    await stop
+    assert.equal((await readState(h)).lastRunAt, START)
+    assert.equal((await h.records()).find(mem => mem.id === 'active').confidence, 0.45)
+  })
 }
 
 test('禁用插件时sessionStart不执行日检', async t => {
