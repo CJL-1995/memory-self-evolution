@@ -75,14 +75,36 @@ function removeHooksFromList(list, agent) {
   return removed
 }
 
+// 每个事件下是一列 { matcher, hooks: [...] } 的那种 hook 配置：在其中新增或更新本插件的那一条。
+export function upsertGroupedHook(list, command, timeout, agent) {
+  for (const group of list) {
+    const hooks = Array.isArray(group && group.hooks) ? group.hooks : []
+    const found = hooks.find((item) => isPluginHook(item && item.command, agent))
+    if (!found) continue
+    found.type = 'command'
+    found.command = command
+    found.timeout = timeout
+    return 'updated'
+  }
+  list.push({
+    matcher: '',
+    hooks: [{ type: 'command', command, timeout }],
+  })
+  return 'added'
+}
+
 // spec 描述一个客户端的配置落在哪、长什么样：
 //   id、name        --agent 的取值和打印用的名字
 //   dir、hooksFile  用户目录下的客户端目录，以及其中放 hook 的文件
 //   events          要注册的事件和各自的超时（秒）
-//   legacyEvent     旧版本注册过、现在要清掉的事件
 //   emptyHooksFile  hook 文件不存在时的初始内容
-//   prepare         可选，写入前补齐这类客户端要求的字段
 //   upsertHook      在某个事件的列表里新增或更新本插件的那一条，返回 added 或 updated
+// 下面几项可以不给：
+//   legacyEvent     旧版本注册过、现在要清掉的事件
+//   prepare         写入前补齐这类客户端要求的字段
+//   afterHooks      hook 写好之后、落盘之前，在同一份配置里再做的事，返回一句说明
+//   cleanup         卸载时移除 hook 之后在同一份配置里收尾，比如清掉 afterHooks 留下的东西；返回一句说明，没有可说的返回空串
+//   registerMcp、removeMcp   MCP 不是写在同目录 mcp.json 里的客户端，自己给出注册和移除的办法
 // 返回的对象是 setup 和 uninstall 用的全部入口。
 export function fileHost(spec) {
   return {
@@ -98,15 +120,16 @@ export function fileHost(spec) {
       if (spec.prepare) spec.prepare(data)
       const command = hookCommand(ctx, spec.id)
       const notes = []
-      const removed = removePluginHookEvent(data.hooks, spec.legacyEvent, spec.id)
+      const removed = spec.legacyEvent ? removePluginHookEvent(data.hooks, spec.legacyEvent, spec.id) : 0
       if (removed > 0) notes.push(`${spec.legacyEvent} removed ${removed}`)
       for (const { event, timeout } of spec.events) {
         if (!Array.isArray(data.hooks[event])) data.hooks[event] = []
         notes.push(`${event} ${spec.upsertHook(data.hooks[event], command, timeout)}`)
       }
+      const extra = spec.afterHooks ? spec.afterHooks(data, ctx) : ''
       writeJson(hooksFile, data)
-      const mcp = registerMcpFile(path.join(dir, 'mcp.json'), spec.id, ctx)
-      return `hooks ${notes.join(', ')}; mcp ${mcp}`
+      const mcp = spec.registerMcp ? spec.registerMcp(home, ctx) : registerMcpFile(path.join(dir, 'mcp.json'), spec.id, ctx)
+      return `hooks ${notes.join(', ')}; mcp ${mcp}${extra ? `; ${extra}` : ''}`
     },
 
     removeHooks(home) {
@@ -117,12 +140,14 @@ export function fileHost(spec) {
       if (!data.hooks || typeof data.hooks !== 'object') return '没有 hooks 字段，已跳过'
       let removed = 0
       for (const list of Object.values(data.hooks)) removed += removeHooksFromList(list, spec.id)
-      if (removed === 0) return '未注册本插件 hook，已跳过'
+      const extra = spec.cleanup ? spec.cleanup(data) : ''
+      if (removed === 0 && !extra) return '未注册本插件 hook，已跳过'
       writeJson(file, data)
-      return `已删除 ${removed} 条 hook`
+      return `已删除 ${removed} 条 hook${extra ? `，${extra}` : ''}`
     },
 
-    removeMcp(home) {
+    removeMcp(home, ctx = {}) {
+      if (spec.removeMcp) return spec.removeMcp(home, ctx)
       const file = path.join(home, spec.dir, 'mcp.json')
       if (!fs.existsSync(path.join(home, spec.dir))) return '客户端目录不存在，已跳过'
       const data = readJsonOrSkip(file)

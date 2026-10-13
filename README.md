@@ -1,8 +1,8 @@
 # memory-self-evolution
 
-给 **Cursor**、**codebuddy** 和 **WorkBuddy** 用的自进化长期记忆。它把你在对话里表达过的偏好、规范和项目事实沉淀下来，靠本地向量模型按相关性召回。记忆强度统一用置信度描述：新建固定 0.5，强化或合并 +0.1，实际召回注入 +0.05，同一条记忆每天合计最多加 0.1，上限 1；闲置满 30 天（`decayDays` 可配置）实际扣除 0.05，降到 0.4 及以下标记废弃，一次都没被用到的新记忆最短 60 天被遗忘。
+给 **Cursor**、**codebuddy**、**WorkBuddy** 和 **Claude Code** 用的自进化长期记忆。它把你在对话里表达过的偏好、规范和项目事实沉淀下来，靠本地向量模型按相关性召回。记忆强度统一用置信度描述：新建固定 0.5，强化或合并 +0.1，实际召回注入 +0.05，同一条记忆每天合计最多加 0.1，上限 1；闲置满 30 天（`decayDays` 可配置）实际扣除 0.05，降到 0.4 及以下标记废弃，一次都没被用到的新记忆最短 60 天被遗忘。
 
-记忆文件存在 `~/.memory-self-evolution/`，三端共用同一份，本地完成向量编码。沉淀新记忆要靠一个你自己提供的模型接口（OpenAI 兼容的 `chat/completions`）：旁路判别会向它发送用户原话和判重所需的相近记忆，不是完全离线运行。没配这个接口时，注入和召回照常工作，但不会记下新内容。用户原话在发送前会先在本地处理：去掉代码块和成片的代码、日志行，把形如密钥的字符串替换成 `[已隐去]`；处理后不足 6 个字或超过 500 个字的不发送。判重时发送的相近记忆不做这层处理。
+记忆文件存在 `~/.memory-self-evolution/`，几个客户端共用同一份，本地完成向量编码。沉淀新记忆要靠一个你自己提供的模型接口（OpenAI 兼容的 `chat/completions`）：旁路判别会向它发送用户原话和判重所需的相近记忆，不是完全离线运行。没配这个接口时，注入和召回照常工作，但不会记下新内容。用户原话在发送前会先在本地处理：去掉代码块和成片的代码、日志行，把形如密钥的字符串替换成 `[已隐去]`；处理后不足 6 个字或超过 500 个字的不发送。判重时发送的相近记忆不做这层处理。
 
 ## 它解决什么
 
@@ -32,7 +32,7 @@ npm run setup
 
 已经 clone 过时，在仓库目录重新执行 `npm install && npm run setup`。`npm run setup` 要在终端里跑，它会按下面的顺序做完。没有终端时它不提问、不改已有配置，后面的下载和注册照做。
 
-1. 只问两件事，其余配置用默认值。
+1. 只问两件事，其余配置用默认值。装了 Claude Code 时会多问一件：是否给 `memory_resolve` 免批准，见下面「在 Claude Code 里」。
    - 弹出确认还是自动追加。直接回车默认弹出确认。
    - 旁路判别接口的 `baseUrl`、`apiKey`、`apiModel`。这三项没有缺省值。输入 `skip` 跳过，安装后自己写入 `~/.memory-self-evolution/config.json` 的 `sideApiBase`、`sideApiModel`，以及 `side-secret.json` 的 `apiKey`。三项配齐之前不会沉淀新记忆，见下面「没配齐接口时」。
 2. 把选择写进 `~/.memory-self-evolution/`。目录不存在时会建出来。这里只落配置和密钥，记忆文件要等第一次写入才出现。同事装完是空记忆库。
@@ -44,10 +44,11 @@ npm run setup
 | Cursor（存在 `~/.cursor`） | `hooks.json` 的 `sessionStart`、`beforeSubmitPrompt`、`stop` | `mcp.json` 的 `memory-self-evolution` |
 | codebuddy（存在 `~/.codebuddy`） | `settings.json` 的 `SessionStart`、`UserPromptSubmit`、`Stop` | `mcp.json` 的 `memory-self-evolution` |
 | WorkBuddy（存在 `~/.workbuddy`） | `settings.json` 的 `SessionStart`、`UserPromptSubmit`、`Stop` | `mcp.json` 的 `memory-self-evolution` |
+| Claude Code（存在 `~/.claude`） | `settings.json` 的 `SessionStart`、`UserPromptSubmit`、`Stop` | 用 `claude mcp add --scope user` 注册，落在 `~/.claude.json` |
 
-三端各自启动同一套 MCP 程序，共享本机记忆文件，不是共用一个常驻进程。工具列表固定为 `memory_list`、`memory_read`、`memory_config` 和 `memory_resolve`，没有能让主模型自己发起写入的工具。
+各端各自启动同一套 MCP 程序，共享本机记忆文件，不是共用一个常驻进程。工具列表固定为 `memory_list`、`memory_read`、`memory_config` 和 `memory_resolve`，没有能让主模型自己发起写入的工具。
 
-注册完成后重启 Cursor、codebuddy 和 WorkBuddy，MCP 才会加载。之后只想重新注册时（比如换了 node 或挪了仓库）运行 `node tools/setup.mjs sidepath`，不再提问，同样会先确认模型缓存再重新注册；重新注册会清理旧版本遗留的本插件工具后 Hook，不影响其他插件。注册的 hook 超时：会话开始 10 秒，回答结束 20 秒；每轮输入的 hook 在 Cursor 是 5 秒，在 codebuddy 和 WorkBuddy 是 10 秒，宿主会等它返回后再把本轮交给模型。
+注册完成后重启 Cursor、codebuddy、WorkBuddy 和 Claude Code，MCP 才会加载。之后只想重新注册时（比如换了 node 或挪了仓库）运行 `node tools/setup.mjs sidepath`，不再提问，同样会先确认模型缓存再重新注册；重新注册会清理旧版本遗留的本插件工具后 Hook，不影响其他插件。只想处理某一端时加 `--only`，比如 `node tools/setup.mjs --only claude`：只注册这一端，不问确认方式和接口，也不读写其它客户端的配置文件。注册的 hook 超时：会话开始 10 秒，回答结束 20 秒；每轮输入的 hook 在 Cursor 是 5 秒，在 codebuddy 和 WorkBuddy 是 10 秒，宿主会等它返回后再把本轮交给模型。
 
 ## 卸载
 
@@ -55,17 +56,17 @@ npm run setup
 npm run uninstall
 ```
 
-插件仓库保留。它会删掉安装时落下的向量模型、三端里本插件的 hook，以及 `mcp.json` 里的 `memory-self-evolution`。其他 hook 和 MCP 不动。
+插件仓库保留。它会删掉安装时落下的向量模型、各端里本插件的 hook 和 MCP 注册。其他 hook 和 MCP 不动。只想去掉某一端时用 `node tools/uninstall.mjs --only claude`，这时向量模型、配置和其它客户端都不动。
 
-`~/.memory-self-evolution/` 目录保留。里面只删 `config.json`、`side-secret.json`、`session-secret` 和 `side/`，其余都不动：记忆 `rule.jsonl` 和 `project.jsonl`、向量索引 `embeddings.jsonl`、给人核对的快照 `memories.md`、日检记录 `decay-state.json`、评测用例 `verify-cases.json`。重新安装时再跑 `npm run setup`，模型会重新下载，配置和本地密钥会在需要时重新生成。卸完后重启三个客户端，MCP 才会从已经打开的会话里消失。
+`~/.memory-self-evolution/` 目录保留。里面只删 `config.json`、`side-secret.json`、`session-secret` 和 `side/`，其余都不动：记忆 `rule.jsonl` 和 `project.jsonl`、向量索引 `embeddings.jsonl`、给人核对的快照 `memories.md`、日检记录 `decay-state.json`、评测用例 `verify-cases.json`。重新安装时再跑 `npm run setup`，模型会重新下载，配置和本地密钥会在需要时重新生成。卸完后重启各客户端，MCP 才会从已经打开的会话里消失。
 
 ## 怎么让它记住东西
 
 沉淀只走旁路这一条通路。`confirm` 只决定写盘前弹不弹确认。
 
-**旁路。** hook 在后台判断这句该不该记，不挡住本轮回答。判别模型一次给出该不该记、记忆正文和分组（`rule` 或 `project`），输出不是 JSON 的按不记处理；要记的再和最相近的 3 条已有记忆比一次，定出新增、强化、合并还是替换。能写记忆的工具只有 `memory_resolve(sessionID, decision)`。`confirm=false` 时后台直接新增、强化、合并或替换，`stop` 只让主模型把结果原样展示出来。`confirm=true` 时，`stop` 让主模型弹出确认，先不写；插件为每条提案给出 sessionID，用户点选后主模型调用一次 `memory_resolve`。decision 统一为 `create_rule`、`create_project`、`reinforce`、`merge`、`replace`、`discard`。`replace` 用在新说法和已有记忆冲突时，用新正文整条换掉旧记忆。新建和 `discard` 总是可选，`reinforce`、`merge`、`replace` 只在这条提案给出了对应选项时才接受。插件只消费 sessionID 对应的当前客户端待确认提案，正文、目标记忆和合并正文不能由主模型覆盖；无效、跨客户端、已处理或动作不匹配的 sessionID 会被拒绝，新一次弹窗会作废同一客户端同一会话之前问过但没点选的提案。sessionID 使用本地 256 位密钥，对 `agent + sessionKey + generation_id + SHA256(prompt) + version` 做 HMAC-SHA256；同一 Hook 重试得到同一个 sessionID，并通过排他建档只启动一次分析。已结束任务保留 24 小时作为幂等墓碑。密钥首次使用时自动生成到 `~/.memory-self-evolution/session-secret`，权限 600，不经 MCP 或上下文返回。使用 CodeBuddy IDE 自定义智能体时，工具白名单里必须包含 `ask_followup_question`，否则无法弹窗。三端共用同一条旁路：请求 `sideApiBase/chat/completions`。`sideApiBase`、`sideApiModel` 和 `side-secret.json` 中的 `apiKey` 都没有缺省值，缺任何一项时不启动判别。
+**旁路。** hook 在后台判断这句该不该记，不挡住本轮回答。判别模型一次给出该不该记、记忆正文和分组（`rule` 或 `project`），输出不是 JSON 的按不记处理；要记的再和最相近的 3 条已有记忆比一次，定出新增、强化、合并还是替换。能写记忆的工具只有 `memory_resolve(sessionID, decision)`。`confirm=false` 时后台直接新增、强化、合并或替换，`stop` 只让主模型把结果原样展示出来。`confirm=true` 时，`stop` 让主模型弹出确认，先不写；插件为每条提案给出 sessionID，用户点选后主模型调用一次 `memory_resolve`。decision 统一为 `create_rule`、`create_project`、`reinforce`、`merge`、`replace`、`discard`。`replace` 用在新说法和已有记忆冲突时，用新正文整条换掉旧记忆。新建和 `discard` 总是可选，`reinforce`、`merge`、`replace` 只在这条提案给出了对应选项时才接受。插件只消费 sessionID 对应的当前客户端待确认提案，正文、目标记忆和合并正文不能由主模型覆盖；无效、跨客户端、已处理或动作不匹配的 sessionID 会被拒绝，新一次弹窗会作废同一客户端同一会话之前问过但没点选的提案。sessionID 使用本地 256 位密钥，对 `agent + sessionKey + 每轮输入的 ID + SHA256(prompt) + version` 做 HMAC-SHA256（每轮输入的 ID 在 Cursor 是 `generation_id`，在 Claude Code 是 `prompt_id`，CodeBuddy 和 WorkBuddy 不提供）；同一 Hook 重试得到同一个 sessionID，并通过排他建档只启动一次分析。已结束任务保留 24 小时作为幂等墓碑。密钥首次使用时自动生成到 `~/.memory-self-evolution/session-secret`，权限 600，不经 MCP 或上下文返回。使用 CodeBuddy IDE 自定义智能体时，工具白名单里必须包含 `ask_followup_question`，否则无法弹窗。各端共用同一条旁路：请求 `sideApiBase/chat/completions`。`sideApiBase`、`sideApiModel` 和 `side-secret.json` 中的 `apiKey` 都没有缺省值，缺任何一项时不启动判别。
 
-旁路任务按 `agent + sessionKey` 强制隔离。Cursor 的 sessionKey 取 `conversation_id`，CodeBuddy / WorkBuddy 取 `session_id`。每次 Stop 只等待、展示和作废当前客户端当前会话的任务；其他会话或其他客户端的任务继续留在池中，等自己的 Stop 处理。Cursor 用于还原隐藏确认指令的临时文件也按客户端和会话分别保存。宿主没有提供稳定会话 ID 时 fail closed：本轮不启动旁路分析并记录原因，避免空 ID 串会话。正式落盘后的 `rule` / `project` 仍是跨会话共享的长期记忆。
+旁路任务按 `agent + sessionKey` 强制隔离。Cursor 的 sessionKey 取 `conversation_id`，CodeBuddy / WorkBuddy / Claude Code 取 `session_id`。每次 Stop 只等待、展示和作废当前客户端当前会话的任务；其他会话或其他客户端的任务继续留在池中，等自己的 Stop 处理。Cursor 用于还原隐藏确认指令的临时文件也按客户端和会话分别保存。宿主没有提供稳定会话 ID 时 fail closed：本轮不启动旁路分析并记录原因，避免空 ID 串会话。正式落盘后的 `rule` / `project` 仍是跨会话共享的长期记忆。
 
 **没配齐接口时。** 判别不启动，不会沉淀新记忆；已有记忆照常注入和召回。这时会话开始和每轮输入注入的不再是「后台在判断」的提醒，而是「记忆沉淀未启用」和启用方法，你陈述偏好或要求记住时，主模型会告诉你这句话不会被记下。急用可以用下面的命令直接写。
 
@@ -86,10 +87,23 @@ node bin/memory.mjs rule add "所有异常处理处都需要添加日志"
 
   > 记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。
 
-  插件发起的确认弹窗标题固定为「记忆确认·插件」。三端只在用户明确点选后调用 `memory_resolve`；明确选择「不落成」时传入同一 sessionID，并使用 `discard` 结束本次分析。提问工具自动返回 `Skipped`，或用户关闭/取消弹窗时不要调用 `memory_resolve`，未处理任务由下一次每日僵尸清理兜底。
+  插件发起的确认弹窗标题固定为「记忆确认·插件」。各端只在用户明确点选后调用 `memory_resolve`；明确选择「不落成」时传入同一 sessionID，并使用 `discard` 结束本次分析。提问工具自动返回 `Skipped`，或用户关闭/取消弹窗时不要调用 `memory_resolve`，未处理任务由下一次每日僵尸清理兜底。
 
+- **Claude Code 里的说法不同**：会话开始的职责边界和上面这段每轮提醒，在 Claude Code 里换成只约束本插件的说法，不要求主模型放下 Claude Code 自带的记忆。
 - **规则上限**：从未废弃的 `rule` 中按已存储置信度降序选前 50 条，同分时最近活跃的在前。每轮语义召回仍从全部未废弃的 `rule` 和 `project` 中检索，不受该 50 条限制。
 - **每轮召回**：`rule` 和 `project` 分别召回，各自过自己的阈值、各自最多 3 条，注入时分「规则」「项目事实」两组列出，不合并排序；两类都没有过线时不注入。打分减的是随仓库分发的固定背景均值，不依赖记忆池，所以只有 1 条记忆时也能召回。项目事实不在 `sessionStart` 注入，只通过每轮召回进入上下文。
+
+## 在 Claude Code 里
+
+命令行和桌面端共用 `~/.claude`，注册一次两边都生效。hook 追加在 `~/.claude/settings.json` 里已有的 hook 之后，互不影响。
+
+注册之后要重启 Claude Code。hook 对已经打开的会话立刻生效，MCP 却要到重启后才加载：这段时间里注入、召回和免确认的写入都正常，但开着确认时没法点选写入，主模型会提示你重启后再说一遍，不会弹窗。
+
+- **MCP 的注册**：Claude Code 的用户级 MCP 存在 `~/.claude.json`，`settings.json` 里的 `mcpServers` 不生效，所以安装脚本调用 `claude mcp add --scope user` 来注册。它先找 `PATH` 里的 `claude`，没有就用桌面端自带的那个（`~/Library/Application Support/Claude/claude-code/` 下版本最新的）；都不在时用环境变量 `MEMORY_CLAUDE_BIN` 指明路径。找不到时 hook 照常注册，并打印出要手动运行的那条命令。
+- **免批准规则**：Claude Code 默认每次调用 MCP 工具都要你批准。开着确认时，在记忆弹窗里点选之后，它还会再问一次是否允许调用 `memory_resolve`。安装时同意的话，脚本会在 `~/.claude/settings.json` 的 `permissions.allow` 里加一条 `mcp__memory-self-evolution__memory_resolve`，只放开这一个工具：它只收 sessionID 和你的选择，只能处理刚弹过窗的提案，改不了正文。没有终端时不加，需要的话照这个名字自己加。`memory_config` 能改判别接口的地址，不放开。卸载时这条规则会一并去掉。
+- **和自带记忆并存**：Claude Code 有自己的一套记忆，按项目存放。插件不去改它的开关，两边各记各的，同一句话可能两边都记下。想只用插件时，在 `~/.claude/settings.json` 里加 `"autoMemoryEnabled": false`。
+- **不送去判别的输入**：子任务里的输入、斜杠命令、以标签开头的内容（任务通知、系统提醒这类由客户端送进来的输入）。召回照常进行。子任务结束时不续轮。
+- **会话开始的注入有上限**：Claude Code 对单次注入限 1 万字，超过会被换成文件路径加一段预览。规则按置信度从高到低列，放不下的不列并注明条数，相关时仍会在每轮召回里出现。按 Claude Code 的文档，压缩上下文之后会再触发一次会话开始，规则随之重新注入。
 
 ## 置信度与旧数据兼容
 
@@ -124,7 +138,9 @@ node bin/memory.mjs read project          # 看项目事实
 node bin/memory.mjs rule add "<规则>"      # 直接新增规则
 node bin/memory.mjs config                # 查看配置
 node bin/memory.mjs config recallTopK 5   # 改配置，下一轮输入即生效
-npm run setup                                 # 交互安装并注册 Cursor / codebuddy / WorkBuddy
+npm run setup                                 # 交互安装并注册 Cursor / codebuddy / WorkBuddy / Claude Code
+node tools/setup.mjs --only claude            # 只注册某一端，不问确认方式和接口，不碰其它客户端
+node tools/uninstall.mjs --only claude        # 只去掉某一端的 hook 和 MCP，模型、配置和其它客户端不动
 npm run uninstall                             # 卸掉模型、hook、MCP 和配置，保留记忆与插件仓库
 node tools/setup.mjs sidepath                 # 不提问，确认模型缓存并重新注册；旧的阻塞模式配置同时改为旁路
 npm test                                      # 隔离回归，不读个人记忆、不请求模型接口
@@ -175,7 +191,7 @@ npm run build-background                      # 重新生成背景均值，换�
 
 改造前（两类合在一起排序、打分减当前记忆池的均值）同一批输入是 42/46 和 13/51，记忆库只有 1 条时召不回。阈值不是常数：换模型、改编码或重新生成背景均值后都要用 `npm run verify` 重新标定，记忆库明显变大后也值得重跑一次。
 
-功能回归使用 `npm test`：全部是隔离测试，覆盖置信度、HMAC sessionID 幂等、客户端与会话隔离、Skip/取消兜底、每日僵尸任务清理、每日实际衰减、衰减天数配置、时间戳重置、跨会话去重、CLI/MCP/旁路入口、接口没配齐和旧阻塞配置下的提示、旧数据兼容、召回边界、并发更新与锁恢复，以及下面「代码结构」里说的两份三端快照，不读取个人记忆或请求模型 API（旁路接口用假的实现代替）。`npm run verify` 是另一套依赖当前用户记忆池的召回评测，用例需按自己的记忆库写在 `~/.memory-self-evolution/verify-cases.json`，格式见 `tools/verify-gate.mjs` 头部注释。
+功能回归使用 `npm test`：全部是隔离测试，覆盖置信度、HMAC sessionID 幂等、客户端与会话隔离、Skip/取消兜底、每日僵尸任务清理、每日实际衰减、衰减天数配置、时间戳重置、跨会话去重、CLI/MCP/旁路入口、接口没配齐和旧阻塞配置下的提示、旧数据兼容、召回边界、并发更新与锁恢复，Claude Code 这一端的适配和安装，以及下面「代码结构」里说的两份三端快照，不读取个人记忆或请求模型 API（旁路接口用假的实现代替）。`npm run verify` 是另一套依赖当前用户记忆池的召回评测，用例需按自己的记忆库写在 `~/.memory-self-evolution/verify-cases.json`，格式见 `tools/verify-gate.mjs` 头部注释。
 
 ## 代码结构
 
@@ -199,6 +215,8 @@ Cursor、CodeBuddy、WorkBuddy 的行为由两份快照锁住：`tests/fixtures/
 没有删除或改分组的命令。正文可以靠重新说一遍、走合并或替换来改；要删掉一条记忆或把它换到另一组，只能等它衰减，或者手动改 `rule.jsonl`、`project.jsonl`（换组时记录里的 `category` 字段要一起改）。手改正文后向量不会跟着更新，要再跑一次 `npm run rebuild-index`。
 
 hook 每次都重新读 `config.json`，注入、判别和弹不弹确认都跟着最新的配置走。MCP 进程只在启动时读一次，受影响的只有 `memory_config` 自己：它显示的是进程启动时的值加上它自己改过的值；用它改一项时，其它项会按这份旧值一起写回文件，盖掉之后在命令行、文件或另一个客户端里改过的值。`memory_resolve` 不读配置。另外，用命令或 `memory_config` 改过任意一项后，全部配置项都会按当时的值写进文件，之后仓库更新的默认值不会自动生效。
+
+Claude Code 这一端的弹窗确认（回答结束时续一轮、弹出提问、点选后调用 `memory_resolve`）在真实的桌面端会话里验证到了「续一轮并把指令交给主模型」这一步，点选后写入这一步还只在隔离测试和脚本里验证过。定时任务和 `/loop` 送进来的输入长什么样也没有实测，现在是按开头的形状挡掉的。
 
 判别模型只看用户当前这一句，而且是本地处理之后的 6 到 500 个字。指代上文的话、要结合好几轮才看得出的纠正、主模型自己查出来而用户没有说出口的事实，都不会被记下。
 

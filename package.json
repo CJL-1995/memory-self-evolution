@@ -1,7 +1,7 @@
 {
   "name": "memory-self-evolution",
   "version": "0.2.0",
-  "description": "为 Cursor、codebuddy 与 WorkBuddy 提供的自进化长期记忆：本地向量语义召回、置信度演化、跨会话沉淀，通过 hook 注入与 MCP 工具接入",
+  "description": "为 Cursor、codebuddy、WorkBuddy 与 Claude Code 提供的自进化长期记忆：本地向量语义召回、置信度演化、跨会话沉淀，通过 hook 注入与 MCP 工具接入",
   "type": "module",
   "bin": {
     "memory-self-evolution": "./bin/memory.mjs",
