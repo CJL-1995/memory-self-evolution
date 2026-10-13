@@ -19,7 +19,7 @@ import { fmtConfidence, readAllGroups, readGroup } from '../lib/core/store.mjs'
 import { renderRecall, renderSessionStart } from '../lib/core/render.mjs'
 import { persistMemory } from '../lib/core/writer.mjs'
 import { describeSettings, loadSettings, updateSetting } from '../lib/core/settings.mjs'
-import { CONFIRM_MARK, hiddenNoticeForPrompt, isUserNotice, maybeStartSideJob, runSideJob, takeSideFollowup } from '../lib/core/sidepath.mjs'
+import { CONFIRM_MARK, hiddenNoticeForPrompt, isUserNotice, maybeStartSideJob, runSideJob, sedimentBlocker, sedimentOffNotice, takeSideFollowup } from '../lib/core/sidepath.mjs'
 
 // Cursor 用 camelCase 事件名 + prompt 字段，输出 additional_context。
 // codebuddy 与 WorkBuddy 都是 Claude Code 系：PascalCase 事件名，输出 hookSpecificOutput.additionalContext。
@@ -98,7 +98,7 @@ async function runHook(argv) {
     let followup = null
     try {
       const settings = await loadSettings()
-      if (settings.enabled && settings.sideJudge) {
+      if (settings.enabled) {
         followup = await takeSideFollowup(agent, payload, settings.sideWaitMs)
       }
     } catch (e) {
@@ -113,8 +113,11 @@ async function runHook(argv) {
   if (kind === 'prompt') {
     try {
       const settings = await loadSettings()
-      if (settings.enabled && settings.sideJudge && promptText && !isUserNotice(promptText) && !promptText.includes(CONFIRM_MARK)) {
-        reminder = '记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。'
+      if (settings.enabled && promptText && !isUserNotice(promptText) && !promptText.includes(CONFIRM_MARK)) {
+        const blocker = await sedimentBlocker(settings)
+        reminder = blocker
+          ? sedimentOffNotice(blocker)
+          : '记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。'
       }
       await maybeStartSideJob({ agent, payload, promptText })
     } catch (e) {

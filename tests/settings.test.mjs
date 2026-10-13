@@ -62,3 +62,19 @@ test('通过updateSetting修改decayDays，非法值被拒绝且不写入', asyn
   assert.equal(JSON.parse(await fsp.readFile(configFile, 'utf8')).decayDays, 14)
   assert.equal((await settings.loadSettings()).decayDays, 14)
 })
+
+test('sideJudge不再是配置项，旧配置里的false原样保留，改其它配置时不丢', async () => {
+  const fresh = await freshSettings({ sideJudge: true, confirm: false })
+  assert.equal('sideJudge' in await fresh.loadSettings(), false)
+  assert.equal((await fresh.describeSettings()).some(item => item.key === 'sideJudge'), false)
+  assert.equal((await fresh.updateSetting('sideJudge', 'false')).ok, false)
+
+  const legacy = await freshSettings({ sideJudge: false, confirm: false })
+  assert.equal((await legacy.loadSettings()).sideJudge, false)
+  assert.equal((await legacy.describeSettings()).some(item => item.key === 'sideJudge'), false)
+  assert.equal((await legacy.updateSetting('sideJudge', 'true')).ok, false)
+  assert.equal((await legacy.updateSetting('confirm', 'true')).ok, true)
+  const saved = JSON.parse(await fsp.readFile(configFile, 'utf8'))
+  assert.equal(saved.sideJudge, false)
+  assert.equal(saved.confirm, true)
+})

@@ -4,10 +4,8 @@
 // 手写协议而不引依赖：这个 server 要被短命/常驻两种方式反复启动，依赖越少启动越快、越不易坏。
 
 import { GROUPS, READ_LIMIT } from '../lib/core/config.mjs'
-import { fmtConfidence, readAllGroups, readAllMemories, readGroup } from '../lib/core/store.mjs'
-import { recall } from '../lib/core/recall.mjs'
-import { inferGroup, mergeMemory, persistMemory, reinforceMemory } from '../lib/core/writer.mjs'
-import { describeSettings, loadSettings, updateSetting } from '../lib/core/settings.mjs'
+import { fmtConfidence, readAllGroups, readGroup } from '../lib/core/store.mjs'
+import { describeSettings, updateSetting } from '../lib/core/settings.mjs'
 import { resolvePendingSession } from '../lib/core/sidepath.mjs'
 
 const PROTOCOL_VERSION = '2024-11-05'
@@ -33,65 +31,8 @@ const TOOLS = [
     },
   },
   {
-    name: 'memory_propose',
-    description:
-      '提交一条值得长期记住的记忆（用户的偏好、规范、项目事实，或对同一件事的第二次纠正）。仅阻塞模式使用，不直接落盘。返回最相近的两条记忆、相似度，以及新建、强化或合并的判重提示。相似度越高越应当强化，而不是新建。确认模式下先按提示选定动作，再用宿主提问工具确认后落盘。一次性任务细节不要提交。正文必须自包含。',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        text: { type: 'string', description: '一句清晰、可执行、自包含的中文陈述' },
-        evidence: { type: 'string', description: '简短佐证，说明用户在哪句话里表达了它' },
-      },
-      required: ['text'],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: 'memory_persist',
-    description: '把记忆正式写入，初始置信度固定为 0.5。阻塞模式在 memory_propose 之后、且用户已确认时调用。',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        text: { type: 'string', description: '记忆正文，中文，须自包含' },
-        category: {
-          type: 'string',
-          enum: GROUPS,
-          description: 'rule=无条件遵守的偏好与规范，每轮都会注入；project=需要时才查阅的项目事实，靠相关性召回。拿不准时选 rule：漏判规则会让它静默失效，多判只是多占一点上下文。',
-        },
-        evidence: { type: 'string' },
-      },
-      required: ['text', 'category'],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: 'memory_reinforce',
-    description: '强化一条已有记忆（置信度 +0.1，上限 1；同一条记忆每天合计最多加 0.1）。阻塞模式在用户确认强化后调用。',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: '要强化的已有记忆 id' },
-      },
-      required: ['id'],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: 'memory_merge',
-    description: '用合并后的正文替换一条已有记忆，丢掉旧向量并重新编码，同时做一次强化（置信度 +0.1，上限 1；同一条记忆每天合计最多加 0.1，当天已加满时只替换正文）。',
-    inputSchema: {
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: '要改写的已有记忆 id' },
-        text: { type: 'string', description: '合并后的自包含中文正文，写当前生效的结论' },
-      },
-      required: ['id', 'text'],
-      additionalProperties: false,
-    },
-  },
-  {
     name: 'memory_resolve',
-    description: '处理插件弹窗中的一条待确认记忆。仅旁路模式使用；sessionID 必须照抄插件提供的值，decision 必须与用户点选一致。正文、目标记忆和合并正文均由插件内部提案决定。',
+    description: '处理插件弹窗中的一条待确认记忆。sessionID 必须照抄插件提供的值，decision 必须与用户点选一致。正文、目标记忆和合并正文均由插件内部提案决定。',
     inputSchema: {
       type: 'object',
       properties: {
@@ -108,7 +49,7 @@ const TOOLS = [
   },
   {
     name: 'memory_config',
-    description: '查看或修改记忆系统配置。不传参数即查看全部；传 key 与 value 则修改。可调项含 recallTopK（rule 和 project 每轮各自最多召回几条，默认 3）、recallMinScore（rule 的召回下限）与 recallMinScoreProject（project 的召回下限），各自与同类 top1×0.6 取更高者作为保留线；recallMinMargin（领先幅度门控，-1 为关闭）、confirm（写盘前是否弹确认，旁路和阻塞都适用）、decayDays（闲置满多少天扣一次置信度，正整数，默认 30）、enabled、sideApiBase、sideApiModel。sideApiBase 和 sideApiModel 没有缺省值，旁路必填。旁路 API 密钥不在这里，放在 side-secret.json 的 apiKey，同样必填。sideJudge 不能在这里改，切换通路用 node tools/setup.mjs sidepath 或 node tools/setup.mjs blocking。',
+    description: '查看或修改记忆系统配置。不传参数即查看全部；传 key 与 value 则修改。可调项含 recallTopK（rule 和 project 每轮各自最多召回几条，默认 3）、recallMinScore（rule 的召回下限）与 recallMinScoreProject（project 的召回下限），各自与同类 top1×0.6 取更高者作为保留线；recallMinMargin（领先幅度门控，-1 为关闭）、confirm（写盘前是否弹确认）、decayDays（闲置满多少天扣一次置信度，正整数，默认 30）、enabled、sideApiBase、sideApiModel。sideApiBase 和 sideApiModel 没有缺省值，旁路必填。旁路 API 密钥不在这里，放在 side-secret.json 的 apiKey，同样必填。',
     inputSchema: {
       type: 'object',
       properties: {
@@ -121,43 +62,6 @@ const TOOLS = [
 ]
 
 const text = (s) => ({ content: [{ type: 'text', text: s }] })
-
-// 旁路只暴露统一确认工具；阻塞模式继续使用原有的提案与写入工具。
-const SIDEPATH_HIDDEN = new Set(['memory_propose', 'memory_persist', 'memory_reinforce', 'memory_merge'])
-const BLOCKING_HIDDEN = new Set(['memory_resolve'])
-
-function sidepathWriteRefusal() {
-  return text('当前是旁路模式，没有 memory_propose。要不要记由后台判断。')
-}
-
-const PROPOSE_TOP_K = 2
-
-const DEDUP_HINT = [
-  '判重由你完成。相似度只说明检索有多近，不代替判断。',
-  '- 相似度越高，越应当强化已有记忆，而不是新建一条近义重复。',
-  '- 先看是不是同一件事：对象相同、结论指向同一规则域才算。平台、语言不同仍是同一件事，不要因此新建。',
-  '- 同一件事，只是换措辞，或新陈述是已有规则已经覆盖的子集、没有新约束：调用 memory_reinforce，id 用上面列出的 id，正文不动。不要把更宽的旧规则改窄。',
-  '- 同一件事，但有新事实、取值冲突、适用范围扩大，或明确要求旧规则以后只在更小的范围生效：调用 memory_merge。id 必须用上面列出的 id，不要编造。text 写合并后的当前结论，自包含；冲突以本次陈述为准，不冲突的旧信息保留；不要写「原先怎样、现在改成怎样」。',
-  '- 拿不准就新建，不要错误合并。',
-].join('\n')
-
-function otherGroup(group) {
-  return group === 'rule' ? 'project' : 'rule'
-}
-
-function hostQuestionGuide(prompt, options) {
-  const optionLines = options.map((label) => `- ${label}`).join('\n')
-  return [
-    '下一步必须调用当前宿主的应用内提问工具，由它弹出确认。禁止在对话里写草稿或列表，禁止使用系统弹窗。',
-    'Cursor 用 AskQuestion，CodeBuddy 与 WorkBuddy 用 AskUserQuestion。题面和选项照抄，不要改写。',
-    '',
-    `题面：${prompt}`,
-    '选项：',
-    optionLines,
-    '',
-    '用户点选落成之后调用 memory_persist。选「不落成」则不要写盘。',
-  ].join('\n')
-}
 
 async function memoryList() {
   const groups = await readAllGroups()
@@ -184,117 +88,7 @@ async function memoryRead(args) {
   return text(`${head}\n${body}`)
 }
 
-async function listTools() {
-  const settings = await loadSettings()
-  const hidden = settings.sideJudge ? SIDEPATH_HIDDEN : BLOCKING_HIDDEN
-  return TOOLS.filter((tool) => !hidden.has(tool.name))
-}
-
-async function memoryPropose(args) {
-  const settings = await loadSettings()
-  if (settings.sideJudge) return sidepathWriteRefusal()
-
-  const content = String(args.text || '').trim()
-  if (!content) return text('参数 text 不能为空')
-  const all = await readAllMemories()
-  // 关掉门控拿最相近的两条。分数只交给模型参考，不在这里决定新建、强化或合并。
-  let similar = []
-  try {
-    similar = await recall([content], all, { topK: PROPOSE_TOP_K, gate: false })
-  } catch (e) {
-    console.error(`[memory] 判重召回失败，跳过相近记忆提示: ${e.message}`)
-  }
-
-  const lines = [`待沉淀内容：${content}`]
-  if (similar.length > 0) {
-    lines.push('', `最相近的 ${similar.length} 条已有记忆（合并或强化时 id 用这里的值）：`)
-    similar.forEach((s, i) => {
-      lines.push(`${i + 1}. id：${s.memory.id}`)
-      lines.push(`   相似度：${s.score.toFixed(2)}`)
-      lines.push(`   分组：${s.memory.category}`)
-      lines.push(`   正文：${s.memory.text}`)
-    })
-    lines.push('', DEDUP_HINT)
-  } else {
-    lines.push('', '没有语义相近的已有记忆。按新建处理，调用 memory_persist。')
-  }
-
-  const guess = inferGroup(content)
-  const groupNote = guess.confident ? '正文的语气信号明确' : '正文没有明确信号，这是保守默认值'
-  lines.push('', `分组建议：${guess.group}（${groupNote}）`)
-
-  if (!settings.confirm && guess.confident) {
-    lines.push('', similar.length > 0
-      ? '当前不需要确认，且分组信号明确：按上面的规则直接调用。memory_reinforce 和 memory_merge 的 id 用上面列出的 id。'
-      : '当前不需要确认，且分组信号明确：直接调用 memory_persist。')
-    return text(lines.join('\n'))
-  }
-
-  if (similar.length === 0) {
-    const alt = otherGroup(guess.group)
-    lines.push('', hostQuestionGuide(
-      `检测到一条记忆，建议落成 ${guess.group}。是否落成记忆。\n正文：${content}\n推荐标签：${guess.group}`,
-      [
-        `落成，使用推荐标签 ${guess.group}`,
-        `落成，把标签改为 ${alt}`,
-        '不落成',
-      ],
-    ))
-    return text(lines.join('\n'))
-  }
-
-  lines.push('', blockingDedupConfirm(content, guess, similar))
-  return text(lines.join('\n'))
-}
-
-function blockingDedupConfirm(content, guess, similar) {
-  const alt = otherGroup(guess.group)
-  const idLines = similar.map((s) => `- ${s.memory.id}`).join('\n')
-  return [
-    '先按判重规则选定新建、强化或合并，再用宿主提问工具弹出确认。禁止在对话里写草稿，禁止使用系统弹窗。',
-    'Cursor 用 AskQuestion，CodeBuddy 与 WorkBuddy 用 AskUserQuestion。',
-    '',
-    `正文：${content}`,
-    `推荐标签：${guess.group}`,
-    '可用的已有记忆 id：',
-    idLines,
-    '按选定的动作出题，不要把三种动作塞进同一题。id 只能从上面选：',
-    '- 强化：选项为「强化已有记忆」加上选中的 id，以及「不落成」。点选强化后调用 memory_reinforce，id 用选中的 id。',
-    '- 合并：题面写上合并后正文。选项为「合并进已有记忆」加上选中的 id，以及「不落成」。点选合并后调用 memory_merge，id 用选中的 id，text 用合并正文。',
-    `- 新建：选项为「落成，使用推荐标签 ${guess.group}」「落成，把标签改为 ${alt}」「不落成」。点选落成后调用 memory_persist。`,
-    '选「不落成」则不要写盘。',
-  ].join('\n')
-}
-
-async function memoryPersist(args) {
-  const settings = await loadSettings()
-  if (settings.sideJudge) return text('旁路模式只允许使用 memory_resolve 处理插件待确认记忆。')
-  const mem = await persistMemory({
-    text: args.text,
-    category: args.category,
-    evidence: args.evidence,
-  })
-  const note = mem.category === 'rule' ? '下个会话开始起无条件注入' : '将按相关性自动召回'
-  return text(`已沉淀为 ${mem.category}：${mem.text}（置信度 ${fmtConfidence(mem.confidence)}，id ${mem.id}）。${note}。`)
-}
-
-async function memoryReinforce(args) {
-  const settings = await loadSettings()
-  if (settings.sideJudge) return text('旁路模式只允许使用 memory_resolve 处理插件待确认记忆。')
-  const mem = await reinforceMemory(String(args.id || '').trim())
-  return text(`已强化 ${mem.category} 中的记忆：${mem.text}（置信度 ${fmtConfidence(mem.confidence)}）`)
-}
-
-async function memoryMerge(args) {
-  const settings = await loadSettings()
-  if (settings.sideJudge) return text('旁路模式只允许使用 memory_resolve 处理插件待确认记忆。')
-  const mem = await mergeMemory(String(args.id || '').trim(), args.text)
-  return text(`已合并进 ${mem.category} 中的记忆：${mem.text}（置信度 ${fmtConfidence(mem.confidence)}，id ${mem.id}）`)
-}
-
 async function memoryResolve(args) {
-  const settings = await loadSettings()
-  if (!settings.sideJudge) return text('memory_resolve 仅用于旁路模式的插件确认流程。')
   const result = await resolvePendingSession(args.sessionID, args.decision, AGENT)
   return text(result.message)
 }
@@ -305,9 +99,6 @@ async function memoryConfig(args) {
     const body = items.map((i) => `- ${i.key} = ${i.value}${i.isDefault ? '（默认）' : ''}`).join('\n')
     return text(`当前配置：\n${body}`)
   }
-  if (args.key === 'sideJudge') {
-    return text('sideJudge 不能在这里改。切换通路请在仓库里运行 node tools/setup.mjs sidepath 或 node tools/setup.mjs blocking，然后重启 Cursor、codebuddy、WorkBuddy。')
-  }
   if (args.value === undefined) return text('修改配置需要同时提供 key 与 value')
   const r = await updateSetting(args.key, args.value)
   return text(r.message)
@@ -316,10 +107,6 @@ async function memoryConfig(args) {
 const HANDLERS = {
   memory_list: memoryList,
   memory_read: memoryRead,
-  memory_propose: memoryPropose,
-  memory_persist: memoryPersist,
-  memory_reinforce: memoryReinforce,
-  memory_merge: memoryMerge,
   memory_resolve: memoryResolve,
   memory_config: memoryConfig,
 }
@@ -337,7 +124,7 @@ async function handle(req) {
       serverInfo: { name: 'memory-self-evolution', version: '0.2.0' },
     }
   }
-  if (method === 'tools/list') return { tools: await listTools() }
+  if (method === 'tools/list') return { tools: TOOLS }
   if (method === 'tools/call') {
     const name = params && params.name
     const handler = HANDLERS[name]

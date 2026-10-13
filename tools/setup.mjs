@@ -2,10 +2,11 @@
 // 给当前用户注册 Cursor、codebuddy 与 WorkBuddy 的 hook 和 MCP。
 // 已有其他 hook / MCP 会保留。本插件已注册时只更新 node 与仓库路径，不重复追加。
 //
-// 不带参数：交互安装。问通路和是否弹确认；旁路再问 baseUrl、apiKey、apiModel。
+// 不带参数：交互安装。问是否弹确认，再问旁路接口的 baseUrl、apiKey、apiModel。
 // 注册 hook 之前会下载向量模型 bge-base-zh-v1.5。缓存已在则直接复用。下载失败则中止安装。
-// 直接回车默认旁路式、弹出确认。旁路三项输入 skip 则跳过，安装后自行配置。
-// sidepath / blocking：只改通路并重新注册，不再提问。
+// 直接回车默认弹出确认。接口三项输入 skip 则跳过，安装后自行配置；配齐之前不会沉淀新记忆。
+// sidepath：不提问，只重新注册。旧版本留下的阻塞模式配置同时改为旁路。
+// 阻塞模式已移除，blocking 参数会报错退出。
 // 用法：npm install && npm run setup
 
 import fs from 'node:fs'
@@ -94,7 +95,7 @@ function registerMcp(file, agent) {
     type: 'stdio',
     command: nodeBin,
     args: [mcpScript, '--agent', agent],
-    description: '跨会话长期记忆：读取记忆、沉淀新记忆、强化已有记忆、处理待确认候选',
+    description: '跨会话长期记忆：读取记忆、处理插件发起的记忆确认',
   }
   writeJson(file, data)
   return existed ? 'updated' : 'added'
@@ -155,12 +156,28 @@ function configFile(home) {
   return path.join(home, '.memory-self-evolution', 'config.json')
 }
 
-function setMode(home, mode) {
+// 旧版本的阻塞模式在配置里留下 sideJudge=false。这个键还在时 hook 不会启动旁路。
+function hasLegacyBlocking(home) {
+  return readJson(configFile(home), {}).sideJudge === false
+}
+
+// sideJudge 不再是配置项。删掉它即表示这台机器改走旁路。
+function clearLegacyMode(home) {
   const file = configFile(home)
   const data = readJson(file, {})
-  data.sideJudge = mode === 'sidepath'
+  if (!('sideJudge' in data)) return
+  delete data.sideJudge
   writeJson(file, data)
-  return data.sideJudge
+}
+
+function missingSideApi(home) {
+  const config = readJson(configFile(home), {})
+  const secret = readJson(path.join(home, '.memory-self-evolution', 'side-secret.json'), {})
+  const missing = []
+  if (!config.sideApiBase) missing.push('config.json 的 sideApiBase')
+  if (!config.sideApiModel) missing.push('config.json 的 sideApiModel')
+  if (!String(secret.apiKey || '').trim()) missing.push('side-secret.json 的 apiKey')
+  return missing
 }
 
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
@@ -215,8 +232,8 @@ async function askRequired(label) {
 
 async function askSideApi() {
   console.log('')
-  console.log('旁路式需要 baseUrl、apiKey、apiModel，三项都必填，没有缺省值。')
-  console.log('输入 skip 跳过。安装完成后自行写入：')
+  console.log('旁路判别需要 baseUrl、apiKey、apiModel，三项都必填，没有缺省值。')
+  console.log('输入 skip 跳过。配齐之前不会沉淀新记忆。安装完成后自行写入：')
   console.log('  ~/.memory-self-evolution/config.json 的 sideApiBase、sideApiModel')
   console.log('  ~/.memory-self-evolution/side-secret.json 的 apiKey')
   const baseUrl = await askRequired('baseUrl')
@@ -239,7 +256,7 @@ function writeSideSecret(home, apiKey) {
 function applyChoices(home, choices) {
   const file = configFile(home)
   const data = readJson(file, {})
-  data.sideJudge = choices.sidepath
+  delete data.sideJudge
   data.confirm = choices.confirm
   if (choices.api) {
     data.sideApiBase = choices.api.baseUrl
@@ -250,16 +267,12 @@ function applyChoices(home, choices) {
 }
 
 async function askInstallChoices() {
-  const sidepath = await askChoice('判别方式：', [
-    { value: true, menu: '1) 旁路式（直接回车）', aliases: ['1', '旁路', '旁路式', 'sidepath'] },
-    { value: false, menu: '2) 阻塞式', aliases: ['2', '阻塞', '阻塞式', 'blocking'] },
-  ])
   const confirm = await askChoice('写盘方式：', [
     { value: true, menu: '1) 弹出确认（直接回车）', aliases: ['1', '弹窗', '弹出', '确认', 'confirm'] },
     { value: false, menu: '2) 自动追加', aliases: ['2', '自动', '自动追加', 'auto'] },
   ])
-  const api = sidepath ? await askSideApi() : null
-  return { sidepath, confirm, api }
+  const api = await askSideApi()
+  return { confirm, api }
 }
 
 async function ensureVectorModel() {
@@ -281,10 +294,15 @@ function registerAll(home) {
 }
 
 const modeArg = process.argv[2]
-if (modeArg && modeArg !== 'sidepath' && modeArg !== 'blocking') {
-  console.error('用法：node tools/setup.mjs [sidepath|blocking]')
-  console.error('不带参数进入交互安装：选择旁路或阻塞、弹窗或自动追加；旁路再填 baseUrl、apiKey、apiModel。')
-  console.error('sidepath / blocking 只切换通路并重新注册，不再提问。')
+if (modeArg === 'blocking') {
+  console.error('阻塞模式已移除。现在只有旁路式：后台调用配置的模型接口判断要不要记，写盘前弹不弹确认仍由 confirm 决定。')
+  console.error('运行 npm run setup 重新安装，或 node tools/setup.mjs sidepath 不提问、只重新注册。')
+  process.exit(1)
+}
+if (modeArg && modeArg !== 'sidepath') {
+  console.error('用法：node tools/setup.mjs [sidepath]')
+  console.error('不带参数进入交互安装：选择弹窗或自动追加，再填旁路接口的 baseUrl、apiKey、apiModel。')
+  console.error('sidepath 不提问，只重新注册；旧版本留下的阻塞模式配置同时改为旁路。')
   process.exit(1)
 }
 
@@ -293,36 +311,33 @@ migrateDataDir(home)
 console.log(`node ${nodeBin}`)
 console.log(`仓库 ${repoRoot}`)
 
-if (!modeArg && !process.stdin.isTTY) {
-  console.error('当前没有终端，跳过安装提问。仍会下载向量模型并注册 hook 和 MCP。要选择通路和确认方式，请在终端重新运行 npm run setup。')
+const legacyBlocking = hasLegacyBlocking(home)
+if (legacyBlocking) {
+  console.log('检测到旧版本的阻塞模式配置。阻塞模式已移除，现在只有旁路式：用户原话会发给配置的模型接口，由它判断要不要记。')
 }
 
-let chosenSidepath = null
 if (modeArg) {
-  chosenSidepath = modeArg === 'sidepath'
-  const sideJudge = setMode(home, modeArg)
-  console.log(`通路已设为 ${modeArg}（sideJudge=${sideJudge}）`)
+  clearLegacyMode(home)
+  if (legacyBlocking) console.log('已改为旁路式。')
 } else if (process.stdin.isTTY) {
   const choices = await askInstallChoices()
-  chosenSidepath = choices.sidepath
   applyChoices(home, choices)
-  console.log(`通路：${choices.sidepath ? '旁路式' : '阻塞式'}`)
   console.log(`写盘：${choices.confirm ? '弹出确认' : '自动追加'}`)
-  if (choices.sidepath && choices.api) {
+  if (choices.api) {
     console.log(`旁路 baseUrl：${choices.api.baseUrl}`)
     console.log(`旁路 apiModel：${choices.api.apiModel}`)
     console.log('apiKey 已写入 ~/.memory-self-evolution/side-secret.json')
-  } else if (choices.sidepath) {
-    console.log('已跳过旁路接口。安装后写入 config.json 的 sideApiBase、sideApiModel，以及 side-secret.json 的 apiKey。三项缺一，旁路不会写记忆。')
   }
+} else {
+  console.error('当前没有终端，跳过安装提问。仍会下载向量模型并注册 hook 和 MCP。要选择确认方式、填写旁路接口，请在终端重新运行 npm run setup。')
+  if (legacyBlocking) console.error('旧的阻塞模式配置没有改动，旁路不会启动。在终端运行 npm run setup 或 node tools/setup.mjs sidepath 后才启用。')
 }
 
 rl.close()
 await ensureVectorModel()
 registerAll(home)
-if (chosenSidepath === false) {
-  console.log('重启后主模型才能看到 memory_propose、memory_persist、memory_reinforce、memory_merge。')
-}
-if (chosenSidepath === true) {
-  console.log('重启后主模型只能看到旁路确认工具 memory_resolve，memory_propose、memory_persist、memory_reinforce、memory_merge 不列出。三端都在插件确认弹窗点选后按 sessionID 调用 memory_resolve。')
+console.log('重启后主模型能看到 memory_list、memory_read、memory_config，以及处理插件确认弹窗的 memory_resolve。')
+const missing = missingSideApi(home)
+if (missing.length > 0) {
+  console.log(`旁路接口还缺：${missing.join('、')}（都在 ~/.memory-self-evolution/ 下）。配齐之前不会沉淀新记忆，已有记忆照常注入和召回；会话开始时会把这一点告诉主模型。`)
 }

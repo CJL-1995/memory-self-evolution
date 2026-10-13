@@ -86,25 +86,23 @@ test('批量实际召回每 id 每天加一次 0.05，去重且忽略失效或�
   assert.equal((await writer.rewardRecalledMemories([])).length, 0)
 })
 
-for (const sideJudge of [true, false]) {
-  for (const confirm of [true, false]) {
-    test(`实际召回输出加分，sideJudge=${sideJudge} confirm=${confirm}`, async t => {
-      const h = await createMemoryHarness(t, { now: START })
-      Object.assign(h.settings, { sideJudge, confirm })
-      await h.seed('rule', [memory('hit'), memory('miss')])
-      h.state.hits = ['hit', 'hit']
-      const render = await h.load('lib/core/render.mjs')
-      const text = await render.renderRecall(['用户问题'])
-      assert.match(text, /置信度 0.55/)
-      assert.equal(text.split('规则 hit').length - 1, 1)
-      assert.equal((await h.records()).find(mem => mem.id === 'miss').confidence, 0.5)
-      assert.match(await render.renderRecall(['用户下一轮问题']), /置信度 0.55/)
-      assert.equal((await h.records()).find(mem => mem.id === 'hit').confidence, 0.55)
-      h.clock.now += DAY
-      assert.match(await render.renderRecall(['第二天的问题']), /置信度 0.6/)
-      assert.equal((await h.records()).find(mem => mem.id === 'hit').confidence, 0.6)
-    })
-  }
+for (const confirm of [true, false]) {
+  test(`实际召回输出加分，confirm=${confirm}`, async t => {
+    const h = await createMemoryHarness(t, { now: START })
+    h.settings.confirm = confirm
+    await h.seed('rule', [memory('hit'), memory('miss')])
+    h.state.hits = ['hit', 'hit']
+    const render = await h.load('lib/core/render.mjs')
+    const text = await render.renderRecall(['用户问题'])
+    assert.match(text, /置信度 0.55/)
+    assert.equal(text.split('规则 hit').length - 1, 1)
+    assert.equal((await h.records()).find(mem => mem.id === 'miss').confidence, 0.5)
+    assert.match(await render.renderRecall(['用户下一轮问题']), /置信度 0.55/)
+    assert.equal((await h.records()).find(mem => mem.id === 'hit').confidence, 0.55)
+    h.clock.now += DAY
+    assert.match(await render.renderRecall(['第二天的问题']), /置信度 0.6/)
+    assert.equal((await h.records()).find(mem => mem.id === 'hit').confidence, 0.6)
+  })
 }
 
 test('关闭功能、空输入、无命中和召回失败不加分', async t => {
@@ -131,28 +129,20 @@ test('会话开始按置信度选前 50 条，但不会因为注入而加分', a
   await h.seed('rule', rules)
   const before = await fsp.readFile(path.join(h.root, 'rule.jsonl'), 'utf8')
   const render = await h.load('lib/core/render.mjs')
-  for (const sideJudge of [true, false]) {
-    h.settings.sideJudge = sideJudge
-    const text = await render.renderSessionStart()
-    assert.match(text, /规则 r51（/)
-    assert.doesNotMatch(text, /规则 r0（|规则 r1（|规则 deleted（/)
-    assert.match(text, /其余 2 条按置信度截断/)
-    assert.equal(await fsp.readFile(path.join(h.root, 'rule.jsonl'), 'utf8'), before)
-    assert.equal(text.includes('后台自动提取'), sideJudge)
-  }
+  const text = await render.renderSessionStart()
+  assert.match(text, /规则 r51（/)
+  assert.doesNotMatch(text, /规则 r0（|规则 r1（|规则 deleted（/)
+  assert.match(text, /其余 2 条按置信度截断/)
+  assert.equal(await fsp.readFile(path.join(h.root, 'rule.jsonl'), 'utf8'), before)
+  assert.match(text, /后台自动提取/)
+  assert.doesNotMatch(text, /记忆沉淀未启用|memory_propose|沉淀规则/)
 })
 
 test('会话开始不列出项目事实，记忆再少也一样', async t => {
   const h = await createMemoryHarness(t)
   await h.seed('project', [memory('only', { category: 'project', text: '唯一的一条项目事实' })])
   const render = await h.load('lib/core/render.mjs')
-  h.settings.sideJudge = true
   assert.doesNotMatch(await render.renderSessionStart(), /项目事实|唯一的一条项目事实/)
-  h.settings.sideJudge = false
-  const blocking = await render.renderSessionStart()
-  assert.match(blocking, /项目事实（共 1 条）/)
-  assert.match(blocking, /每轮输入时自动召回，无需主动读取/)
-  assert.doesNotMatch(blocking, /唯一的一条项目事实/)
 })
 
 test('每轮召回按 rule 和 project 分两组列出，没有命中的一组不出现', async t => {
@@ -248,7 +238,6 @@ test('新记忆未衰减时有效，满 30 天实际扣分，不高于 0.4 即�
 
 test('候选池已移除：Stop 不读对话记录，遗留的 candidates.json 不被读取也不被改动', async t => {
   const h = await createMemoryHarness(t, { argv: ['hook', '--agent', 'codebuddy'] })
-  h.settings.sideJudge = false
   await h.seed('rule', [memory('r1')])
   const leftover = path.join(h.root, 'candidates.json')
   const body = JSON.stringify({ candidates: [{ fingerprint: 'x', text: '以后都用中文回答', observations: 9, sessions: ['s'] }], rejected: [] })
@@ -260,9 +249,9 @@ test('候选池已移除：Stop 不读对话记录，遗留的 candidates.json �
   await running
   assert.equal(h.output.join(''), '{}')
   assert.equal(h.errors.some(line => /transcript|候选/.test(line)), false)
-  const blocking = await (await h.load('lib/core/render.mjs')).renderSessionStart()
-  assert.match(blocking, /规则 r1/)
-  assert.doesNotMatch(blocking, /待确认候选|memory_review/)
+  const started = await (await h.load('lib/core/render.mjs')).renderSessionStart()
+  assert.match(started, /规则 r1/)
+  assert.doesNotMatch(started, /待确认候选|memory_review/)
   assert.equal(h.state.reads.has(leftover), false)
   assert.equal(await fsp.readFile(leftover, 'utf8'), body)
 })
@@ -277,36 +266,6 @@ test('旁路通知展示实际加分，不展示旧 observations', async t => {
     assert.match(side.formatNotice({ ...base, gained: 0 }), /置信度不变/)
     assert.doesNotMatch(side.formatNotice({ ...base, gained: 0.1 }), /观测|召回频率/)
   }
-})
-
-test('MCP 不暴露 confidence 入参，旧客户端传值也不能改变初始值', async t => {
-  const h = await createMemoryHarness(t, { now: START })
-  h.settings.sideJudge = false
-  await h.load('bin/memory-mcp.mjs')
-  let sequence = 0
-  async function call(method, params) {
-    const id = ++sequence
-    h.stdin.emit('data', JSON.stringify({ jsonrpc: '2.0', id, method, params }) + '\n')
-    for (let i = 0; i < 200; i++) {
-      const result = h.output.map(line => JSON.parse(line)).find(message => message.id === id)
-      if (result) return result
-      await delay(10)
-    }
-    throw new Error(`等待 MCP 响应超时 method=${method}`)
-  }
-  const tools = (await call('tools/list')).result.tools
-  assert.equal(tools.some(tool => tool.name === 'memory_resolve'), false)
-  assert.equal(tools.some(tool => tool.name === 'memory_review' || tool.name === 'memory_discard'), false)
-  assert.equal('confidence' in tools.find(tool => tool.name === 'memory_persist').inputSchema.properties, false)
-  const persisted = await call('tools/call', { name: 'memory_persist', arguments: { text: 'MCP新记忆', category: 'rule', confidence: 9 } })
-  assert.match(persisted.result.content[0].text, /置信度 0.5/)
-  const mem = (await h.records())[0]
-  h.clock.now += DAY
-  const reinforced = await call('tools/call', { name: 'memory_reinforce', arguments: { id: mem.id } })
-  assert.match(reinforced.result.content[0].text, /置信度 0.6/)
-  const merged = await call('tools/call', { name: 'memory_merge', arguments: { id: mem.id, text: 'MCP合并记忆' } })
-  assert.match(merged.result.content[0].text, /MCP合并记忆（置信度 0.6/)
-  assert.doesNotMatch(JSON.stringify([reinforced, merged]), /观测|召回频率/)
 })
 
 test('记忆正文不足 6 个字或超过 400 个字时拒绝写入，新建与合并一致', async t => {
@@ -691,9 +650,8 @@ test('判重冲突走 replace，写入时只用新陈述覆盖旧正文', async 
   assert.equal((await side.resolvePendingSession('j_create', 'replace', 'cursor')).ok, false)
 })
 
-test('旁路只暴露统一的 memory_resolve 工具', async t => {
+test('MCP 只有 list、read、resolve、config 四个工具，写入只能走 memory_resolve', async t => {
   const h = await createMemoryHarness(t, { argv: ['--agent', 'cursor'] })
-  h.settings.sideJudge = true
   await h.load('bin/memory-mcp.mjs')
   let sequence = 0
   async function call(method, params) {
@@ -708,13 +666,13 @@ test('旁路只暴露统一的 memory_resolve 工具', async t => {
   }
 
   const tools = (await call('tools/list')).result.tools
-  assert.equal(tools.some(tool => tool.name === 'memory_persist'), false)
-  assert.equal(tools.some(tool => tool.name === 'memory_reinforce'), false)
-  assert.equal(tools.some(tool => tool.name === 'memory_merge'), false)
-  assert.equal(tools.some(tool => tool.name === 'memory_review' || tool.name === 'memory_discard'), false)
-  const removed = await call('tools/call', { name: 'memory_review', arguments: {} })
-  assert.equal(removed.result.isError, true)
-  assert.match(removed.result.content[0].text, /未知工具/)
+  assert.deepEqual(tools.map(tool => tool.name), ['memory_list', 'memory_read', 'memory_resolve', 'memory_config'])
+  assert.doesNotMatch(JSON.stringify(tools), /sideJudge|阻塞|blocking/)
+  for (const name of ['memory_propose', 'memory_persist', 'memory_reinforce', 'memory_merge', 'memory_review']) {
+    const removed = await call('tools/call', { name, arguments: { text: '绕过确认直接写入', category: 'rule', id: 'x' } })
+    assert.equal(removed.result.isError, true)
+    assert.match(removed.result.content[0].text, /未知工具/)
+  }
   const resolve = tools.find(tool => tool.name === 'memory_resolve')
   assert.deepEqual(resolve.inputSchema.required, ['sessionID', 'decision'])
   assert.deepEqual(resolve.inputSchema.properties.decision.enum, ['create_rule', 'create_project', 'reinforce', 'merge', 'replace', 'discard'])
@@ -736,15 +694,15 @@ test('三端 Stop 续轮都要求按 sessionID 调用 memory_resolve', async t =
   assert.match(model, /Skipped.*不要调用 memory_resolve/)
   assert.doesNotMatch(model, /Skipped.*decision=discard/)
   assert.match(model, /弹窗标题写「记忆确认·插件」/)
-  assert.match(model, /禁止调用 memory_propose、update_memory 工具来分析、更新记忆/)
+  assert.match(model, /只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆/)
   assert.match(model, /落成，使用推荐标签 rule「新规则」/)
   assert.match(model, /落成，把标签改为 project「新规则」/)
-  assert.doesNotMatch(model, /memory_persist|memory_reinforce|memory_merge/)
+  assert.doesNotMatch(model, /memory_propose|memory_persist|memory_reinforce|memory_merge/)
   const workbuddyModel = side.buildFollowup('workbuddy', [{ id: 'j_test', proposal }])
-  assert.match(workbuddyModel, /禁止调用 memory_propose、update_memory 工具来分析、更新记忆/)
+  assert.match(workbuddyModel, /禁止调用 update_memory 工具来分析、更新记忆/)
   const cursorModel = side.buildFollowup('cursor', [{ id: 'j_test', proposal }])
-  assert.match(cursorModel, /只能调用 memory_resolve 工具来写入记忆，禁止调用 memory_propose 工具来分析、更新记忆/)
-  assert.doesNotMatch(cursorModel, /update_memory/)
+  assert.match(cursorModel, /只能调用 memory_resolve 工具来写入记忆。/)
+  assert.doesNotMatch(cursorModel, /update_memory|memory_propose/)
   const out = side.buildStopResponse('codebuddy', '用户可见文案', model)
   assert.equal(out.decision, 'block')
   assert.ok(out.reason.startsWith('用户可见文案'))
@@ -797,3 +755,71 @@ test('codebuddy 新一次弹窗会作废之前问过但未点选的提案', asyn
   assert.equal(JSON.parse(await fsp.readFile(path.join(jobs, 'j_stale.json'), 'utf8')).reason, 'superseded')
   assert.equal(JSON.parse(await fsp.readFile(path.join(jobs, 'j_new.json'), 'utf8')).prompted, true)
 })
+
+test('memory_resolve 只按任务状态判断，进程里的 confirm 和 enabled 是旧值也能处理弹过窗的提案', async t => {
+  const h = await createMemoryHarness(t)
+  const side = await h.load('lib/core/sidepath.mjs')
+  const jobs = path.join(h.root, 'side')
+  await fsp.mkdir(jobs)
+  const write = (id, extra) => fsp.writeFile(path.join(jobs, `${id}.json`), JSON.stringify({
+    id, agent: 'cursor', sessionKey: 'conversation-a', status: 'ready', prompted: true, applied: false,
+    startedAt: new Date().toISOString(), proposal: { action: 'create', text: `弹过窗的规则 ${id}`, category: 'rule' }, ...extra,
+  }))
+  await write('s_stale_confirm')
+  await write('s_stale_enabled')
+  await write('s_unasked', { prompted: false })
+
+  // MCP 进程启动时读到的是 confirm=false，之后用户改成了 true，hook 已经弹过窗。
+  h.settings.confirm = false
+  assert.equal((await side.resolvePendingSession('s_stale_confirm', 'create_rule', 'cursor')).ok, true)
+  h.settings.enabled = false
+  assert.equal((await side.resolvePendingSession('s_stale_enabled', 'discard', 'cursor')).ok, true)
+  // 没弹过窗的提案仍然不能被写入。
+  assert.equal((await side.resolvePendingSession('s_unasked', 'create_rule', 'cursor')).ok, false)
+  assert.deepEqual((await h.records()).map(mem => mem.text), ['弹过窗的规则 s_stale_confirm'])
+})
+
+async function runHook(h, payload) {
+  const running = h.load('bin/memory.mjs')
+  for (let i = 0; i < 1000 && !h.stdin.listenerCount('end'); i++) await delay(1)
+  h.stdin.emit('data', JSON.stringify(payload))
+  h.stdin.emit('end')
+  await running
+  return JSON.parse(h.output.join(''))
+}
+
+test('旁路接口配齐时，每轮输入提醒主模型不要自己管记忆，并启动判别', async t => {
+  const h = await createMemoryHarness(t, { argv: ['hook', '--agent', 'cursor'] })
+  const out = await runHook(h, { hook_event_name: 'beforeSubmitPrompt', conversation_id: 'conversation-a', generation_id: 'g1', prompt: '以后回答我都用中文' })
+  assert.match(out.additional_context, /记忆由 memory-self-evolution 插件在后台判断/)
+  assert.doesNotMatch(out.additional_context, /记忆沉淀未启用/)
+  assert.equal(h.state.spawns.length, 1)
+})
+
+for (const [name, change, expected] of [
+  ['旁路接口没配齐', h => { h.settings.sideApiModel = '' }, /还没有配齐旁路判别接口.*sideApiBase、sideApiModel.*side-secret\.json.*npm run setup/],
+  ['只缺 apiKey', h => fsp.rm(path.join(h.root, 'side-secret.json')), /还没有配齐旁路判别接口/],
+  ['旧配置还停在阻塞模式', h => { h.settings.sideJudge = false }, /阻塞模式已经移除.*setup\.mjs" sidepath.*会把用户原话发给配置的模型接口/],
+]) {
+  test(`${name}时不启动判别，会话开始和每轮输入都说明沉淀未启用`, async t => {
+    const h = await createMemoryHarness(t, { argv: ['hook', '--agent', 'cursor'] })
+    await change(h)
+    await h.seed('rule', [memory('r1')])
+    const out = await runHook(h, { hook_event_name: 'beforeSubmitPrompt', conversation_id: 'conversation-a', generation_id: 'g1', prompt: '记住：以后回答我都用中文' })
+    assert.match(out.additional_context, /memory-self-evolution 的记忆沉淀未启用/)
+    assert.match(out.additional_context, expected)
+    assert.match(out.additional_context, /告诉用户它不会被记下/)
+    assert.match(out.additional_context, /rule add/)
+    assert.doesNotMatch(out.additional_context, /在后台判断/)
+    assert.equal(h.state.spawns.length, 0)
+    await assert.rejects(fsp.access(path.join(h.root, 'side')))
+
+    const started = await (await h.load('lib/core/render.mjs')).renderSessionStart()
+    assert.match(started, /memory-self-evolution 的记忆沉淀未启用/)
+    assert.match(started, expected)
+    assert.match(started, /以下规则与偏好仍需遵守。/)
+    assert.match(started, /规则 r1/)
+    assert.doesNotMatch(started, /后台自动提取/)
+    assert.ok(h.errors.some(line => line.includes('记忆沉淀未启用')))
+  })
+}
