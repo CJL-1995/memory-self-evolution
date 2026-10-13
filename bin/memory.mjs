@@ -20,23 +20,7 @@ import { renderRecall, renderSessionStart } from '../lib/core/render.mjs'
 import { persistMemory } from '../lib/core/writer.mjs'
 import { describeSettings, loadSettings, updateSetting } from '../lib/core/settings.mjs'
 import { CONFIRM_MARK, hiddenNoticeForPrompt, isUserNotice, maybeStartSideJob, runSideJob, sedimentBlocker, sedimentOffNotice, takeSideFollowup } from '../lib/core/sidepath.mjs'
-
-// Cursor 用 camelCase 事件名 + prompt 字段，输出 additional_context。
-// codebuddy 与 WorkBuddy 都是 Claude Code 系：PascalCase 事件名，输出 hookSpecificOutput.additionalContext。
-// 输入字段两边都能读：codebuddy 给 user_prompt，WorkBuddy 给 prompt。
-const CLAUDE_STYLE_AGENTS = new Set(['codebuddy', 'workbuddy'])
-const CLAUDE_STYLE_EVENTS = new Set(['UserPromptSubmit', 'SessionStart', 'Stop'])
-const CURSOR_EVENTS = new Set(['beforeSubmitPrompt', 'sessionStart', 'stop'])
-
-// 三端事件名归一成语义相同的三类。
-const EVENT_KIND = {
-  sessionStart: 'session-start',
-  SessionStart: 'session-start',
-  beforeSubmitPrompt: 'prompt',
-  UserPromptSubmit: 'prompt',
-  stop: 'stop',
-  Stop: 'stop',
-}
+import { agentForEvent, eventKind, hostOf } from '../lib/hosts/index.mjs'
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -55,23 +39,7 @@ function readStdin() {
 function detectAgent(argv, event) {
   const flagIdx = argv.indexOf('--agent')
   if (flagIdx >= 0 && argv[flagIdx + 1]) return argv[flagIdx + 1]
-  if (CLAUDE_STYLE_EVENTS.has(event)) return 'codebuddy'
-  if (CURSOR_EVENTS.has(event)) return 'cursor'
-  return 'cursor'
-}
-
-// 不同宿主的注入字段名不同，统一在这里转换。
-function wrapInjection(agent, event, text) {
-  if (!text) return {}
-  if (CLAUDE_STYLE_AGENTS.has(agent)) {
-    return {
-      hookSpecificOutput: {
-        hookEventName: event || 'UserPromptSubmit',
-        additionalContext: text,
-      },
-    }
-  }
-  return { additional_context: text }
+  return agentForEvent(event)
 }
 
 async function runHook(argv) {
@@ -86,7 +54,8 @@ async function runHook(argv) {
   }
   const event = String(payload.hook_event_name || '')
   const agent = detectAgent(argv, event)
-  const kind = EVENT_KIND[event] || (argv.includes('--session-start') ? 'session-start' : 'prompt')
+  const host = hostOf(agent)
+  const kind = eventKind(event) || (argv.includes('--session-start') ? 'session-start' : 'prompt')
 
   // 旁路模型自己的子进程也会触发 hook。这里直接退出，避免再启动一次判断。
   if (process.env.MEMORY_SIDE_JUDGE === '1') {
@@ -108,7 +77,7 @@ async function runHook(argv) {
     return
   }
 
-  const promptText = String(payload.prompt || payload.user_prompt || '').trim()
+  const promptText = host.promptText(payload)
   let reminder = ''
   if (kind === 'prompt') {
     try {
@@ -131,7 +100,7 @@ async function runHook(argv) {
     ? await renderSessionStart()
     : [hidden, reminder, recalled].filter(Boolean).join('\n\n')
 
-  process.stdout.write(JSON.stringify(wrapInjection(agent, event, text), null, 0))
+  process.stdout.write(JSON.stringify(text ? host.wrapInjection(event, text) : {}, null, 0))
 }
 
 async function runList() {
