@@ -175,7 +175,18 @@ npm run build-background                      # 重新生成背景均值，换�
 
 改造前（两类合在一起排序、打分减当前记忆池的均值）同一批输入是 42/46 和 13/51，记忆库只有 1 条时召不回。阈值不是常数：换模型、改编码或重新生成背景均值后都要用 `npm run verify` 重新标定，记忆库明显变大后也值得重跑一次。
 
-功能回归使用 `npm test`：全部是隔离测试，覆盖置信度、HMAC sessionID 幂等、客户端与会话隔离、Skip/取消兜底、每日僵尸任务清理、每日实际衰减、衰减天数配置、时间戳重置、跨会话去重、CLI/MCP/旁路入口、接口没配齐和旧阻塞配置下的提示、旧数据兼容、召回边界、并发更新与锁恢复，不读取个人记忆或请求模型 API（旁路接口用假的实现代替）。`npm run verify` 是另一套依赖当前用户记忆池的召回评测，用例需按自己的记忆库写在 `~/.memory-self-evolution/verify-cases.json`，格式见 `tools/verify-gate.mjs` 头部注释。
+功能回归使用 `npm test`：全部是隔离测试，覆盖置信度、HMAC sessionID 幂等、客户端与会话隔离、Skip/取消兜底、每日僵尸任务清理、每日实际衰减、衰减天数配置、时间戳重置、跨会话去重、CLI/MCP/旁路入口、接口没配齐和旧阻塞配置下的提示、旧数据兼容、召回边界、并发更新与锁恢复，以及下面「代码结构」里说的两份三端快照，不读取个人记忆或请求模型 API（旁路接口用假的实现代替）。`npm run verify` 是另一套依赖当前用户记忆池的召回评测，用例需按自己的记忆库写在 `~/.memory-self-evolution/verify-cases.json`，格式见 `tools/verify-gate.mjs` 头部注释。
+
+## 代码结构
+
+- `bin/`：两个入口。`memory.mjs` 是 hook 和命令行，`memory-mcp.mjs` 是 MCP 服务。
+- `lib/core/`：记忆的读写、召回、旁路判别和确认流程，各端共用，不按名字判断是哪一端。
+- `lib/hosts/`：各端在 hook 协议上的差异，一个客户端一个文件：事件名、输入字段、注入和续轮的输出格式、续轮指令里随客户端变的措辞。
+- `tools/hosts/`：各端的注册和移除，`setup` 和 `uninstall` 共用。
+
+接入新的客户端，是在 `lib/hosts/` 和 `tools/hosts/` 各加一个文件并登记一行，要实现的成员写在这两个目录的 `index.mjs` 开头。
+
+Cursor、CodeBuddy、WorkBuddy 的行为由两份快照锁住：`tests/fixtures/host-snapshot.json` 记录这三端在每个 hook 事件下交给客户端的内容，`tests/fixtures/install-snapshot.json` 记录安装和卸载写出的配置文件和打印的结果。两份都是在抽出 `lib/hosts/` 之前的代码上生成的。一次改动不该影响这三端时，这两份文件必须一个字都不变；确实要改这三端的行为时，用 `UPDATE_HOST_SNAPSHOT=1 npm test` 重新生成，并逐行核对差异。
 
 ## 已知限制
 

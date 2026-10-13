@@ -1,0 +1,4353 @@
+{
+ "agent=cursor input=cursor": {
+  "sessionStart": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_ed5f265d67e5d7e6c4ab4673811fd93d9efdf8d93f2047977f4ecce7e311b775.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_ed5f265d67e5d7e6c4ab4673811fd93d9efdf8d93f2047977f4ecce7e311b775.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "gen-1",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "additional_context": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "confirm-cursor-conv-1.json": {
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」",
+    "modelText": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskQuestion，一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "s_create.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskQuestion，一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "confirm-cursor-conv-1.json": {
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。",
+    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=cursor input=codebuddy": {
+  "sessionStart": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_e797f76d1eba5dc660a02b61cece1776fe3f843205c60660a4950a52828ef16a.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_e797f76d1eba5dc660a02b61cece1776fe3f843205c60660a4950a52828ef16a.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "additional_context": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "confirm-cursor-sess-1.json": {
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」",
+    "modelText": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskQuestion，一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "s_create.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskQuestion，一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "confirm-cursor-sess-1.json": {
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。",
+    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=cursor input=workbuddy": {
+  "sessionStart": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_e797f76d1eba5dc660a02b61cece1776fe3f843205c60660a4950a52828ef16a.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_e797f76d1eba5dc660a02b61cece1776fe3f843205c60660a4950a52828ef16a.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "additional_context": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "confirm-cursor-sess-1.json": {
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」",
+    "modelText": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskQuestion，一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "s_create.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskQuestion，一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "confirm-cursor-sess-1.json": {
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。",
+    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=codebuddy input=cursor": {
+  "sessionStart": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "sessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+    }
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_3cacecf098b418036c934f728f42912ebd8d055e4e4343caf7cd32e56a425454.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_3cacecf098b418036c934f728f42912ebd8d055e4e4343caf7cd32e56a425454.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "gen-1",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "sessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=codebuddy input=codebuddy": {
+  "sessionStart": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+    }
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_bbabb52332d6a51e2c7be8ec011a99db31efbdb1f793980ef075fc9852d24997.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_bbabb52332d6a51e2c7be8ec011a99db31efbdb1f793980ef075fc9852d24997.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=codebuddy input=workbuddy": {
+  "sessionStart": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+    }
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_bbabb52332d6a51e2c7be8ec011a99db31efbdb1f793980ef075fc9852d24997.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_bbabb52332d6a51e2c7be8ec011a99db31efbdb1f793980ef075fc9852d24997.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=workbuddy input=cursor": {
+  "sessionStart": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "sessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+    }
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_58ff48815827d2e6011864db47c30b4ce2ee28208ed780fea01e0c4b6ac53f57.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_58ff48815827d2e6011864db47c30b4ce2ee28208ed780fea01e0c4b6ac53f57.json": {
+    "agent": "workbuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "gen-1",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "sessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "workbuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "workbuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "workbuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "workbuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "workbuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "beforeSubmitPrompt",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "workbuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=workbuddy input=codebuddy": {
+  "sessionStart": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+    }
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_ce36edf2107cb1303c0c8aba06bac914abe3878f4f5f1ec75c9b812749195258.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_ce36edf2107cb1303c0c8aba06bac914abe3878f4f5f1ec75c9b812749195258.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=workbuddy input=workbuddy": {
+  "sessionStart": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+    }
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_ce36edf2107cb1303c0c8aba06bac914abe3878f4f5f1ec75c9b812749195258.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_ce36edf2107cb1303c0c8aba06bac914abe3878f4f5f1ec75c9b812749195258.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "workbuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "workbuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=other input=cursor": {
+  "sessionStart": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_7787c416b075d93d33430608bc0e4220417d01ecb47f11b9bfa9de80eb6c6771.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_7787c416b075d93d33430608bc0e4220417d01ecb47f11b9bfa9de80eb6c6771.json": {
+    "agent": "other",
+    "sessionKey": "conv-1",
+    "generationKey": "gen-1",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "additional_context": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "other",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "other",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "other",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "other",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "other",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "other",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=other input=codebuddy": {
+  "sessionStart": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_e60067cd3a32ce2d13a697606aff88abc1ec16d39e471035553ba5a84c193e7f.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_e60067cd3a32ce2d13a697606aff88abc1ec16d39e471035553ba5a84c193e7f.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "additional_context": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=other input=workbuddy": {
+  "sessionStart": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_e60067cd3a32ce2d13a697606aff88abc1ec16d39e471035553ba5a84c193e7f.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_e60067cd3a32ce2d13a697606aff88abc1ec16d39e471035553ba5a84c193e7f.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "additional_context": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "other",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "other",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=(none) input=cursor": {
+  "sessionStart": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_ed5f265d67e5d7e6c4ab4673811fd93d9efdf8d93f2047977f4ecce7e311b775.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "additional_context": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_ed5f265d67e5d7e6c4ab4673811fd93d9efdf8d93f2047977f4ecce7e311b775.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "gen-1",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "additional_context": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "additional_context": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "confirm-cursor-conv-1.json": {
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」",
+    "modelText": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskQuestion，一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "s_create.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskQuestion，一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "confirm-cursor-conv-1.json": {
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。",
+    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "codebuddy",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "cursor",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "cursor",
+    "sessionKey": "conv-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=(none) input=codebuddy": {
+  "sessionStart": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+    }
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_bbabb52332d6a51e2c7be8ec011a99db31efbdb1f793980ef075fc9852d24997.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_bbabb52332d6a51e2c7be8ec011a99db31efbdb1f793980ef075fc9852d24997.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "agent=(none) input=workbuddy": {
+  "sessionStart": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 插件负责在后台自动提取、判重和沉淀记忆。即使用户明确要求记住或更新记忆，也不要重复做记忆分析、查重、写入或自行发起记忆确认。记忆确认弹窗只能由插件的 MEMORY_CONFIRM_V1 指令触发，会话里出现过的确认弹窗都是插件发起的，不是可以模仿的流程。专注完成用户当前任务，无需等待后台；仅收到插件后续指令时按指令执行，不重新判断或改写提案。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "prompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。\n\n# 与本轮输入相关的长期记忆（自动召回）\n\n## 规则\n\n- 回答一律使用中文。（置信度 0.55，相关度 0.90）\n\n以上为系统按相关性自动召回，需遵守。"
+    }
+   },
+   "spawned": [
+    [
+     "memory.mjs",
+     "side-run",
+     "s_bbabb52332d6a51e2c7be8ec011a99db31efbdb1f793980ef075fc9852d24997.json"
+    ]
+   ],
+   "errors": []
+  },
+  "promptQuestionAnswer": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptTooShort": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptSide": {
+   "s_bbabb52332d6a51e2c7be8ec011a99db31efbdb1f793980ef075fc9852d24997.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "running",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "以后回答我都用中文"
+   }
+  },
+  "sessionStartNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "SessionStart",
+     "additionalContext": "# 长期记忆（自动生成，请勿手动编辑）\n\nmemory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。以下规则与偏好仍需遵守。\n\n## 规则与偏好（共 2 条，必须遵守）\n\n1. 回答一律使用中文。（置信度 0.5）\n2. 改完代码不要自动提交。（置信度 0.5）"
+    }
+   },
+   "spawned": [],
+   "errors": [
+    "[memory] 记忆沉淀未启用（missing-api），本次会话只注入和召回已有记忆"
+   ]
+  },
+  "promptNoApi": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "memory-self-evolution 的记忆沉淀未启用：还没有配齐旁路判别接口。启用方法：在 ~/.memory-self-evolution/config.json 写入 sideApiBase、sideApiModel，在 ~/.memory-self-evolution/side-secret.json 写入 apiKey，或在 <REPO> 里重新运行 npm run setup。已有记忆照常注入和召回，但用户新说的偏好、规范和事实不会被记下。用户陈述这类内容或要求记住时，照做，并用一句话告诉用户它不会被记下，以及上面的启用方法；急用可以运行 node \"<REPO>/bin/memory.mjs\" rule add \"<规则>\" 直接添加一条规则。不要自行发起记忆确认弹窗，也不要主动调用 memory_resolve。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "promptNoApiSide": {},
+  "stopIdle": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirm": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」\n\nMEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 2 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSide": {
+   "s_create.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样展示给用户。\n\n结果\n建议新增记忆「提交代码前先跑完整测试。」\n建议合并。新记忆「线上配置放在 config/prod.yaml。」并入已有记忆「灰度配置放在 config/gray.yaml。」。合并后「灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。」"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopConfirmSideAfterPrompt": {
+   "s_create.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_merge.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopConfirmAgain": {
+   "out": {},
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirect": {
+   "out": {
+    "decision": "block",
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSide": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  },
+  "stopDirectRules": [
+   {
+    "text": "回答一律使用中文。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "改完代码不要自动提交。",
+    "category": "rule",
+    "confidence": 0.5
+   },
+   {
+    "text": "提交代码前先跑完整测试。",
+    "category": "rule",
+    "confidence": 0.5
+   }
+  ],
+  "stopDirectNextPrompt": {
+   "out": {
+    "hookSpecificOutput": {
+     "hookEventName": "UserPromptSubmit",
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    }
+   },
+   "spawned": [],
+   "errors": []
+  },
+  "stopDirectSideAfterPrompt": {
+   "s_other_agent.json": {
+    "agent": "cursor",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_other_session.json": {
+    "agent": "codebuddy",
+    "sessionKey": "another-session",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": false,
+    "applied": false,
+    "reason": "",
+    "prompt": "用户原话"
+   },
+   "s_pending.json": {
+    "agent": "codebuddy",
+    "sessionKey": "sess-1",
+    "generationKey": "",
+    "status": "ready",
+    "prompted": true,
+    "applied": true,
+    "reason": "",
+    "prompt": "用户原话"
+   }
+  }
+ },
+ "functions": {
+  "cursor": {
+   "followup": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 5 条，现在只做一件事：把每一条都问一遍。\n调用 AskQuestion，一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_reinforce\n正文：回答我的时候用中文。\n推荐标签：rule\n佐证：用中文\n与最相近记忆的相似度：0.83\n最相近记忆：回答一律使用中文。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n强化已有记忆 「回答一律使用中文。」\n仍新建，使用推荐标签 rule「回答我的时候用中文。」\n仍新建，把标签改为 project「回答我的时候用中文。」\n不落成\n\n第 3 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成\n\n第 4 条\nsessionID：s_replace\n正文：改完代码后自己提交。\n推荐标签：rule\n佐证：改完直接提交\n与最相近记忆的相似度：0.66\n最相近记忆：改完代码不要自动提交。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n替换已有记忆 「改完代码不要自动提交。」\n落成，使用推荐标签 rule「改完代码后自己提交。」\n落成，把标签改为 project「改完代码后自己提交。」\n不落成\n\n第 5 条\nsessionID：s_unsure\n正文：日志里要带上请求 ID。\n推荐标签：rule\n佐证：日志带请求 ID\n与最相近记忆的相似度：0.41\n最相近记忆：改完代码不要自动提交。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n强化已有记忆 「改完代码不要自动提交。」\n落成，使用推荐标签 rule「日志里要带上请求 ID。」\n落成，把标签改为 project「日志里要带上请求 ID。」\n不落成",
+   "stopResponse": {
+    "followup_message": "用户看到的话"
+   },
+   "stopResponseSameText": {
+    "followup_message": "同一段话"
+   },
+   "stopResponseEmpty": null,
+   "sessionIds": {
+    "cursor": "s_88ec23ab42211125c555b6e6c00637adc09e09b57f9ba8a8bf9e3c0bfc005975",
+    "codebuddy": "s_4545c02d560e1be0b6cd01737eb5fcda0f2f1835e61cfd3c2eb95da335df78d6",
+    "workbuddy": "s_4545c02d560e1be0b6cd01737eb5fcda0f2f1835e61cfd3c2eb95da335df78d6"
+   }
+  },
+  "codebuddy": {
+   "followup": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 5 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_reinforce\n正文：回答我的时候用中文。\n推荐标签：rule\n佐证：用中文\n与最相近记忆的相似度：0.83\n最相近记忆：回答一律使用中文。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n强化已有记忆 「回答一律使用中文。」\n仍新建，使用推荐标签 rule「回答我的时候用中文。」\n仍新建，把标签改为 project「回答我的时候用中文。」\n不落成\n\n第 3 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成\n\n第 4 条\nsessionID：s_replace\n正文：改完代码后自己提交。\n推荐标签：rule\n佐证：改完直接提交\n与最相近记忆的相似度：0.66\n最相近记忆：改完代码不要自动提交。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n替换已有记忆 「改完代码不要自动提交。」\n落成，使用推荐标签 rule「改完代码后自己提交。」\n落成，把标签改为 project「改完代码后自己提交。」\n不落成\n\n第 5 条\nsessionID：s_unsure\n正文：日志里要带上请求 ID。\n推荐标签：rule\n佐证：日志带请求 ID\n与最相近记忆的相似度：0.41\n最相近记忆：改完代码不要自动提交。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n强化已有记忆 「改完代码不要自动提交。」\n落成，使用推荐标签 rule「日志里要带上请求 ID。」\n落成，把标签改为 project「日志里要带上请求 ID。」\n不落成",
+   "stopResponse": {
+    "decision": "block",
+    "reason": "用户看到的话\n\n给模型的指令"
+   },
+   "stopResponseSameText": {
+    "decision": "block",
+    "reason": "同一段话"
+   },
+   "stopResponseEmpty": null,
+   "sessionIds": {
+    "cursor": "s_295d51ea08a98c4ac45f417f3960e96f2a33876b30f3fa07777ea7be2a1d3f52",
+    "codebuddy": "s_41d9bd621307c28f001205e4dc875cdead5ec3bfcdf1f5d7d11b71224aef7467",
+    "workbuddy": "s_41d9bd621307c28f001205e4dc875cdead5ec3bfcdf1f5d7d11b71224aef7467"
+   }
+  },
+  "workbuddy": {
+   "followup": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 5 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_reinforce\n正文：回答我的时候用中文。\n推荐标签：rule\n佐证：用中文\n与最相近记忆的相似度：0.83\n最相近记忆：回答一律使用中文。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n强化已有记忆 「回答一律使用中文。」\n仍新建，使用推荐标签 rule「回答我的时候用中文。」\n仍新建，把标签改为 project「回答我的时候用中文。」\n不落成\n\n第 3 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成\n\n第 4 条\nsessionID：s_replace\n正文：改完代码后自己提交。\n推荐标签：rule\n佐证：改完直接提交\n与最相近记忆的相似度：0.66\n最相近记忆：改完代码不要自动提交。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n替换已有记忆 「改完代码不要自动提交。」\n落成，使用推荐标签 rule「改完代码后自己提交。」\n落成，把标签改为 project「改完代码后自己提交。」\n不落成\n\n第 5 条\nsessionID：s_unsure\n正文：日志里要带上请求 ID。\n推荐标签：rule\n佐证：日志带请求 ID\n与最相近记忆的相似度：0.41\n最相近记忆：改完代码不要自动提交。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n强化已有记忆 「改完代码不要自动提交。」\n落成，使用推荐标签 rule「日志里要带上请求 ID。」\n落成，把标签改为 project「日志里要带上请求 ID。」\n不落成",
+   "stopResponse": {
+    "decision": "block",
+    "reason": "用户看到的话\n\n给模型的指令"
+   },
+   "stopResponseSameText": {
+    "decision": "block",
+    "reason": "同一段话"
+   },
+   "stopResponseEmpty": null,
+   "sessionIds": {
+    "cursor": "s_452e0ac9810f3249722f02018eef4400722a020d029a84ba142945a5f47a775e",
+    "codebuddy": "s_40221e026883cf7fab1447a9dd208cf03e210e32e1e4d3ef2158e7eb698d7522",
+    "workbuddy": "s_40221e026883cf7fab1447a9dd208cf03e210e32e1e4d3ef2158e7eb698d7522"
+   }
+  },
+  "other": {
+   "followup": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 5 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_reinforce\n正文：回答我的时候用中文。\n推荐标签：rule\n佐证：用中文\n与最相近记忆的相似度：0.83\n最相近记忆：回答一律使用中文。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n强化已有记忆 「回答一律使用中文。」\n仍新建，使用推荐标签 rule「回答我的时候用中文。」\n仍新建，把标签改为 project「回答我的时候用中文。」\n不落成\n\n第 3 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成\n\n第 4 条\nsessionID：s_replace\n正文：改完代码后自己提交。\n推荐标签：rule\n佐证：改完直接提交\n与最相近记忆的相似度：0.66\n最相近记忆：改完代码不要自动提交。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n替换已有记忆 「改完代码不要自动提交。」\n落成，使用推荐标签 rule「改完代码后自己提交。」\n落成，把标签改为 project「改完代码后自己提交。」\n不落成\n\n第 5 条\nsessionID：s_unsure\n正文：日志里要带上请求 ID。\n推荐标签：rule\n佐证：日志带请求 ID\n与最相近记忆的相似度：0.41\n最相近记忆：改完代码不要自动提交。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n强化已有记忆 「改完代码不要自动提交。」\n落成，使用推荐标签 rule「日志里要带上请求 ID。」\n落成，把标签改为 project「日志里要带上请求 ID。」\n不落成",
+   "stopResponse": {
+    "decision": "block",
+    "reason": "用户看到的话\n\n给模型的指令"
+   },
+   "stopResponseSameText": {
+    "decision": "block",
+    "reason": "同一段话"
+   },
+   "stopResponseEmpty": null,
+   "sessionIds": {
+    "cursor": "s_048c455734b8d19db09aaf7949fd610ddfbec5c70c47e5942f151d89663d4d93",
+    "codebuddy": "s_dcacb082f274236ed5ccdaac52cac49a7cf2da53027f6bac0194a397300e9b2b",
+    "workbuddy": "s_dcacb082f274236ed5ccdaac52cac49a7cf2da53027f6bac0194a397300e9b2b"
+   }
+  },
+  "(none)": {
+   "followup": "MEMORY_CONFIRM_V1\n本轮回答已经结束。待确认记忆有 5 条，现在只做一件事：把每一条都问一遍。\n调用 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），一次提问里每一条一道题。若这次调用只能放一道题，就按顺序连续调用，直到每一条都问过。\n不要改用文字列草稿提问。\n只能调用 memory_resolve 工具来写入记忆，禁止调用 update_memory 工具来分析、更新记忆。\n弹窗标题写「记忆确认·插件」。选项的 id 与选项文案用同一段文字，选项文案一字不改。\n用户点选返回后，每条都调用一次 memory_resolve，sessionID 使用该条给出的值。\ndecision 映射：标签为 rule 的落成或仍新建选 create_rule；标签为 project 的选 create_project；强化选 reinforce；合并选 merge；替换选 replace；不落成选 discard。\n若提问工具返回 Skipped，或用户关闭、取消确认弹窗，不要调用 memory_resolve；未处理任务由每日僵尸清理兜底。\n\n第 1 条\nsessionID：s_create\n正文：提交代码前先跑完整测试。\n推荐标签：rule\n佐证：以后提交前都先跑测试\n题面：检测到一条记忆。是否落成记忆。\n选项：\n落成，使用推荐标签 rule「提交代码前先跑完整测试。」\n落成，把标签改为 project「提交代码前先跑完整测试。」\n不落成\n\n第 2 条\nsessionID：s_reinforce\n正文：回答我的时候用中文。\n推荐标签：rule\n佐证：用中文\n与最相近记忆的相似度：0.83\n最相近记忆：回答一律使用中文。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n强化已有记忆 「回答一律使用中文。」\n仍新建，使用推荐标签 rule「回答我的时候用中文。」\n仍新建，把标签改为 project「回答我的时候用中文。」\n不落成\n\n第 3 条\nsessionID：s_merge\n正文：线上配置放在 config/prod.yaml。\n推荐标签：project\n佐证：线上配置放在 config/prod.yaml\n与最相近记忆的相似度：0.71\n最相近记忆：灰度配置放在 config/gray.yaml。\n合并后正文：灰度配置放在 config/gray.yaml，线上配置放在 config/prod.yaml。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n合并进已有记忆 「灰度配置放在 config/gray.yaml。」\n落成，使用推荐标签 project「线上配置放在 config/prod.yaml。」\n落成，把标签改为 rule「线上配置放在 config/prod.yaml。」\n不落成\n\n第 4 条\nsessionID：s_replace\n正文：改完代码后自己提交。\n推荐标签：rule\n佐证：改完直接提交\n与最相近记忆的相似度：0.66\n最相近记忆：改完代码不要自动提交。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n替换已有记忆 「改完代码不要自动提交。」\n落成，使用推荐标签 rule「改完代码后自己提交。」\n落成，把标签改为 project「改完代码后自己提交。」\n不落成\n\n第 5 条\nsessionID：s_unsure\n正文：日志里要带上请求 ID。\n推荐标签：rule\n佐证：日志带请求 ID\n与最相近记忆的相似度：0.41\n最相近记忆：改完代码不要自动提交。\n题面：检测到一条记忆。是否落成记忆。\n选项：\n强化已有记忆 「改完代码不要自动提交。」\n落成，使用推荐标签 rule「日志里要带上请求 ID。」\n落成，把标签改为 project「日志里要带上请求 ID。」\n不落成",
+   "stopResponse": {
+    "decision": "block",
+    "reason": "用户看到的话\n\n给模型的指令"
+   },
+   "stopResponseSameText": {
+    "decision": "block",
+    "reason": "同一段话"
+   },
+   "stopResponseEmpty": null,
+   "sessionIds": {
+    "cursor": "s_02b1afe4e6b61c1ae6e7489bbc01744454cb54c2fcfa7bd4ee4b0a3f8323e1c9",
+    "codebuddy": "s_db290ddc35337f7c3444e458a201e0fcb057f69785f9dfa4870536e266633fad",
+    "workbuddy": "s_db290ddc35337f7c3444e458a201e0fcb057f69785f9dfa4870536e266633fad"
+   }
+  }
+ }
+}
