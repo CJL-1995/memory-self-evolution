@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 给当前用户注册 Cursor、codebuddy 与 WorkBuddy 的 hook 和 MCP。
+// 给当前用户注册 Cursor、codebuddy、WorkBuddy 与 Claude Code 的 hook 和 MCP。
 // 已有其他 hook / MCP 会保留。本插件已注册时只更新 node 与仓库路径，不重复追加。
 //
 // 不带参数：交互安装。问是否弹确认，再问旁路接口的 baseUrl、apiKey、apiModel。
@@ -7,6 +7,7 @@
 // 直接回车默认弹出确认。接口三项输入 skip 则跳过，安装后自行配置；配齐之前不会沉淀新记忆。
 // sidepath：不提问，只重新注册。旧版本留下的阻塞模式配置同时改为旁路。
 // 阻塞模式已移除，blocking 参数会报错退出。
+// --only <客户端>：只注册这一端，不问确认方式和接口，也不碰其它客户端的配置文件。
 // 用法：npm install && npm run setup
 
 import fs from 'node:fs'
@@ -15,7 +16,7 @@ import path from 'node:path'
 import readline from 'node:readline'
 import { fileURLToPath } from 'node:url'
 import { downloadModel } from '../lib/embedding.js'
-import { INSTALL_HOSTS } from './hosts/index.mjs'
+import { INSTALL_HOSTS, selectHosts } from './hosts/index.mjs'
 import { readJson, writeJson } from './hosts/shared.mjs'
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -165,22 +166,36 @@ async function ensureVectorModel() {
   console.log('向量模型已就绪')
 }
 
-function registerAll(home) {
-  const ctx = { nodeBin, hookScript, mcpScript }
-  for (const host of INSTALL_HOSTS) console.log(`${host.name}：${host.register(home, ctx)}`)
+function registerAll(home, hosts, ctx) {
+  for (const host of hosts) console.log(`${host.name}：${host.register(home, ctx)}`)
   console.log('记忆数据在 ~/.memory-self-evolution/，不会随仓库分发。重启客户端后 MCP 才会加载。')
 }
 
-const modeArg = process.argv[2]
+const args = process.argv.slice(2)
+const onlyIdx = args.indexOf('--only')
+const only = onlyIdx >= 0 ? String(args[onlyIdx + 1] || '') : ''
+if (onlyIdx >= 0) args.splice(onlyIdx, 2)
+const modeArg = args[0]
+const USAGE = `用法：node tools/setup.mjs [sidepath] [--only <${INSTALL_HOSTS.map((host) => host.id).join('|')}>]`
+let hosts
+try {
+  if (onlyIdx >= 0 && !only) throw new Error('--only 后面要跟客户端的名字')
+  hosts = selectHosts(only)
+} catch (error) {
+  console.error(error.message)
+  console.error(USAGE)
+  process.exit(1)
+}
 if (modeArg === 'blocking') {
   console.error('阻塞模式已移除。现在只有旁路式：后台调用配置的模型接口判断要不要记，写盘前弹不弹确认仍由 confirm 决定。')
   console.error('运行 npm run setup 重新安装，或 node tools/setup.mjs sidepath 不提问、只重新注册。')
   process.exit(1)
 }
 if (modeArg && modeArg !== 'sidepath') {
-  console.error('用法：node tools/setup.mjs [sidepath]')
+  console.error(USAGE)
   console.error('不带参数进入交互安装：选择弹窗或自动追加，再填旁路接口的 baseUrl、apiKey、apiModel。')
   console.error('sidepath 不提问，只重新注册；旧版本留下的阻塞模式配置同时改为旁路。')
+  console.error('--only 只注册这一端，不碰其它客户端的配置文件。')
   process.exit(1)
 }
 
@@ -194,17 +209,30 @@ if (legacyBlocking) {
   console.log('检测到旧版本的阻塞模式配置。阻塞模式已移除，现在只有旁路式：用户原话会发给配置的模型接口，由它判断要不要记。')
 }
 
+// MEMORY_CLAUDE_BIN：claude 命令不在 PATH、也不在桌面端的默认位置时，用它指明路径。
+const ctx = { nodeBin, hookScript, mcpScript, claudeBin: process.env.MEMORY_CLAUDE_BIN || '' }
+
 if (modeArg) {
   clearLegacyMode(home)
   if (legacyBlocking) console.log('已改为旁路式。')
 } else if (process.stdin.isTTY) {
-  const choices = await askInstallChoices()
-  applyChoices(home, choices)
-  console.log(`写盘：${choices.confirm ? '弹出确认' : '自动追加'}`)
-  if (choices.api) {
-    console.log(`旁路 baseUrl：${choices.api.baseUrl}`)
-    console.log(`旁路 apiModel：${choices.api.apiModel}`)
-    console.log('apiKey 已写入 ~/.memory-self-evolution/side-secret.json')
+  // 只注册某一端时不动全局配置，确认方式和接口沿用已有的。
+  if (!only) {
+    const choices = await askInstallChoices()
+    applyChoices(home, choices)
+    console.log(`写盘：${choices.confirm ? '弹出确认' : '自动追加'}`)
+    if (choices.api) {
+      console.log(`旁路 baseUrl：${choices.api.baseUrl}`)
+      console.log(`旁路 apiModel：${choices.api.apiModel}`)
+      console.log('apiKey 已写入 ~/.memory-self-evolution/side-secret.json')
+    }
+  }
+  // 个别客户端安装时有自己要问的事。
+  for (const host of hosts) {
+    for (const question of host.questions ? host.questions(home, ctx) : []) {
+      console.log('')
+      ctx[question.key] = await askChoice(question.title, question.options)
+    }
   }
 } else {
   console.error('当前没有终端，跳过安装提问。仍会下载向量模型并注册 hook 和 MCP。要选择确认方式、填写旁路接口，请在终端重新运行 npm run setup。')
@@ -213,7 +241,7 @@ if (modeArg) {
 
 rl.close()
 await ensureVectorModel()
-registerAll(home)
+registerAll(home, hosts, ctx)
 console.log('重启后主模型能看到 memory_list、memory_read、memory_config，以及处理插件确认弹窗的 memory_resolve。')
 const missing = missingSideApi(home)
 if (missing.length > 0) {

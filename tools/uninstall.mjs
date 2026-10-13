@@ -2,17 +2,18 @@
 // 卸载本机注册，不删除插件仓库，也不删除已经生成的记忆。
 //
 // 1. 删除向量模型缓存（bge-base-zh-v1.5 的权重，不是记忆向量索引）
-// 2. 从 Cursor、codebuddy、WorkBuddy 去掉本插件的 hook
-// 3. 从这三端的 mcp.json 去掉本插件。仓库和 node_modules 里的插件代码保留
+// 2. 从 Cursor、codebuddy、WorkBuddy、Claude Code 去掉本插件的 hook
+// 3. 从这几端去掉本插件的 MCP。仓库和 node_modules 里的插件代码保留
 // 4. 保留 ~/.memory-self-evolution/ 和其中的记忆。删掉配置、旁路密钥和旁路任务
 //
-// 用法：node tools/uninstall.mjs
+// 用法：node tools/uninstall.mjs [--only <客户端>]
+// --only 只去掉这一端的 hook 和 MCP。向量模型、配置和其它客户端都不动。
 
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { INSTALL_HOSTS } from './hosts/index.mjs'
+import { INSTALL_HOSTS, selectHosts } from './hosts/index.mjs'
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const home = os.homedir()
@@ -48,10 +49,24 @@ function removeConfig() {
   console.log('保留 rule.jsonl、project.jsonl、memories.md、embeddings.jsonl、project-memory')
 }
 
-removeModel()
-for (const host of INSTALL_HOSTS) {
-  console.log(`${host.name} hook：${host.removeHooks(home)}`)
-  console.log(`${host.name} MCP：${host.removeMcp(home)}`)
+const onlyIdx = process.argv.indexOf('--only')
+const only = onlyIdx >= 0 ? String(process.argv[onlyIdx + 1] || '') : ''
+let hosts
+try {
+  if (onlyIdx >= 0 && !only) throw new Error('--only 后面要跟客户端的名字')
+  hosts = selectHosts(only)
+} catch (error) {
+  console.error(error.message)
+  console.error(`用法：node tools/uninstall.mjs [--only <${INSTALL_HOSTS.map((host) => host.id).join('|')}>]`)
+  process.exit(1)
 }
-removeConfig()
-console.log(`插件仓库未删除。重启 ${INSTALL_HOSTS.map((host) => host.name).join('、')} 后，MCP 才会从客户端消失。`)
+const ctx = { claudeBin: process.env.MEMORY_CLAUDE_BIN || '' }
+
+if (!only) removeModel()
+for (const host of hosts) {
+  console.log(`${host.name} hook：${host.removeHooks(home)}`)
+  console.log(`${host.name} MCP：${host.removeMcp(home, ctx)}`)
+}
+if (!only) removeConfig()
+else console.log('向量模型、配置和其它客户端没有动。')
+console.log(`插件仓库未删除。重启 ${hosts.map((host) => host.name).join('、')} 后，MCP 才会从客户端消失。`)

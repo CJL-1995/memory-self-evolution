@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// 各宿主共用的记忆 CLI。Cursor / codebuddy / WorkBuddy 通过 hook 调用本入口拿注入文本，
+// 各宿主共用的记忆 CLI。Cursor / codebuddy / WorkBuddy / Claude Code 通过 hook 调用本入口拿注入文本，
 // 人工也可直接用 list / read / rule 等子命令管理记忆库。
 //
 // 用法：
-//   memory-self-evolution hook [--agent cursor|codebuddy|workbuddy]   从 stdin 读 hook 事件，按事件类型注入记忆或取回旁路结果
+//   memory-self-evolution hook [--agent cursor|codebuddy|workbuddy|claude]   从 stdin 读 hook 事件，按事件类型注入记忆或取回旁路结果
 //   memory-self-evolution list                              列出两组记忆的条数
 //   memory-self-evolution read <rule|project>               打印该组记忆
 //   memory-self-evolution rule add "<规则>"                  直接新增一条规则，不经模型判断
@@ -36,6 +36,9 @@ function readStdin() {
   })
 }
 
+// 每轮输入时提醒主模型：记忆由插件在后台处理。宿主可以给出自己的说法。
+const PROMPT_REMINDER = '记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。'
+
 function detectAgent(argv, event) {
   const flagIdx = argv.indexOf('--agent')
   if (flagIdx >= 0 && argv[flagIdx + 1]) return argv[flagIdx + 1]
@@ -67,7 +70,9 @@ async function runHook(argv) {
     let followup = null
     try {
       const settings = await loadSettings()
-      if (settings.enabled) {
+      // 子任务结束不是用户这一轮结束，不在那里续轮。
+      const background = Boolean(host.isBackground && host.isBackground(payload))
+      if (settings.enabled && !background) {
         followup = await takeSideFollowup(agent, payload, settings.sideWaitMs)
       }
     } catch (e) {
@@ -84,9 +89,7 @@ async function runHook(argv) {
       const settings = await loadSettings()
       if (settings.enabled && promptText && !isUserNotice(promptText) && !promptText.includes(CONFIRM_MARK)) {
         const blocker = await sedimentBlocker(settings)
-        reminder = blocker
-          ? sedimentOffNotice(blocker)
-          : '记忆由 memory-self-evolution 插件在后台判断。用户陈述偏好、规范或要求记住时，你只需回应并照做：不要判断是否该记，不要调用提问工具发起「检测到一条记忆」确认，也不要主动调用 memory_resolve 或其它记忆写工具。只有收到含 MEMORY_CONFIRM_V1 的插件指令时，才按指令弹窗并处理对应 sessionID。'
+        reminder = blocker ? sedimentOffNotice(blocker) : (host.promptReminder || PROMPT_REMINDER)
       }
       await maybeStartSideJob({ agent, payload, promptText })
     } catch (e) {
@@ -97,7 +100,7 @@ async function runHook(argv) {
   const recalled = kind === 'session-start' ? '' : await renderRecall([promptText])
   const hidden = kind === 'prompt' ? await hiddenNoticeForPrompt(agent, promptText, payload) : ''
   const text = kind === 'session-start'
-    ? await renderSessionStart()
+    ? await renderSessionStart({ boundary: host.sessionStartBoundary, maxChars: host.injectionLimit })
     : [hidden, reminder, recalled].filter(Boolean).join('\n\n')
 
   process.stdout.write(JSON.stringify(text ? host.wrapInjection(event, text) : {}, null, 0))
