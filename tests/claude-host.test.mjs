@@ -112,7 +112,9 @@ test('Claude 回答结束：用 decision block 续轮，指令里给出提问工
   assert.equal(stop.out.decision, 'block')
   assert.match(stop.out.reason, /MEMORY_CONFIRM_V1/)
   assert.match(stop.out.reason, /调用 AskUserQuestion，/)
-  assert.ok(stop.out.reason.includes(`只能调用 ${RESOLVE_TOOL} 来写入这个插件的记忆`))
+  assert.ok(stop.out.reason.includes(`提问之前先确认能调用 ${RESOLVE_TOOL}：下文的 memory_resolve 指的就是它，只能用它来写入这个插件的记忆。`))
+  // 注册后没重启的会话里 MCP 还没加载，这时弹窗点了也写不进去。
+  assert.match(stop.out.reason, /搜索不到，说明这个会话打开时插件的 MCP 还没有加载，这时不要提问，只告诉用户重启 Claude Code 之后把这句话再说一遍。/)
   assert.match(stop.out.reason, /sessionID：s_claude/)
   assert.doesNotMatch(stop.out.reason, /update_memory|ask_followup_question|AskQuestion，/)
   assert.equal(JSON.parse(await fsp.readFile(file, 'utf8')).prompted, true)

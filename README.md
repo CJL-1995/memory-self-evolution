@@ -97,6 +97,8 @@ node bin/memory.mjs rule add "所有异常处理处都需要添加日志"
 
 命令行和桌面端共用 `~/.claude`，注册一次两边都生效。hook 追加在 `~/.claude/settings.json` 里已有的 hook 之后，互不影响。
 
+注册之后要重启 Claude Code。hook 对已经打开的会话立刻生效，MCP 却要到重启后才加载：这段时间里注入、召回和免确认的写入都正常，但开着确认时没法点选写入，主模型会提示你重启后再说一遍，不会弹窗。
+
 - **MCP 的注册**：Claude Code 的用户级 MCP 存在 `~/.claude.json`，`settings.json` 里的 `mcpServers` 不生效，所以安装脚本调用 `claude mcp add --scope user` 来注册。它先找 `PATH` 里的 `claude`，没有就用桌面端自带的那个（`~/Library/Application Support/Claude/claude-code/` 下版本最新的）；都不在时用环境变量 `MEMORY_CLAUDE_BIN` 指明路径。找不到时 hook 照常注册，并打印出要手动运行的那条命令。
 - **免批准规则**：Claude Code 默认每次调用 MCP 工具都要你批准。开着确认时，在记忆弹窗里点选之后，它还会再问一次是否允许调用 `memory_resolve`。安装时同意的话，脚本会在 `~/.claude/settings.json` 的 `permissions.allow` 里加一条 `mcp__memory-self-evolution__memory_resolve`，只放开这一个工具：它只收 sessionID 和你的选择，只能处理刚弹过窗的提案，改不了正文。没有终端时不加，需要的话照这个名字自己加。`memory_config` 能改判别接口的地址，不放开。卸载时这条规则会一并去掉。
 - **和自带记忆并存**：Claude Code 有自己的一套记忆，按项目存放。插件不去改它的开关，两边各记各的，同一句话可能两边都记下。想只用插件时，在 `~/.claude/settings.json` 里加 `"autoMemoryEnabled": false`。
@@ -214,7 +216,7 @@ Cursor、CodeBuddy、WorkBuddy 的行为由两份快照锁住：`tests/fixtures/
 
 hook 每次都重新读 `config.json`，注入、判别和弹不弹确认都跟着最新的配置走。MCP 进程只在启动时读一次，受影响的只有 `memory_config` 自己：它显示的是进程启动时的值加上它自己改过的值；用它改一项时，其它项会按这份旧值一起写回文件，盖掉之后在命令行、文件或另一个客户端里改过的值。`memory_resolve` 不读配置。另外，用命令或 `memory_config` 改过任意一项后，全部配置项都会按当时的值写进文件，之后仓库更新的默认值不会自动生效。
 
-Claude Code 这一端的弹窗确认（回答结束时续一轮、弹出提问、点选后调用 `memory_resolve`）目前只在隔离测试和脚本里验证过：真实的 Claude Code 能连上插件的 MCP 服务，hook 的输入字段也实际抓过，但还没有在真实会话里完整走通一次弹窗。定时任务和 `/loop` 送进来的输入长什么样也没有实测，现在是按开头的形状挡掉的。
+Claude Code 这一端的弹窗确认（回答结束时续一轮、弹出提问、点选后调用 `memory_resolve`）在真实的桌面端会话里验证到了「续一轮并把指令交给主模型」这一步，点选后写入这一步还只在隔离测试和脚本里验证过。定时任务和 `/loop` 送进来的输入长什么样也没有实测，现在是按开头的形状挡掉的。
 
 判别模型只看用户当前这一句，而且是本地处理之后的 6 到 500 个字。指代上文的话、要结合好几轮才看得出的纠正、主模型自己查出来而用户没有说出口的事实，都不会被记下。
 
