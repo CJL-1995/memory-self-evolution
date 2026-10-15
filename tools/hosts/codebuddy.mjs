@@ -9,6 +9,7 @@ function host(id, name, dir) {
     name,
     dir,
     hooksFile: 'settings.json',
+    skillsDir: `${dir}/skills`,
     events: [
       { event: 'SessionStart', timeout: 10 },
       { event: 'UserPromptSubmit', timeout: 10 },

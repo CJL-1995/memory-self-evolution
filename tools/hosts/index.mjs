@@ -1,5 +1,5 @@
 // 安装侧的宿主清单。setup 和 uninstall 按这个顺序逐个处理。
-// 接入新的客户端：在这个目录加一个文件，导出 { id, name, register, removeHooks, removeMcp }，再在这里登记一行。
+// 接入新的客户端：在这个目录加一个文件，导出 { id, name, register, removeHooks, removeMcp, removeSkill }，再在这里登记一行。
 // 安装时有要问用户的事，再导出 questions(home, ctx)，返回 [{ key, title, options }]，答案会放进 ctx[key]。
 
 import cursor from './cursor.mjs'

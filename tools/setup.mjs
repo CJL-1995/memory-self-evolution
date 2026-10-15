@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// 给当前用户注册 Cursor、codebuddy、WorkBuddy 与 Claude Code 的 hook 和 MCP。
+// 给当前用户注册 Cursor、codebuddy、WorkBuddy 与 Claude Code 的 hook、MCP 和整理记忆用的 skill。
 // 已有其他 hook / MCP 会保留。本插件已注册时只更新 node 与仓库路径，不重复追加。
 //
 // 不带参数：交互安装。问是否弹确认，再问旁路接口的 baseUrl、apiKey、apiModel。
@@ -23,6 +23,7 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const nodeBin = process.execPath
 const hookScript = path.join(repoRoot, 'bin', 'memory.mjs')
 const mcpScript = path.join(repoRoot, 'bin', 'memory-mcp.mjs')
+const skillSource = path.join(repoRoot, 'skills', 'memory-self-evolution-manage', 'SKILL.md')
 
 function migrateDataDir(home) {
   const oldDir = path.join(home, '.dsh-memory')
@@ -210,7 +211,7 @@ if (legacyBlocking) {
 }
 
 // MEMORY_CLAUDE_BIN：claude 命令不在 PATH、也不在桌面端的默认位置时，用它指明路径。
-const ctx = { nodeBin, hookScript, mcpScript, claudeBin: process.env.MEMORY_CLAUDE_BIN || '' }
+const ctx = { nodeBin, hookScript, mcpScript, skillSource, claudeBin: process.env.MEMORY_CLAUDE_BIN || '' }
 
 if (modeArg) {
   clearLegacyMode(home)
@@ -242,7 +243,7 @@ if (modeArg) {
 rl.close()
 await ensureVectorModel()
 registerAll(home, hosts, ctx)
-console.log('重启后主模型能看到 memory_list、memory_read、memory_config，以及处理插件确认弹窗的 memory_resolve。')
+console.log('重启后主模型能看到 memory_list、memory_read、memory_config、整理记忆用的 memory_update，以及处理插件确认弹窗的 memory_resolve。')
 const missing = missingSideApi(home)
 if (missing.length > 0) {
   console.log(`旁路接口还缺：${missing.join('、')}（都在 ~/.memory-self-evolution/ 下）。配齐之前不会沉淀新记忆，已有记忆照常注入和召回；会话开始时会把这一点告诉主模型。`)

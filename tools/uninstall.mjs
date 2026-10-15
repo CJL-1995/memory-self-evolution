@@ -3,11 +3,11 @@
 //
 // 1. 删除向量模型缓存（bge-base-zh-v1.5 的权重，不是记忆向量索引）
 // 2. 从 Cursor、codebuddy、WorkBuddy、Claude Code 去掉本插件的 hook
-// 3. 从这几端去掉本插件的 MCP。仓库和 node_modules 里的插件代码保留
+// 3. 从这几端去掉本插件的 MCP 和整理记忆用的 skill。仓库和 node_modules 里的插件代码保留
 // 4. 保留 ~/.memory-self-evolution/ 和其中的记忆。删掉配置、旁路密钥和旁路任务
 //
 // 用法：node tools/uninstall.mjs [--only <客户端>]
-// --only 只去掉这一端的 hook 和 MCP。向量模型、配置和其它客户端都不动。
+// --only 只去掉这一端的 hook、MCP 和 skill。向量模型、配置和其它客户端都不动。
 
 import fs from 'node:fs'
 import os from 'node:os'
@@ -66,6 +66,7 @@ if (!only) removeModel()
 for (const host of hosts) {
   console.log(`${host.name} hook：${host.removeHooks(home)}`)
   console.log(`${host.name} MCP：${host.removeMcp(home, ctx)}`)
+  console.log(`${host.name} skill：${host.removeSkill(home)}`)
 }
 if (!only) removeConfig()
 else console.log('向量模型、配置和其它客户端没有动。')

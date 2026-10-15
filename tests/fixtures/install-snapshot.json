@@ -1,78 +1,114 @@
 {
  "fresh": {
   "registered": {
-   "Cursor": "hooks sessionStart added, beforeSubmitPrompt added, stop added; mcp added",
-   "codebuddy": "hooks SessionStart added, UserPromptSubmit added, Stop added; mcp added",
-   "WorkBuddy": "hooks SessionStart added, UserPromptSubmit added, Stop added; mcp added"
+   "Cursor": "hooks sessionStart added, beforeSubmitPrompt added, stop added; mcp added; skill added",
+   "codebuddy": "hooks SessionStart added, UserPromptSubmit added, Stop added; mcp added; skill added",
+   "WorkBuddy": "hooks SessionStart added, UserPromptSubmit added, Stop added; mcp added; skill added"
   },
   "registerError": [],
   "afterRegister": {
    ".cursor/": [
     "hooks.json",
-    "mcp.json"
+    "mcp.json",
+    "skills"
    ],
    ".cursor/hooks.json": "{\n  \"version\": 1,\n  \"hooks\": {\n    \"sessionStart\": [\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 10\n      }\n    ],\n    \"beforeSubmitPrompt\": [\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 5\n      }\n    ],\n    \"stop\": [\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 20\n      }\n    ]\n  }\n}\n",
    ".cursor/mcp.json": "{\n  \"mcpServers\": {\n    \"memory-self-evolution\": {\n      \"type\": \"stdio\",\n      \"command\": \"<NODE>\",\n      \"args\": [\n        \"<REPO>/bin/memory-mcp.mjs\",\n        \"--agent\",\n        \"cursor\"\n      ],\n      \"description\": \"跨会话长期记忆：读取记忆、处理插件发起的记忆确认\"\n    }\n  }\n}\n",
+   ".cursor/skills/": [
+    "memory-self-evolution-manage"
+   ],
+   ".cursor/skills/memory-self-evolution-manage/": [
+    "SKILL.md"
+   ],
+   ".cursor/skills/memory-self-evolution-manage/SKILL.md": "（与仓库里的 SKILL.md 相同）",
    ".codebuddy/": [
     "mcp.json",
-    "settings.json"
+    "settings.json",
+    "skills"
    ],
    ".codebuddy/mcp.json": "{\n  \"mcpServers\": {\n    \"memory-self-evolution\": {\n      \"type\": \"stdio\",\n      \"command\": \"<NODE>\",\n      \"args\": [\n        \"<REPO>/bin/memory-mcp.mjs\",\n        \"--agent\",\n        \"codebuddy\"\n      ],\n      \"description\": \"跨会话长期记忆：读取记忆、处理插件发起的记忆确认\"\n    }\n  }\n}\n",
    ".codebuddy/settings.json": "{\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent codebuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"UserPromptSubmit\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent codebuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"Stop\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent codebuddy\",\n            \"timeout\": 20\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   ".codebuddy/skills/": [
+    "memory-self-evolution-manage"
+   ],
+   ".codebuddy/skills/memory-self-evolution-manage/": [
+    "SKILL.md"
+   ],
+   ".codebuddy/skills/memory-self-evolution-manage/SKILL.md": "（与仓库里的 SKILL.md 相同）",
    ".workbuddy/": [
     "mcp.json",
-    "settings.json"
+    "settings.json",
+    "skills"
    ],
    ".workbuddy/mcp.json": "{\n  \"mcpServers\": {\n    \"memory-self-evolution\": {\n      \"type\": \"stdio\",\n      \"command\": \"<NODE>\",\n      \"args\": [\n        \"<REPO>/bin/memory-mcp.mjs\",\n        \"--agent\",\n        \"workbuddy\"\n      ],\n      \"description\": \"跨会话长期记忆：读取记忆、处理插件发起的记忆确认\"\n    }\n  }\n}\n",
-   ".workbuddy/settings.json": "{\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"UserPromptSubmit\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"Stop\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 20\n          }\n        ]\n      }\n    ]\n  }\n}\n"
+   ".workbuddy/settings.json": "{\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"UserPromptSubmit\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"Stop\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 20\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   ".workbuddy/skills/": [
+    "memory-self-evolution-manage"
+   ],
+   ".workbuddy/skills/memory-self-evolution-manage/": [
+    "SKILL.md"
+   ],
+   ".workbuddy/skills/memory-self-evolution-manage/SKILL.md": "（与仓库里的 SKILL.md 相同）"
   },
   "removed": {
    "Cursor": {
     "hook": "已删除 3 条 hook",
-    "MCP": "已删除 memory-self-evolution"
+    "MCP": "已删除 memory-self-evolution",
+    "skill": "已删除 memory-self-evolution-manage"
    },
    "codebuddy": {
     "hook": "已删除 3 条 hook",
-    "MCP": "已删除 memory-self-evolution"
+    "MCP": "已删除 memory-self-evolution",
+    "skill": "已删除 memory-self-evolution-manage"
    },
    "WorkBuddy": {
     "hook": "已删除 3 条 hook",
-    "MCP": "已删除 memory-self-evolution"
+    "MCP": "已删除 memory-self-evolution",
+    "skill": "已删除 memory-self-evolution-manage"
    }
   },
   "removeWarnings": [],
   "afterRemove": {
    ".cursor/": [
     "hooks.json",
-    "mcp.json"
+    "mcp.json",
+    "skills"
    ],
    ".cursor/hooks.json": "{\n  \"version\": 1,\n  \"hooks\": {\n    \"sessionStart\": [],\n    \"beforeSubmitPrompt\": [],\n    \"stop\": []\n  }\n}\n",
    ".cursor/mcp.json": "{\n  \"mcpServers\": {}\n}\n",
+   ".cursor/skills/": [],
    ".codebuddy/": [
     "mcp.json",
-    "settings.json"
+    "settings.json",
+    "skills"
    ],
    ".codebuddy/mcp.json": "{\n  \"mcpServers\": {}\n}\n",
    ".codebuddy/settings.json": "{\n  \"hooks\": {\n    \"SessionStart\": [],\n    \"UserPromptSubmit\": [],\n    \"Stop\": []\n  }\n}\n",
+   ".codebuddy/skills/": [],
    ".workbuddy/": [
     "mcp.json",
-    "settings.json"
+    "settings.json",
+    "skills"
    ],
    ".workbuddy/mcp.json": "{\n  \"mcpServers\": {}\n}\n",
-   ".workbuddy/settings.json": "{\n  \"hooks\": {\n    \"SessionStart\": [],\n    \"UserPromptSubmit\": [],\n    \"Stop\": []\n  }\n}\n"
+   ".workbuddy/settings.json": "{\n  \"hooks\": {\n    \"SessionStart\": [],\n    \"UserPromptSubmit\": [],\n    \"Stop\": []\n  }\n}\n",
+   ".workbuddy/skills/": []
   },
   "removedOnly": {
    "Cursor": {
     "hook": "hook 文件不存在，已跳过",
-    "MCP": "mcp.json 不存在，已跳过"
+    "MCP": "mcp.json 不存在，已跳过",
+    "skill": "未安装本插件 skill，已跳过"
    },
    "codebuddy": {
     "hook": "hook 文件不存在，已跳过",
-    "MCP": "mcp.json 不存在，已跳过"
+    "MCP": "mcp.json 不存在，已跳过",
+    "skill": "未安装本插件 skill，已跳过"
    },
    "WorkBuddy": {
     "hook": "hook 文件不存在，已跳过",
-    "MCP": "mcp.json 不存在，已跳过"
+    "MCP": "mcp.json 不存在，已跳过",
+    "skill": "未安装本插件 skill，已跳过"
    }
   },
   "removedOnlyWarnings": [],
@@ -84,78 +120,114 @@
  },
  "existing": {
   "registered": {
-   "Cursor": "hooks postToolUse removed 1, sessionStart updated, beforeSubmitPrompt added, stop added; mcp updated",
-   "codebuddy": "hooks PostToolUse removed 1, SessionStart updated, UserPromptSubmit added, Stop added; mcp updated",
-   "WorkBuddy": "hooks SessionStart added, UserPromptSubmit added, Stop added; mcp added"
+   "Cursor": "hooks postToolUse removed 1, sessionStart updated, beforeSubmitPrompt added, stop added; mcp updated; skill added",
+   "codebuddy": "hooks PostToolUse removed 1, SessionStart updated, UserPromptSubmit added, Stop added; mcp updated; skill added",
+   "WorkBuddy": "hooks SessionStart added, UserPromptSubmit added, Stop added; mcp added; skill added"
   },
   "registerError": [],
   "afterRegister": {
    ".cursor/": [
     "hooks.json",
-    "mcp.json"
+    "mcp.json",
+    "skills"
    ],
    ".cursor/hooks.json": "{\n  \"version\": 1,\n  \"hooks\": {\n    \"sessionStart\": [\n      {\n        \"command\": \"other-tool start\",\n        \"timeout\": 3\n      },\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 10\n      }\n    ],\n    \"postToolUse\": [\n      {\n        \"command\": \"other-tool after\"\n      }\n    ],\n    \"stop\": [\n      {\n        \"command\": \"other-tool stop\"\n      },\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 20\n      }\n    ],\n    \"beforeSubmitPrompt\": [\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 5\n      }\n    ]\n  }\n}\n",
    ".cursor/mcp.json": "{\n  \"mcpServers\": {\n    \"other\": {\n      \"command\": \"x\"\n    },\n    \"memory-self-evolution\": {\n      \"type\": \"stdio\",\n      \"command\": \"<NODE>\",\n      \"args\": [\n        \"<REPO>/bin/memory-mcp.mjs\",\n        \"--agent\",\n        \"cursor\"\n      ],\n      \"description\": \"跨会话长期记忆：读取记忆、处理插件发起的记忆确认\"\n    }\n  }\n}\n",
+   ".cursor/skills/": [
+    "memory-self-evolution-manage"
+   ],
+   ".cursor/skills/memory-self-evolution-manage/": [
+    "SKILL.md"
+   ],
+   ".cursor/skills/memory-self-evolution-manage/SKILL.md": "（与仓库里的 SKILL.md 相同）",
    ".codebuddy/": [
     "mcp.json",
-    "settings.json"
+    "settings.json",
+    "skills"
    ],
    ".codebuddy/mcp.json": "{\n  \"mcpServers\": {\n    \"memory-self-evolution\": {\n      \"type\": \"stdio\",\n      \"command\": \"<NODE>\",\n      \"args\": [\n        \"<REPO>/bin/memory-mcp.mjs\",\n        \"--agent\",\n        \"codebuddy\"\n      ],\n      \"description\": \"跨会话长期记忆：读取记忆、处理插件发起的记忆确认\"\n    }\n  }\n}\n",
    ".codebuddy/settings.json": "{\n  \"theme\": \"dark\",\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"other start\"\n          },\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent codebuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"Stop\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent codebuddy\",\n            \"timeout\": 20\n          }\n        ]\n      }\n    ],\n    \"UserPromptSubmit\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent codebuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   ".codebuddy/skills/": [
+    "memory-self-evolution-manage"
+   ],
+   ".codebuddy/skills/memory-self-evolution-manage/": [
+    "SKILL.md"
+   ],
+   ".codebuddy/skills/memory-self-evolution-manage/SKILL.md": "（与仓库里的 SKILL.md 相同）",
    ".workbuddy/": [
     "mcp.json",
-    "settings.json"
+    "settings.json",
+    "skills"
    ],
    ".workbuddy/mcp.json": "{\n  \"mcpServers\": {\n    \"memory-self-evolution\": {\n      \"type\": \"stdio\",\n      \"command\": \"<NODE>\",\n      \"args\": [\n        \"<REPO>/bin/memory-mcp.mjs\",\n        \"--agent\",\n        \"workbuddy\"\n      ],\n      \"description\": \"跨会话长期记忆：读取记忆、处理插件发起的记忆确认\"\n    }\n  }\n}\n",
-   ".workbuddy/settings.json": "{\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"UserPromptSubmit\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"Stop\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 20\n          }\n        ]\n      }\n    ]\n  }\n}\n"
+   ".workbuddy/settings.json": "{\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"UserPromptSubmit\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 10\n          }\n        ]\n      }\n    ],\n    \"Stop\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent workbuddy\",\n            \"timeout\": 20\n          }\n        ]\n      }\n    ]\n  }\n}\n",
+   ".workbuddy/skills/": [
+    "memory-self-evolution-manage"
+   ],
+   ".workbuddy/skills/memory-self-evolution-manage/": [
+    "SKILL.md"
+   ],
+   ".workbuddy/skills/memory-self-evolution-manage/SKILL.md": "（与仓库里的 SKILL.md 相同）"
   },
   "removed": {
    "Cursor": {
     "hook": "已删除 3 条 hook",
-    "MCP": "已删除 memory-self-evolution"
+    "MCP": "已删除 memory-self-evolution",
+    "skill": "已删除 memory-self-evolution-manage"
    },
    "codebuddy": {
     "hook": "已删除 3 条 hook",
-    "MCP": "已删除 memory-self-evolution"
+    "MCP": "已删除 memory-self-evolution",
+    "skill": "已删除 memory-self-evolution-manage"
    },
    "WorkBuddy": {
     "hook": "已删除 3 条 hook",
-    "MCP": "已删除 memory-self-evolution"
+    "MCP": "已删除 memory-self-evolution",
+    "skill": "已删除 memory-self-evolution-manage"
    }
   },
   "removeWarnings": [],
   "afterRemove": {
    ".cursor/": [
     "hooks.json",
-    "mcp.json"
+    "mcp.json",
+    "skills"
    ],
    ".cursor/hooks.json": "{\n  \"version\": 1,\n  \"hooks\": {\n    \"sessionStart\": [\n      {\n        \"command\": \"other-tool start\",\n        \"timeout\": 3\n      }\n    ],\n    \"postToolUse\": [\n      {\n        \"command\": \"other-tool after\"\n      }\n    ],\n    \"stop\": [\n      {\n        \"command\": \"other-tool stop\"\n      }\n    ],\n    \"beforeSubmitPrompt\": []\n  }\n}\n",
    ".cursor/mcp.json": "{\n  \"mcpServers\": {\n    \"other\": {\n      \"command\": \"x\"\n    }\n  }\n}\n",
+   ".cursor/skills/": [],
    ".codebuddy/": [
     "mcp.json",
-    "settings.json"
+    "settings.json",
+    "skills"
    ],
    ".codebuddy/mcp.json": "{\n  \"mcpServers\": {}\n}\n",
    ".codebuddy/settings.json": "{\n  \"theme\": \"dark\",\n  \"hooks\": {\n    \"SessionStart\": [\n      {\n        \"matcher\": \"\",\n        \"hooks\": [\n          {\n            \"type\": \"command\",\n            \"command\": \"other start\"\n          }\n        ]\n      }\n    ],\n    \"Stop\": [],\n    \"UserPromptSubmit\": []\n  }\n}\n",
+   ".codebuddy/skills/": [],
    ".workbuddy/": [
     "mcp.json",
-    "settings.json"
+    "settings.json",
+    "skills"
    ],
    ".workbuddy/mcp.json": "{\n  \"mcpServers\": {}\n}\n",
-   ".workbuddy/settings.json": "{\n  \"hooks\": {\n    \"SessionStart\": [],\n    \"UserPromptSubmit\": [],\n    \"Stop\": []\n  }\n}\n"
+   ".workbuddy/settings.json": "{\n  \"hooks\": {\n    \"SessionStart\": [],\n    \"UserPromptSubmit\": [],\n    \"Stop\": []\n  }\n}\n",
+   ".workbuddy/skills/": []
   },
   "removedOnly": {
    "Cursor": {
     "hook": "已删除 2 条 hook",
-    "MCP": "已删除 dsh-memory"
+    "MCP": "已删除 dsh-memory",
+    "skill": "未安装本插件 skill，已跳过"
    },
    "codebuddy": {
     "hook": "已删除 2 条 hook",
-    "MCP": "已删除 memory-self-evolution"
+    "MCP": "已删除 memory-self-evolution",
+    "skill": "未安装本插件 skill，已跳过"
    },
    "WorkBuddy": {
     "hook": "没有 hooks 字段，已跳过",
-    "MCP": "没有 mcpServers，已跳过"
+    "MCP": "没有 mcpServers，已跳过",
+    "skill": "未安装本插件 skill，已跳过"
    }
   },
   "removedOnlyWarnings": [],
@@ -182,7 +254,7 @@
  },
  "partial": {
   "registered": {
-   "Cursor": "hooks sessionStart added, beforeSubmitPrompt added, stop added; mcp added",
+   "Cursor": "hooks sessionStart added, beforeSubmitPrompt added, stop added; mcp added; skill added",
    "codebuddy": "未安装，已跳过",
    "WorkBuddy": "未安装，已跳过"
   },
@@ -190,46 +262,62 @@
   "afterRegister": {
    ".cursor/": [
     "hooks.json",
-    "mcp.json"
+    "mcp.json",
+    "skills"
    ],
    ".cursor/hooks.json": "{\n  \"hooks\": {\n    \"sessionStart\": [\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 10\n      }\n    ],\n    \"beforeSubmitPrompt\": [\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 5\n      }\n    ],\n    \"stop\": [\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 20\n      }\n    ]\n  },\n  \"version\": 1\n}\n",
-   ".cursor/mcp.json": "{\n  \"mcpServers\": {\n    \"memory-self-evolution\": {\n      \"type\": \"stdio\",\n      \"command\": \"<NODE>\",\n      \"args\": [\n        \"<REPO>/bin/memory-mcp.mjs\",\n        \"--agent\",\n        \"cursor\"\n      ],\n      \"description\": \"跨会话长期记忆：读取记忆、处理插件发起的记忆确认\"\n    }\n  }\n}\n"
+   ".cursor/mcp.json": "{\n  \"mcpServers\": {\n    \"memory-self-evolution\": {\n      \"type\": \"stdio\",\n      \"command\": \"<NODE>\",\n      \"args\": [\n        \"<REPO>/bin/memory-mcp.mjs\",\n        \"--agent\",\n        \"cursor\"\n      ],\n      \"description\": \"跨会话长期记忆：读取记忆、处理插件发起的记忆确认\"\n    }\n  }\n}\n",
+   ".cursor/skills/": [
+    "memory-self-evolution-manage"
+   ],
+   ".cursor/skills/memory-self-evolution-manage/": [
+    "SKILL.md"
+   ],
+   ".cursor/skills/memory-self-evolution-manage/SKILL.md": "（与仓库里的 SKILL.md 相同）"
   },
   "removed": {
    "Cursor": {
     "hook": "已删除 3 条 hook",
-    "MCP": "已删除 memory-self-evolution"
+    "MCP": "已删除 memory-self-evolution",
+    "skill": "已删除 memory-self-evolution-manage"
    },
    "codebuddy": {
     "hook": "客户端目录不存在，已跳过",
-    "MCP": "客户端目录不存在，已跳过"
+    "MCP": "客户端目录不存在，已跳过",
+    "skill": "客户端目录不存在，已跳过"
    },
    "WorkBuddy": {
     "hook": "客户端目录不存在，已跳过",
-    "MCP": "客户端目录不存在，已跳过"
+    "MCP": "客户端目录不存在，已跳过",
+    "skill": "客户端目录不存在，已跳过"
    }
   },
   "removeWarnings": [],
   "afterRemove": {
    ".cursor/": [
     "hooks.json",
-    "mcp.json"
+    "mcp.json",
+    "skills"
    ],
    ".cursor/hooks.json": "{\n  \"hooks\": {\n    \"sessionStart\": [],\n    \"beforeSubmitPrompt\": [],\n    \"stop\": []\n  },\n  \"version\": 1\n}\n",
-   ".cursor/mcp.json": "{\n  \"mcpServers\": {}\n}\n"
+   ".cursor/mcp.json": "{\n  \"mcpServers\": {}\n}\n",
+   ".cursor/skills/": []
   },
   "removedOnly": {
    "Cursor": {
     "hook": "未注册本插件 hook，已跳过",
-    "MCP": "mcp.json 不存在，已跳过"
+    "MCP": "mcp.json 不存在，已跳过",
+    "skill": "未安装本插件 skill，已跳过"
    },
    "codebuddy": {
     "hook": "客户端目录不存在，已跳过",
-    "MCP": "客户端目录不存在，已跳过"
+    "MCP": "客户端目录不存在，已跳过",
+    "skill": "客户端目录不存在，已跳过"
    },
    "WorkBuddy": {
     "hook": "客户端目录不存在，已跳过",
-    "MCP": "客户端目录不存在，已跳过"
+    "MCP": "客户端目录不存在，已跳过",
+    "skill": "客户端目录不存在，已跳过"
    }
   },
   "removedOnlyWarnings": [],
@@ -242,7 +330,7 @@
  },
  "corrupt": {
   "registered": {
-   "Cursor": "hooks sessionStart added, beforeSubmitPrompt added, stop added; mcp added"
+   "Cursor": "hooks sessionStart added, beforeSubmitPrompt added, stop added; mcp added; skill added"
   },
   "registerError": [
    "读取 <HOME>/.codebuddy/settings.json 失败："
@@ -250,10 +338,18 @@
   "afterRegister": {
    ".cursor/": [
     "hooks.json",
-    "mcp.json"
+    "mcp.json",
+    "skills"
    ],
    ".cursor/hooks.json": "{\n  \"version\": 1,\n  \"hooks\": {\n    \"sessionStart\": [\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 10\n      }\n    ],\n    \"beforeSubmitPrompt\": [\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 5\n      }\n    ],\n    \"stop\": [\n      {\n        \"command\": \"\\\"<NODE>\\\" \\\"<REPO>/bin/memory.mjs\\\" hook --agent cursor\",\n        \"timeout\": 20\n      }\n    ]\n  }\n}\n",
    ".cursor/mcp.json": "{\n  \"mcpServers\": {\n    \"memory-self-evolution\": {\n      \"type\": \"stdio\",\n      \"command\": \"<NODE>\",\n      \"args\": [\n        \"<REPO>/bin/memory-mcp.mjs\",\n        \"--agent\",\n        \"cursor\"\n      ],\n      \"description\": \"跨会话长期记忆：读取记忆、处理插件发起的记忆确认\"\n    }\n  }\n}\n",
+   ".cursor/skills/": [
+    "memory-self-evolution-manage"
+   ],
+   ".cursor/skills/memory-self-evolution-manage/": [
+    "SKILL.md"
+   ],
+   ".cursor/skills/memory-self-evolution-manage/SKILL.md": "（与仓库里的 SKILL.md 相同）",
    ".codebuddy/": [
     "mcp.json",
     "settings.json"
@@ -265,15 +361,18 @@
   "removed": {
    "Cursor": {
     "hook": "已删除 3 条 hook",
-    "MCP": "已删除 memory-self-evolution"
+    "MCP": "已删除 memory-self-evolution",
+    "skill": "已删除 memory-self-evolution-manage"
    },
    "codebuddy": {
     "hook": "hook 文件不存在，已跳过",
-    "MCP": "mcp.json 不存在，已跳过"
+    "MCP": "mcp.json 不存在，已跳过",
+    "skill": "未安装本插件 skill，已跳过"
    },
    "WorkBuddy": {
     "hook": "hook 文件不存在，已跳过",
-    "MCP": "mcp.json 不存在，已跳过"
+    "MCP": "mcp.json 不存在，已跳过",
+    "skill": "未安装本插件 skill，已跳过"
    }
   },
   "removeWarnings": [
@@ -283,10 +382,12 @@
   "afterRemove": {
    ".cursor/": [
     "hooks.json",
-    "mcp.json"
+    "mcp.json",
+    "skills"
    ],
    ".cursor/hooks.json": "{\n  \"version\": 1,\n  \"hooks\": {\n    \"sessionStart\": [],\n    \"beforeSubmitPrompt\": [],\n    \"stop\": []\n  }\n}\n",
    ".cursor/mcp.json": "{\n  \"mcpServers\": {}\n}\n",
+   ".cursor/skills/": [],
    ".codebuddy/": [
     "mcp.json",
     "settings.json"
@@ -298,15 +399,18 @@
   "removedOnly": {
    "Cursor": {
     "hook": "hook 文件不存在，已跳过",
-    "MCP": "mcp.json 不存在，已跳过"
+    "MCP": "mcp.json 不存在，已跳过",
+    "skill": "未安装本插件 skill，已跳过"
    },
    "codebuddy": {
     "hook": "hook 文件不存在，已跳过",
-    "MCP": "mcp.json 不存在，已跳过"
+    "MCP": "mcp.json 不存在，已跳过",
+    "skill": "未安装本插件 skill，已跳过"
    },
    "WorkBuddy": {
     "hook": "hook 文件不存在，已跳过",
-    "MCP": "mcp.json 不存在，已跳过"
+    "MCP": "mcp.json 不存在，已跳过",
+    "skill": "未安装本插件 skill，已跳过"
    }
   },
   "removedOnlyWarnings": [
