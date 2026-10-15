@@ -6,6 +6,8 @@ import path from 'node:path'
 import { isPluginHook, removePluginHookEvent } from '../../lib/core/hook-config.mjs'
 
 export const MCP_NAME = 'memory-self-evolution'
+// 整理记忆用的 skill，四端共用仓库里的同一份 SKILL.md，安装时复制到各端的 skill 目录。
+export const SKILL_NAME = 'memory-self-evolution-manage'
 // 插件改名之前注册的名字，安装和卸载时一并清掉。
 const LEGACY_MCP_NAME = 'dsh-memory'
 
@@ -93,9 +95,22 @@ export function upsertGroupedHook(list, command, timeout, agent) {
   return 'added'
 }
 
+// 把 skill 复制到客户端的 skill 目录。ctx.skillSource 是仓库里 SKILL.md 的路径，没给时不装。
+function installSkill(home, skillsDir, ctx) {
+  if (!ctx.skillSource) return ''
+  const dir = path.join(home, skillsDir, SKILL_NAME)
+  const existed = fs.existsSync(path.join(dir, 'SKILL.md'))
+  fs.mkdirSync(dir, { recursive: true })
+  const tmp = path.join(dir, `SKILL.md.tmp.${process.pid}`)
+  fs.copyFileSync(ctx.skillSource, tmp)
+  fs.renameSync(tmp, path.join(dir, 'SKILL.md'))
+  return existed ? 'updated' : 'added'
+}
+
 // spec 描述一个客户端的配置落在哪、长什么样：
 //   id、name        --agent 的取值和打印用的名字
 //   dir、hooksFile  用户目录下的客户端目录，以及其中放 hook 的文件
+//   skillsDir       客户端读取个人 skill 的目录，相对用户目录
 //   events          要注册的事件和各自的超时（秒）
 //   emptyHooksFile  hook 文件不存在时的初始内容
 //   upsertHook      在某个事件的列表里新增或更新本插件的那一条，返回 added 或 updated
@@ -129,7 +144,16 @@ export function fileHost(spec) {
       const extra = spec.afterHooks ? spec.afterHooks(data, ctx) : ''
       writeJson(hooksFile, data)
       const mcp = spec.registerMcp ? spec.registerMcp(home, ctx) : registerMcpFile(path.join(dir, 'mcp.json'), spec.id, ctx)
-      return `hooks ${notes.join(', ')}; mcp ${mcp}${extra ? `; ${extra}` : ''}`
+      const skill = installSkill(home, spec.skillsDir, ctx)
+      return `hooks ${notes.join(', ')}; mcp ${mcp}${skill ? `; skill ${skill}` : ''}${extra ? `; ${extra}` : ''}`
+    },
+
+    removeSkill(home) {
+      if (!fs.existsSync(path.join(home, spec.dir))) return '客户端目录不存在，已跳过'
+      const dir = path.join(home, spec.skillsDir, SKILL_NAME)
+      if (!fs.existsSync(dir)) return '未安装本插件 skill，已跳过'
+      fs.rmSync(dir, { recursive: true, force: true })
+      return `已删除 ${SKILL_NAME}`
     },
 
     removeHooks(home) {

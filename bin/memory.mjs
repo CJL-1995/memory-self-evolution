@@ -7,6 +7,8 @@
 //   memory-self-evolution list                              列出两组记忆的条数
 //   memory-self-evolution read <rule|project>               打印该组记忆
 //   memory-self-evolution rule add "<规则>"                  直接新增一条规则，不经模型判断
+//   memory-self-evolution trash                             列出回收站里的记忆
+//   memory-self-evolution restore <id>                      从回收站恢复一条记忆
 //   memory-self-evolution config [key] [value]              查看或修改配置
 //
 // hook 按事件分派：session-start 注入 rule，prompt 注入每轮召回并启动旁路判别，stop 取回旁路的结果。
@@ -17,7 +19,7 @@
 import { GROUPS, READ_LIMIT } from '../lib/core/config.mjs'
 import { fmtConfidence, readAllGroups, readGroup } from '../lib/core/store.mjs'
 import { renderRecall, renderSessionStart } from '../lib/core/render.mjs'
-import { persistMemory } from '../lib/core/writer.mjs'
+import { listTrash, persistMemory, restoreMemory } from '../lib/core/writer.mjs'
 import { describeSettings, loadSettings, updateSetting } from '../lib/core/settings.mjs'
 import { CONFIRM_MARK, hiddenNoticeForPrompt, isUserNotice, maybeStartSideJob, runSideJob, sedimentBlocker, sedimentOffNotice, takeSideFollowup } from '../lib/core/sidepath.mjs'
 import { agentForEvent, eventKind, hostOf } from '../lib/hosts/index.mjs'
@@ -149,6 +151,29 @@ async function runRuleAdd(text) {
   console.log('下个会话开始起无条件生效。')
 }
 
+async function runTrash() {
+  const items = await listTrash()
+  if (items.length === 0) {
+    console.log('回收站是空的')
+    return
+  }
+  console.log(`回收站（共 ${items.length} 条，最近删掉的在前，保留 30 天）`)
+  items.forEach((item, i) => {
+    const how = item.deletedReason === 'merge' ? `合并进 ${item.mergedInto}` : '删除'
+    console.log(`${i + 1}. ${item.text}（${item.category}，id ${item.id}，${how}于 ${item.deletedAt}）`)
+  })
+}
+
+async function runRestore(id) {
+  if (!id) {
+    console.error('用法：memory-self-evolution restore <id>')
+    process.exitCode = 1
+    return
+  }
+  const mem = await restoreMemory(id)
+  console.log(`已恢复到 ${mem.category}：${mem.text}（置信度 ${fmtConfidence(mem.confidence)}，id ${mem.id}）`)
+}
+
 async function runConfig(key, value) {
   if (!key) {
     const items = await describeSettings()
@@ -177,12 +202,16 @@ try {
     await runRead(argv[1])
   } else if (cmd === 'rule' && argv[1] === 'add') {
     await runRuleAdd(argv.slice(2).join(' ').trim())
+  } else if (cmd === 'trash') {
+    await runTrash()
+  } else if (cmd === 'restore') {
+    await runRestore(argv[1])
   } else if (cmd === 'config') {
     await runConfig(argv[1], argv[2])
   } else if (cmd === 'side-run') {
     await runSideJob(argv[1])
   } else {
-    console.error('用法：memory-self-evolution <hook|list|read|rule add|config> [参数]')
+    console.error('用法：memory-self-evolution <hook|list|read|rule add|trash|restore|config> [参数]')
     process.exitCode = 1
   }
 } catch (e) {

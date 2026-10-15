@@ -100,6 +100,7 @@ const base = fileHost({
   name: 'Claude Code',
   dir: '.claude',
   hooksFile: 'settings.json',
+  skillsDir: '.claude/skills',
   events: [
     { event: 'SessionStart', timeout: 10 },
     { event: 'UserPromptSubmit', timeout: 10 },

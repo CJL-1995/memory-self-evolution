@@ -7,6 +7,8 @@ export default fileHost({
   name: 'Cursor',
   dir: '.cursor',
   hooksFile: 'hooks.json',
+  // 个人 skill 放在这里；~/.cursor/skills-cursor 是 Cursor 自带的，不能往里放。
+  skillsDir: '.cursor/skills',
   events: [
     { event: 'sessionStart', timeout: 10 },
     { event: 'beforeSubmitPrompt', timeout: 5 },
