@@ -243,7 +243,7 @@ if (modeArg) {
 rl.close()
 await ensureVectorModel()
 registerAll(home, hosts, ctx)
-console.log('重启后主模型能看到 memory_list、memory_read、memory_config，以及处理插件确认弹窗的 memory_resolve。')
+console.log('重启后主模型能看到 memory_list、memory_read、memory_config、整理记忆用的 memory_update，以及处理插件确认弹窗的 memory_resolve。')
 const missing = missingSideApi(home)
 if (missing.length > 0) {
   console.log(`旁路接口还缺：${missing.join('、')}（都在 ~/.memory-self-evolution/ 下）。配齐之前不会沉淀新记忆，已有记忆照常注入和召回；会话开始时会把这一点告诉主模型。`)
