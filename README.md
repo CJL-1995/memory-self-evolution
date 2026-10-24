@@ -64,6 +64,8 @@ npm run uninstall
 
 沉淀只走旁路这一条通路。`confirm` 只决定写盘前弹不弹确认。
 
+**记什么。** 只记跨会话还用得上的内容：跨任务都适用的偏好和工作规范；文档、链接、仓库、目录、开关、账号这类长期查阅信息；跨项目通用的技术选型结论。只在当前任务里成立的内容不记，说得再肯定也一样：方案讨论和分析；实验、训练、数据处理里的参数、阶段结论和标注口径；单个 bug、需求或 MR 的细节；为当前任务交代的背景；假设和提问；对话内的澄清；带期限的安排。你明确说「记住」「记一下」时照记，不受这些限制。
+
 **旁路。** hook 在后台判断这句该不该记，不挡住本轮回答。判别模型一次给出该不该记、记忆正文和分组（`rule` 或 `project`），输出不是 JSON 的按不记处理；要记的再和最相近的 3 条已有记忆比一次，定出新增、强化、合并还是替换。能写记忆的工具只有 `memory_resolve(sessionID, decision)`。`confirm=false` 时后台直接新增、强化、合并或替换，`stop` 只让主模型把结果原样展示出来。`confirm=true` 时，`stop` 让主模型弹出确认，先不写；插件为每条提案给出 sessionID，用户点选后主模型调用一次 `memory_resolve`。decision 统一为 `create_rule`、`create_project`、`reinforce`、`merge`、`replace`、`discard`。`replace` 用在新说法和已有记忆冲突时，用新正文整条换掉旧记忆。新建和 `discard` 总是可选，`reinforce`、`merge`、`replace` 只在这条提案给出了对应选项时才接受。插件只消费 sessionID 对应的当前客户端待确认提案，正文、目标记忆和合并正文不能由主模型覆盖；无效、跨客户端、已处理或动作不匹配的 sessionID 会被拒绝，新一次弹窗会作废同一客户端同一会话之前问过但没点选的提案。sessionID 使用本地 256 位密钥，对 `agent + sessionKey + 每轮输入的 ID + SHA256(prompt) + version` 做 HMAC-SHA256（每轮输入的 ID 在 Cursor 是 `generation_id`，在 Claude Code 是 `prompt_id`，CodeBuddy 和 WorkBuddy 不提供）；同一 Hook 重试得到同一个 sessionID，并通过排他建档只启动一次分析。已结束任务保留 24 小时作为幂等墓碑。密钥首次使用时自动生成到 `~/.memory-self-evolution/session-secret`，权限 600，不经 MCP 或上下文返回。使用 CodeBuddy IDE 自定义智能体时，工具白名单里必须包含 `ask_followup_question`，否则无法弹窗。各端共用同一条旁路：请求 `sideApiBase/chat/completions`。`sideApiBase`、`sideApiModel` 和 `side-secret.json` 中的 `apiKey` 都没有缺省值，缺任何一项时不启动判别。
 
 旁路任务按 `agent + sessionKey` 强制隔离。Cursor 的 sessionKey 取 `conversation_id`，CodeBuddy / WorkBuddy / Claude Code 取 `session_id`。每次 Stop 只等待、展示和作废当前客户端当前会话的任务；其他会话或其他客户端的任务继续留在池中，等自己的 Stop 处理。Cursor 用于还原隐藏确认指令的临时文件也按客户端和会话分别保存。宿主没有提供稳定会话 ID 时 fail closed：本轮不启动旁路分析并记录原因，避免空 ID 串会话。正式落盘后的 `rule` / `project` 仍是跨会话共享的长期记忆。
