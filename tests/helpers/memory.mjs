@@ -13,7 +13,7 @@ export async function createMemoryHarness(t, options = {}) {
   const root = path.join(home, '.memory-self-evolution')
   await fsp.mkdir(root, { recursive: true })
   const errors = []
-  const state = { hits: [], recallError: null, writeError: false, failRenameTo: '', failRead: '', reads: new Map(), embeddedTexts: [], vectorRefreshes: 0, spawns: [], fetch: null }
+  const state = { hits: [], recallError: null, writeError: false, failRenameTo: '', failRead: '', reads: new Map(), embeddedTexts: [], vectorRefreshes: 0, droppedVectors: [], spawns: [], spawnExitCode: 0, fetch: null }
   const clock = { now: options.now ? new Date(options.now).getTime() : null }
   class TestDate extends Date {
     constructor(...args) { super(...(args.length ? args : [clock.now ?? Date.now()])) }
@@ -65,7 +65,13 @@ export async function createMemoryHarness(t, options = {}) {
       mod = synthetic(identifier, {
         spawn: (...args) => {
           state.spawns.push(args)
-          return { unref() {} }
+          return {
+            unref() {},
+            // 打开文件的命令要等它退出才知道成没成，这里按 state.spawnExitCode 模拟退出。
+            on(event, cb) {
+              if (event === 'exit') setTimeout(() => cb(state.spawnExitCode), 0)
+            },
+          }
         },
       })
     } else if (identifier.startsWith('node:')) {
@@ -77,6 +83,7 @@ export async function createMemoryHarness(t, options = {}) {
         loadIndex: async () => new Map(),
         ensureVectors: async (_, index) => index,
         refreshVector: async () => { state.vectorRefreshes++ },
+        dropVectors: async (ids) => { state.droppedVectors.push(...ids); return ids.length },
         recall: async (_, pool) => {
           if (state.recallError) throw state.recallError
           return state.hits.map(id => ({ memory: pool.find(mem => mem.id === id), score: 0.9 })).filter(hit => hit.memory)

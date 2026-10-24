@@ -1,6 +1,7 @@
 // 安装与卸载快照用的假用户目录。每种目录对应一种安装前的状态。
 import fsp from 'node:fs/promises'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 const stale = (agent) => `"/old/node" "/old/repo/bin/memory.mjs" hook --agent ${agent}`
 const json = (value) => `${JSON.stringify(value, null, 2)}\n`
@@ -63,14 +64,28 @@ export async function buildFixtureHome(home, name) {
   }
 }
 
-// 三个客户端目录下所有文件的内容，路径相对用户目录。
+const SKILL_SOURCE = fileURLToPath(new URL('../../skills/memory-self-evolution-manage/SKILL.md', import.meta.url))
+
+// 三个客户端目录下所有文件的内容，路径相对用户目录，子目录也逐层列出。
+// 和仓库里 SKILL.md 一样的文件只记一个占位：快照要锁的是装没装、装在哪，不是 skill 的措辞。
 export async function readClientFiles(home) {
+  const skill = await fsp.readFile(SKILL_SOURCE, 'utf8').catch(() => null)
   const out = {}
-  for (const dir of CLIENT_DIRS) {
-    const names = await fsp.readdir(path.join(home, dir)).catch(() => null)
-    if (names === null) continue
-    out[`${dir}/`] = names.sort()
-    for (const name of names) out[`${dir}/${name}`] = await fsp.readFile(path.join(home, dir, name), 'utf8')
+  async function walk(rel) {
+    const names = await fsp.readdir(path.join(home, rel)).catch(() => null)
+    if (names === null) return
+    names.sort()
+    out[`${rel}/`] = names
+    for (const name of names) {
+      const child = `${rel}/${name}`
+      if ((await fsp.stat(path.join(home, child))).isDirectory()) {
+        await walk(child)
+        continue
+      }
+      const body = await fsp.readFile(path.join(home, child), 'utf8')
+      out[child] = body === skill ? '（与仓库里的 SKILL.md 相同）' : body
+    }
   }
+  for (const dir of CLIENT_DIRS) await walk(dir)
   return out
 }

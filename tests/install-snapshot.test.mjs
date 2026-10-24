@@ -19,8 +19,9 @@ const FIXTURE = fileURLToPath(new URL('./fixtures/install-snapshot.json', import
 const UPDATE = process.env.UPDATE_HOST_SNAPSHOT === '1'
 const expected = UPDATE ? {} : JSON.parse(await fsp.readFile(FIXTURE, 'utf8'))
 const actual = {}
-// 快照里的 node 和仓库路径已经换成占位符，这里直接拿占位符当路径用。
-const ctx = { nodeBin: '<NODE>', hookScript: '<REPO>/bin/memory.mjs', mcpScript: '<REPO>/bin/memory-mcp.mjs' }
+// 快照里的 node 和仓库路径已经换成占位符，这里直接拿占位符当路径用。skill 用仓库里的真实文件。
+const skillSource = fileURLToPath(new URL('../skills/memory-self-evolution-manage/SKILL.md', import.meta.url))
+const ctx = { nodeBin: '<NODE>', hookScript: '<REPO>/bin/memory.mjs', mcpScript: '<REPO>/bin/memory-mcp.mjs', skillSource }
 const SNAPSHOT_HOSTS = ['cursor', 'codebuddy', 'workbuddy']
 const hosts = INSTALL_HOSTS.filter((host) => SNAPSHOT_HOSTS.includes(host.id))
 const FIELDS = ['registered', 'registerError', 'afterRegister', 'removed', 'removeWarnings', 'afterRemove', 'removedOnly', 'removedOnlyWarnings', 'afterRemoveOnly']
@@ -39,7 +40,7 @@ async function withErrors(home, mark, run) {
 
 function removeAll(home) {
   const out = {}
-  for (const host of hosts) out[host.name] = { hook: host.removeHooks(home), MCP: host.removeMcp(home) }
+  for (const host of hosts) out[host.name] = { hook: host.removeHooks(home), MCP: host.removeMcp(home), skill: host.removeSkill(home) }
   return out
 }
 

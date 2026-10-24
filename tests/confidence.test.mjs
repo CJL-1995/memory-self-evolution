@@ -650,7 +650,7 @@ test('判重冲突走 replace，写入时只用新陈述覆盖旧正文', async 
   assert.equal((await side.resolvePendingSession('j_create', 'replace', 'cursor')).ok, false)
 })
 
-test('MCP 只有 list、read、resolve、config 四个工具，写入只能走 memory_resolve', async t => {
+test('MCP 有 list、read、update、resolve、config 五个工具，已经移除的写工具不可用', async t => {
   const h = await createMemoryHarness(t, { argv: ['--agent', 'cursor'] })
   await h.load('bin/memory-mcp.mjs')
   let sequence = 0
@@ -666,7 +666,7 @@ test('MCP 只有 list、read、resolve、config 四个工具，写入只能走 m
   }
 
   const tools = (await call('tools/list')).result.tools
-  assert.deepEqual(tools.map(tool => tool.name), ['memory_list', 'memory_read', 'memory_resolve', 'memory_config'])
+  assert.deepEqual(tools.map(tool => tool.name), ['memory_list', 'memory_read', 'memory_update', 'memory_resolve', 'memory_config'])
   assert.doesNotMatch(JSON.stringify(tools), /sideJudge|阻塞|blocking/)
   for (const name of ['memory_propose', 'memory_persist', 'memory_reinforce', 'memory_merge', 'memory_review']) {
     const removed = await call('tools/call', { name, arguments: { text: '绕过确认直接写入', category: 'rule', id: 'x' } })

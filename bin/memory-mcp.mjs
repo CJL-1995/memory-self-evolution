@@ -3,10 +3,13 @@
 // Cursor、codebuddy 与 WorkBuddy 的 mcp.json 格式一致，同一份配置三端复用。
 // 手写协议而不引依赖：这个 server 要被短命/常驻两种方式反复启动，依赖越少启动越快、越不易坏。
 
-import { GROUPS, READ_LIMIT } from '../lib/core/config.mjs'
+import { GROUPS, READ_LIMIT, paths } from '../lib/core/config.mjs'
 import { fmtConfidence, readAllGroups, readGroup } from '../lib/core/store.mjs'
 import { describeSettings, updateSetting } from '../lib/core/settings.mjs'
 import { resolvePendingSession } from '../lib/core/sidepath.mjs'
+import { UPDATE_ACTIONS, updateMemory } from '../lib/core/manage.mjs'
+import { syncSnapshot } from '../lib/core/snapshot.mjs'
+import { openWithDefaultApp } from '../lib/core/open-file.mjs'
 
 const PROTOCOL_VERSION = '2024-11-05'
 
@@ -17,8 +20,12 @@ const AGENT = agentIdx >= 0 ? String(process.argv[agentIdx + 1] || '') : ''
 const TOOLS = [
   {
     name: 'memory_list',
-    description: '列出两组记忆的条数。rule 是无条件生效的规则与偏好，project 是按需召回的项目事实。',
-    inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+    description: '列出两组记忆的条数。rule 是无条件生效的规则与偏好，project 是按需召回的项目事实。用户要查看全部记忆时传 open=true，插件会刷新 memories.md 并用系统默认程序打开它。',
+    inputSchema: {
+      type: 'object',
+      properties: { open: { type: 'boolean', description: '为 true 时刷新并打开 memories.md，供用户查看全部记忆' } },
+      additionalProperties: false,
+    },
   },
   {
     name: 'memory_read',
@@ -27,6 +34,21 @@ const TOOLS = [
       type: 'object',
       properties: { group: { type: 'string', enum: GROUPS, description: 'rule=规则与偏好，project=项目事实' } },
       required: ['group'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'memory_update',
+    description: '整理这个插件里已有的记忆：删除、合并或改写。只在用户明确要求、并且已经确认要执行的内容之后调用；新增记忆不用它，客户端自带的记忆也不用它。id 必须来自 memory_read 的返回。delete 删除 id；merge 保留 id、并掉 id2，正文换成 text，置信度取两条中较高的；replace 用 text 换掉 id 的正文，置信度不变。text 由用户给出或经用户确认，须为中文、自包含、6 到 400 个字。删除和被并掉的记忆进回收站，30 天内可以恢复。',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        action: { type: 'string', enum: UPDATE_ACTIONS, description: 'delete 删除，merge 合并，replace 改写' },
+        id: { type: 'string', description: '要删除或改写的记忆 id；合并时是要保留的那条' },
+        id2: { type: 'string', description: '合并时要并掉的那条记忆 id，只在 merge 时使用' },
+        text: { type: 'string', description: 'merge 和 replace 的新正文' },
+      },
+      required: ['action', 'id'],
       additionalProperties: false,
     },
   },
@@ -63,16 +85,23 @@ const TOOLS = [
 
 const text = (s) => ({ content: [{ type: 'text', text: s }] })
 
-async function memoryList() {
+async function memoryList(args) {
   const groups = await readAllGroups()
   const total = GROUPS.reduce((n, g) => n + groups[g].length, 0)
-  if (total === 0) return text('记忆库为空')
-  return text(
-    [
-      `rule    ${groups.rule.length} 条 —— 无条件生效的规则与偏好，会话开始已全量注入，无需读取`,
-      `project ${groups.project.length} 条 —— 项目事实，相关条目每轮自动召回；需要全量时用 memory_read("project")`,
-    ].join('\n')
-  )
+  const lines = total === 0
+    ? ['记忆库为空']
+    : [
+        `rule    ${groups.rule.length} 条 —— 无条件生效的规则与偏好，会话开始已全量注入，无需读取`,
+        `project ${groups.project.length} 条 —— 项目事实，相关条目每轮自动召回；需要全量时用 memory_read("project")`,
+      ]
+  if (args.open === true) {
+    await syncSnapshot()
+    const opened = await openWithDefaultApp(paths.snapshot)
+    lines.push(opened.ok
+      ? `已用默认程序打开全部记忆：${paths.snapshot}`
+      : `没能打开文件（${opened.detail}），全部记忆在：${paths.snapshot}`)
+  }
+  return text(lines.join('\n'))
 }
 
 async function memoryRead(args) {
@@ -86,6 +115,10 @@ async function memoryRead(args) {
     .map((m, i) => `${i + 1}. ${m.deprecated ? '[已废弃] ' : ''}${m.text}（置信度 ${fmtConfidence(m.confidence)}，id ${m.id}）`)
     .join('\n')
   return text(`${head}\n${body}`)
+}
+
+async function memoryUpdate(args) {
+  return text(await updateMemory(args))
 }
 
 async function memoryResolve(args) {
@@ -107,6 +140,7 @@ async function memoryConfig(args) {
 const HANDLERS = {
   memory_list: memoryList,
   memory_read: memoryRead,
+  memory_update: memoryUpdate,
   memory_resolve: memoryResolve,
   memory_config: memoryConfig,
 }
