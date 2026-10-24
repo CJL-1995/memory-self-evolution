@@ -12,14 +12,14 @@ description: 查看、删除、合并或改写 memory-self-evolution 插件里�
   1. 会话开始注入的「# 长期记忆（自动生成，请勿手动编辑）」下面列出的规则；
   2. 每轮注入的「# 与本轮输入相关的长期记忆（自动召回）」下面的规则和项目事实；
   3. memory_read 返回的条目，每条带 id；
-  4. ~/.memory-self-evolution/memories.md 里列出的条目。
+  4. ~/.memory-self-evolution/memories.html 里列出的条目。
 - 不属于这个插件的：客户端自带的记忆，包括 Claude Code 的 memory 目录和 CLAUDE.md、CodeBuddy 与 WorkBuddy 的 update_memory、Cursor 的 Memories 和 Rules。
 
 ## 能做的事
 
 | 操作 | 调用 | 结果 |
 |---|---|---|
-| 查看全部记忆 | memory_list，open=true | 插件刷新并用默认程序打开 memories.md，返回两组条数和文件路径 |
+| 查看全部记忆 | memory_list，open=true | 插件刷新 memories.html 并用默认浏览器打开，返回两组条数和文件路径 |
 | 查看某一条或某一类 | memory_read | 在对话里列出匹配的条目，带正文、置信度和 id |
 | 删除一条或多条 | memory_update，action=delete，一条用 id，多条用 ids | 这些记忆从插件里移除，召回和下一个会话的注入里都不再出现；ids 里不存在的 id 跳过，其余照常删除 |
 | 合并两条 | memory_update，action=merge，id，id2，text | id 保留，正文换成 text 并重算向量；id2 被并掉；置信度取两条中较高的 |
@@ -27,7 +27,7 @@ description: 查看、删除、合并或改写 memory-self-evolution 插件里�
 
 ## 只允许调用的工具
 
-- memory_list：看两组各有多少条；带 open=true 时打开 memories.md。
+- memory_list：看两组各有多少条；带 open=true 时在浏览器里打开 memories.html。
 - memory_read：按组读出记忆和 id，用来找目标、在对话里列出某一类记忆。
 - memory_update：执行删除、合并、改写。
 - 当前客户端的提问工具：执行前让用户确认，或有多个候选时让用户选。Cursor 是 AskQuestion，CodeBuddy 与 WorkBuddy 是 AskUserQuestion（CodeBuddy IDE 中为 ask_followup_question），Claude Code 是 AskUserQuestion。
@@ -37,7 +37,7 @@ description: 查看、删除、合并或改写 memory-self-evolution 插件里�
 ## 禁止事项
 
 1. 不改客户端自带的记忆，不调用 update_memory，不改 CLAUDE.md、Claude Code 的 memory 目录、Cursor 的 Memories 和 Rules。
-2. 不用文件工具、命令或脚本读写记忆库里的文件：rule.jsonl、project.jsonl、embeddings.jsonl、memories.md、trash.jsonl、side/ 目录。要看全部记忆，用 memory_list 打开 memories.md，不要自己用命令打开或读取它。
+2. 不用文件工具、命令或脚本读写记忆库里的文件：rule.jsonl、project.jsonl、embeddings.jsonl、memories.html、trash.jsonl、side/ 目录。要看全部记忆，用 memory_list 打开 memories.html，不要自己用命令打开或读取它。
 3. 不调用 memory_resolve，它只处理插件自己发起的确认弹窗；也不调用 memory_config。
 4. 用户没有明确要求时，不删除、不合并、不改写。觉得两条重复或某条过时，可以告诉用户，由用户决定。
 5. 不编造 id。id 只能来自 memory_read 的返回。
@@ -56,7 +56,7 @@ description: 查看、删除、合并或改写 memory-self-evolution 插件里�
    - 不是整理记忆：陈述新的偏好或规范（「以后都……」），交给插件后台；要改的是代码或文档里的规则，不是记忆。
 2. 找到目标：
    - 用户给的是描述（「代理节点那条」「多格式导出那几条」）时，用 memory_read 读 rule 和 project 两组，按描述找候选。
-   - 用户给的是 memories.md 里的序号或 id 时，用 memory_read 核对这条的正文和 id。序号会随置信度变化，以 id 为准。
+   - 用户给的是 memories.html 里的序号或 id 时，用 memory_read 核对这条的正文和 id。序号会随置信度变化，以 id 为准。
    - 用户要删除、并用空格分隔给出多个 id（「删除 id1 id2 id3」）时，按空格拆成多个 id，用 memory_read 逐个核对正文。核对不到的 id 告诉用户，执行时会被跳过，其余照常删除。
    - 正好一条：继续。
    - 多条：列出候选的正文和 id，让用户选。
