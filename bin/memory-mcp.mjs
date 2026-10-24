@@ -39,16 +39,17 @@ const TOOLS = [
   },
   {
     name: 'memory_update',
-    description: '整理这个插件里已有的记忆：删除、合并或改写。只在用户明确要求、并且已经确认要执行的内容之后调用；新增记忆不用它，客户端自带的记忆也不用它。id 必须来自 memory_read 的返回。delete 删除 id；merge 保留 id、并掉 id2，正文换成 text，置信度取两条中较高的；replace 用 text 换掉 id 的正文，置信度不变。text 由用户给出或经用户确认，须为中文、自包含、6 到 400 个字。删除和被并掉的记忆进回收站，30 天内可以恢复。',
+    description: '整理这个插件里已有的记忆：删除、合并或改写。只在用户明确要求、并且已经确认要执行的内容之后调用；新增记忆不用它，客户端自带的记忆也不用它。id 必须来自 memory_read 的返回。delete 删除 id，或一次删除 ids 里的多条，不存在的 id 跳过、其余照常删除；merge 保留 id、并掉 id2，正文换成 text，置信度取两条中较高的；replace 用 text 换掉 id 的正文，置信度不变。text 由用户给出或经用户确认，须为中文、自包含、6 到 400 个字。删除和被并掉的记忆进回收站，30 天内可以恢复。',
     inputSchema: {
       type: 'object',
       properties: {
         action: { type: 'string', enum: UPDATE_ACTIONS, description: 'delete 删除，merge 合并，replace 改写' },
-        id: { type: 'string', description: '要删除或改写的记忆 id；合并时是要保留的那条' },
+        id: { type: 'string', description: '要删除或改写的记忆 id；合并时是要保留的那条。删除多条时用 ids' },
+        ids: { type: 'array', items: { type: 'string' }, description: '一次删除多条时的记忆 id 列表，只在 delete 时使用' },
         id2: { type: 'string', description: '合并时要并掉的那条记忆 id，只在 merge 时使用' },
         text: { type: 'string', description: 'merge 和 replace 的新正文' },
       },
-      required: ['action', 'id'],
+      required: ['action'],
       additionalProperties: false,
     },
   },

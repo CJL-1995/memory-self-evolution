@@ -68,6 +68,38 @@ test('删除：从分组文件和快照里去掉，进回收站，删掉向量�
   await assert.rejects(manage.updateMemory({ action: 'delete', id: 'r3' }), /未找到记忆 r3/)
 })
 
+test('批量删除：ids 里的多条一次删掉，跨分组；不存在的 id 跳过，重复的只删一次；一个都不存在时报错且不改动', async (t) => {
+  const { h, manage } = await setup(t)
+  const pending = await proposal(h, 's_pending', 'r2')
+
+  await assert.rejects(manage.updateMemory({ action: 'delete', ids: ['nope', 'gone'] }), /未找到记忆 nope、gone/)
+  assert.deepEqual((await h.records()).map((m) => m.id).sort(), ['r1', 'r2', 'r3'])
+  assert.deepEqual(await readTrash(h), [])
+
+  const message = await manage.updateMemory({ action: 'delete', ids: ['r1', 'nope', 'p1', 'r1'] })
+  assert.ok(message.startsWith([
+    '已删除 2 条记忆：',
+    '- 规则与偏好：「回答一律使用中文。」（id r1）',
+    '- 项目事实：「多格式导出的 PRD 在 doc 文档里。」（id p1）',
+    '在回收站里保留 30 天',
+  ].join('\n')), message)
+  assert.ok(message.includes(`node "${path.join(repo, 'bin', 'memory.mjs')}" restore <id> 逐条恢复。`))
+  assert.ok(message.endsWith('以下 id 不存在，已跳过：nope。'), message)
+
+  assert.deepEqual((await h.records()).map((m) => m.id).sort(), ['r2', 'r3'])
+  assert.deepEqual(await h.records('project'), [])
+  assert.doesNotMatch(await fsp.readFile(path.join(h.root, 'memories.md'), 'utf8'), /回答一律使用中文|多格式导出的 PRD/)
+  assert.deepEqual((await readTrash(h)).map((m) => [m.id, m.deletedReason]), [['r1', 'delete'], ['p1', 'delete']])
+  assert.deepEqual(h.state.droppedVectors, ['r1', 'p1'])
+
+  // 模型把用户空格分隔的一串 id 原样放进 id 时也能认。
+  const joined = await manage.updateMemory({ action: 'delete', id: ' r2  r3 ' })
+  assert.match(joined, /^已删除 2 条记忆：/)
+  assert.match(joined, /另有 1 条指向这些记忆的待确认提案已作废。$/)
+  assert.equal((await pending()).reason, 'target-changed')
+  assert.deepEqual(await h.records(), [])
+})
+
 test('合并：保留 id、正文换成给定的 text 并重算向量，id2 进回收站，置信度取较高的', async (t) => {
   const { h, manage } = await setup(t)
   const pending = await proposal(h, 's_pending', 'r2')
@@ -185,9 +217,10 @@ test('MCP：memory_update 的参数定义，执行结果原样返回，出错时
   const { h } = await setup(t)
   const { tool, call } = await mcp(t, h.home)
   const schema = (await call('tools/list')).result.tools.find((item) => item.name === 'memory_update').inputSchema
-  assert.deepEqual(schema.required, ['action', 'id'])
+  assert.deepEqual(schema.required, ['action'])
   assert.deepEqual(schema.properties.action.enum, ['delete', 'merge', 'replace'])
-  assert.deepEqual(Object.keys(schema.properties), ['action', 'id', 'id2', 'text'])
+  assert.deepEqual(Object.keys(schema.properties), ['action', 'id', 'ids', 'id2', 'text'])
+  assert.deepEqual(schema.properties.ids, { type: 'array', items: { type: 'string' }, description: schema.properties.ids.description })
 
   const done = await tool('memory_update', { action: 'replace', id: 'r1', text: '回答用户的问题时一律使用中文。' })
   assert.equal(done.isError, undefined)
@@ -195,6 +228,9 @@ test('MCP：memory_update 的参数定义，执行结果原样返回，出错时
   const failed = await tool('memory_update', { action: 'delete', id: 'missing' })
   assert.equal(failed.isError, true)
   assert.match(failed.content[0].text, /未找到记忆 missing/)
+  const batch = await tool('memory_update', { action: 'delete', ids: ['r2', 'missing', 'r3'] })
+  assert.equal(batch.isError, undefined)
+  assert.match(batch.content[0].text, /^已删除 2 条记忆：[\s\S]*以下 id 不存在，已跳过：missing。$/)
 })
 
 test('MCP：memory_list 带 open=true 时刷新并打开 memories.md，打不开时给出路径；不带时和原来一样', async (t) => {
