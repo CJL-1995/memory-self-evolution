@@ -630,7 +630,7 @@ test('判重冲突走 replace，写入时只用新陈述覆盖旧正文', async 
   const model = side.buildFollowup('cursor', [{ id: 'j_replace', proposal }])
   assert.match(model, /替换已有记忆 「未经用户许可不得执行编译命令」/)
   assert.match(model, /替换选 replace/)
-  const replaceNotice = '记忆插件memory-self-evolution替换了一条记忆：新记忆："改完代码必须自行编译验证"。旧记忆："未经用户许可不得执行编译命令"。'
+  const replaceNotice = '记忆插件memory-self-evolution替换了一条记忆：新记忆："改完代码必须自行编译验证"。旧记忆："未经用户许可不得执行编译命令"。归类：rule（规则与偏好）。'
   assert.equal(side.formatNotice(proposal), replaceNotice)
   assert.equal(side.formatDirectNotice(proposal), replaceNotice)
 
@@ -648,6 +648,45 @@ test('判重冲突走 replace，写入时只用新陈述覆盖旧正文', async 
 
   await job('j_create', { action: 'create', text: '无关新规则', category: 'rule' })
   assert.equal((await side.resolvePendingSession('j_create', 'replace', 'cursor')).ok, false)
+})
+
+test('写入通知末尾标出记忆实际所在的分组，不是判别模型推荐的分组', async t => {
+  const h = await createMemoryHarness(t)
+  await h.seed('rule', [memory('r1', { text: '回答一律使用中文。' })])
+  await h.seed('project', [memory('p1', { category: 'project', text: '多格式导出的 PRD 在 doc 文档里。' })])
+  const side = await h.load('lib/core/sidepath.mjs')
+  const jobs = path.join(h.root, 'side')
+  await fsp.mkdir(jobs)
+  const job = (id, body) => fsp.writeFile(path.join(jobs, `${id}.json`), JSON.stringify({
+    id, agent: 'cursor', status: 'ready', prompted: true, applied: false, startedAt: new Date().toISOString(), proposal: body,
+  }))
+
+  // 判别推荐 rule，用户在弹窗里改成 project：按实际写入的 project 显示。
+  await job('j_new', { action: 'create', text: '每次提交前先跑全量测试', category: 'rule' })
+  const created = await side.resolvePendingSession('j_new', 'create_project', 'cursor')
+  assert.equal(created.message, '生成了一条记忆：每次提交前先跑全量测试。归类：project（项目事实）。')
+  assert.deepEqual((await h.records('project')).map(m => m.text).sort(), ['多格式导出的 PRD 在 doc 文档里。', '每次提交前先跑全量测试'])
+
+  // 强化和合并作用在已有记忆上，分组跟着目标记忆走。
+  await job('j_reinforce', { action: 'reinforce', text: 'PRD 在 doc 里', category: 'rule', targetId: 'p1', targetText: '多格式导出的 PRD 在 doc 文档里。' })
+  const reinforced = await side.resolvePendingSession('j_reinforce', 'reinforce', 'cursor')
+  assert.match(reinforced.message, /^强化了一条记忆：多格式导出的 PRD 在 doc 文档里。，置信度/)
+  assert.ok(reinforced.message.endsWith('。归类：project（项目事实）。'), reinforced.message)
+
+  await job('j_merge', { action: 'merge', text: '文档也用中文写', category: 'project', targetId: 'r1', targetText: '回答一律使用中文。', mergedText: '回答和文档一律使用中文。' })
+  const merged = await side.resolvePendingSession('j_merge', 'merge', 'cursor')
+  assert.match(merged.message, /^合并了一条记忆：旧记忆「回答一律使用中文。」，新记忆「回答和文档一律使用中文。」，置信度/)
+  assert.ok(merged.message.endsWith('。归类：rule（规则与偏好）。'), merged.message)
+
+  // 免确认模式的通知同样带分组；分组未知时不加。
+  assert.equal(side.formatDirectNotice({ action: 'create', text: '新的项目事实', category: 'project' }),
+    '记忆插件memory-self-evolution新增了一条记忆："新的项目事实"。归类：project（项目事实）。')
+  assert.equal(side.formatDirectNotice({ action: 'reinforce', text: '新说法', targetText: '旧规则', category: 'rule' }),
+    '记忆插件memory-self-evolution强化了一条记忆："旧规则"。归类：rule（规则与偏好）。')
+  assert.equal(side.formatDirectNotice({ action: 'merge', text: '新说法', mergedText: '合并后的规则', category: 'rule' }),
+    '记忆插件memory-self-evolution合并了一条记忆："合并后的规则"。归类：rule（规则与偏好）。')
+  assert.equal(side.formatDirectNotice({ action: 'create', text: '没有分组的记忆' }),
+    '记忆插件memory-self-evolution新增了一条记忆："没有分组的记忆"。')
 })
 
 test('MCP 有 list、read、update、resolve、config 五个工具，已经移除的写工具不可用', async t => {
