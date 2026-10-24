@@ -177,15 +177,15 @@
   },
   "stopDirect": {
    "out": {
-    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
   },
   "stopDirectSide": {
    "confirm-cursor-conv-1.json": {
-    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。",
-    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。",
+    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "s_other_agent.json": {
     "agent": "codebuddy",
@@ -237,7 +237,7 @@
   ],
   "stopDirectNextPrompt": {
    "out": {
-    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -453,15 +453,15 @@
   },
   "stopDirect": {
    "out": {
-    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
   },
   "stopDirectSide": {
    "confirm-cursor-sess-1.json": {
-    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。",
-    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。",
+    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "s_other_agent.json": {
     "agent": "codebuddy",
@@ -513,7 +513,7 @@
   ],
   "stopDirectNextPrompt": {
    "out": {
-    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -729,15 +729,15 @@
   },
   "stopDirect": {
    "out": {
-    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
   },
   "stopDirectSide": {
    "confirm-cursor-sess-1.json": {
-    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。",
-    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。",
+    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "s_other_agent.json": {
     "agent": "codebuddy",
@@ -789,7 +789,7 @@
   ],
   "stopDirectNextPrompt": {
    "out": {
-    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -1024,7 +1024,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -1082,7 +1082,7 @@
    "out": {
     "hookSpecificOutput": {
      "hookEventName": "beforeSubmitPrompt",
-     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
     }
    },
    "spawned": [],
@@ -1318,7 +1318,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -1376,7 +1376,7 @@
    "out": {
     "hookSpecificOutput": {
      "hookEventName": "UserPromptSubmit",
-     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
     }
    },
    "spawned": [],
@@ -1612,7 +1612,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -1670,7 +1670,7 @@
    "out": {
     "hookSpecificOutput": {
      "hookEventName": "UserPromptSubmit",
-     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
     }
    },
    "spawned": [],
@@ -1906,7 +1906,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -1964,7 +1964,7 @@
    "out": {
     "hookSpecificOutput": {
      "hookEventName": "beforeSubmitPrompt",
-     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
     }
    },
    "spawned": [],
@@ -2200,7 +2200,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -2258,7 +2258,7 @@
    "out": {
     "hookSpecificOutput": {
      "hookEventName": "UserPromptSubmit",
-     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
     }
    },
    "spawned": [],
@@ -2494,7 +2494,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -2552,7 +2552,7 @@
    "out": {
     "hookSpecificOutput": {
      "hookEventName": "UserPromptSubmit",
-     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
     }
    },
    "spawned": [],
@@ -2767,7 +2767,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -2823,7 +2823,7 @@
   ],
   "stopDirectNextPrompt": {
    "out": {
-    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -3037,7 +3037,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -3093,7 +3093,7 @@
   ],
   "stopDirectNextPrompt": {
    "out": {
-    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -3307,7 +3307,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -3363,7 +3363,7 @@
   ],
   "stopDirectNextPrompt": {
    "out": {
-    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -3579,15 +3579,15 @@
   },
   "stopDirect": {
    "out": {
-    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "followup_message": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
   },
   "stopDirectSide": {
    "confirm-cursor-conv-1.json": {
-    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。",
-    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "userText": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。",
+    "modelText": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "s_other_agent.json": {
     "agent": "codebuddy",
@@ -3639,7 +3639,7 @@
   ],
   "stopDirectNextPrompt": {
    "out": {
-    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "additional_context": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -3874,7 +3874,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -3932,7 +3932,7 @@
    "out": {
     "hookSpecificOutput": {
      "hookEventName": "UserPromptSubmit",
-     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
     }
    },
    "spawned": [],
@@ -4168,7 +4168,7 @@
   "stopDirect": {
    "out": {
     "decision": "block",
-    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+    "reason": "memory-self-evolution 捕捉到了新的记忆：\n结果：\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。\n\nMEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
    },
    "spawned": [],
    "errors": []
@@ -4226,7 +4226,7 @@
    "out": {
     "hookSpecificOutput": {
      "hookEventName": "UserPromptSubmit",
-     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。"
+     "additionalContext": "MEMORY_CONFIRM_V1\n插件已直接写入记忆。不要调用任何工具，不要向用户提问，不要复述本段说明。\n只把「结果」下面的文字原样输出给用户，不要增删改，不要做其他任何操作。\n\n结果\n记忆插件memory-self-evolution新增了一条记忆：\"提交代码前先跑完整测试。\"。归类：rule（规则与偏好）。"
     }
    },
    "spawned": [],
