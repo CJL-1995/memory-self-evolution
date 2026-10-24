@@ -46,7 +46,7 @@ function removeConfig() {
     console.log(`配置：已删除 ${target}`)
   }
   console.log(`记忆目录保留：${dataDir}`)
-  console.log('保留 rule.jsonl、project.jsonl、memories.md、embeddings.jsonl、project-memory')
+  console.log('保留 rule.jsonl、project.jsonl、memories.html、embeddings.jsonl、project-memory')
 }
 
 const onlyIdx = process.argv.indexOf('--only')

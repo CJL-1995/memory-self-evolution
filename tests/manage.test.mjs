@@ -1,4 +1,4 @@
-// 用户主动整理记忆：删除、合并、改写、回收站、打开 memories.md，以及整理记忆用的 skill 的安装。
+// 用户主动整理记忆：删除、合并、改写、回收站、打开 memories.html，以及整理记忆用的 skill 的安装。
 
 import test from 'node:test'
 import assert from 'node:assert/strict'
@@ -56,7 +56,7 @@ test('删除：从分组文件和快照里去掉，进回收站，删掉向量�
   assert.match(message, /另有 1 条指向它的待确认提案已作废。$/)
 
   assert.deepEqual((await h.records()).map((m) => m.id).sort(), ['r1', 'r2'])
-  assert.doesNotMatch(await fsp.readFile(path.join(h.root, 'memories.md'), 'utf8'), /改完代码不要自动提交/)
+  assert.doesNotMatch(await fsp.readFile(path.join(h.root, 'memories.html'), 'utf8'), /改完代码不要自动提交/)
   const [trashed] = await readTrash(h)
   assert.equal(trashed.id, 'r3')
   assert.equal(trashed.deletedReason, 'delete')
@@ -88,7 +88,7 @@ test('批量删除：ids 里的多条一次删掉，跨分组；不存在的 id 
 
   assert.deepEqual((await h.records()).map((m) => m.id).sort(), ['r2', 'r3'])
   assert.deepEqual(await h.records('project'), [])
-  assert.doesNotMatch(await fsp.readFile(path.join(h.root, 'memories.md'), 'utf8'), /回答一律使用中文|多格式导出的 PRD/)
+  assert.doesNotMatch(await fsp.readFile(path.join(h.root, 'memories.html'), 'utf8'), /回答一律使用中文|多格式导出的 PRD/)
   assert.deepEqual((await readTrash(h)).map((m) => [m.id, m.deletedReason]), [['r1', 'delete'], ['p1', 'delete']])
   assert.deepEqual(h.state.droppedVectors, ['r1', 'p1'])
 
@@ -233,25 +233,50 @@ test('MCP：memory_update 的参数定义，执行结果原样返回，出错时
   assert.match(batch.content[0].text, /^已删除 2 条记忆：[\s\S]*以下 id 不存在，已跳过：missing。$/)
 })
 
-test('MCP：memory_list 带 open=true 时刷新并打开 memories.md，打不开时给出路径；不带时和原来一样', async (t) => {
+test('MCP：memory_list 带 open=true 时刷新并打开 memories.html，打不开时给出路径；不带时和原来一样', async (t) => {
   const { h } = await setup(t)
   const { tool, h: server } = await mcp(t, h.home)
-  const snapshot = path.join(h.root, 'memories.md')
+  const snapshot = path.join(h.root, 'memories.html')
+  const legacy = path.join(h.root, 'memories.md')
   await fsp.rm(snapshot, { force: true })
+  await fsp.writeFile(legacy, '# 记忆快照\n\n旧版本留下的 Markdown 快照\n')
 
   const plain = await tool('memory_list', {})
-  assert.doesNotMatch(plain.content[0].text, /memories\.md/)
+  assert.doesNotMatch(plain.content[0].text, /memories\.html/)
   assert.equal(server.state.spawns.length, 0)
+  assert.ok(fs.existsSync(legacy))
 
   const opened = await tool('memory_list', { open: true })
   assert.match(opened.content[0].text, /^rule    3 条/)
   assert.ok(opened.content[0].text.endsWith(`已用默认程序打开全部记忆：${snapshot}`))
   assert.match(await fsp.readFile(snapshot, 'utf8'), /改完代码不要自动提交/)
+  assert.equal(fs.existsSync(legacy), false)
   assert.deepEqual(JSON.parse(JSON.stringify(server.state.spawns[0].slice(0, 2))), ['xdg-open', [snapshot]])
 
   server.state.spawnExitCode = 3
   const failed = await tool('memory_list', { open: true })
   assert.ok(failed.content[0].text.endsWith(`没能打开文件（xdg-open 退出码 3），全部记忆在：${snapshot}`))
+})
+
+test('快照：HTML 转义正文，网址可点，序号和已废弃标记可见，不引用外部资源', async (t) => {
+  const h = await createMemoryHarness(t, { now: NOW })
+  await h.seed('rule', [
+    memory('r1', { text: '标签 <script>alert(1)</script> 要原样显示 & "引号" \'单引号\'', confidence: 1 }),
+    memory('r2', { text: '旧规则，已经不用了。', confidence: 0.3, deprecated: true }),
+  ])
+  await h.seed('project', [memory('p1', { category: 'project', text: 'PRD 在 https://doc.example.com/p?a=1&b=2。后续参考它', confidence: 0.9 })])
+  await (await h.load('lib/core/snapshot.mjs')).syncSnapshot()
+  const html = await fsp.readFile(path.join(h.root, 'memories.html'), 'utf8')
+
+  assert.match(html, /^<!doctype html>\n<html lang="zh-CN">/)
+  assert.ok(html.includes('<h2>规则与偏好（2）</h2>'), html)
+  assert.ok(html.includes('<h2>项目事实（1）</h2>'), html)
+  assert.ok(html.includes('<p class="text">标签 &lt;script&gt;alert(1)&lt;/script&gt; 要原样显示 &amp; &quot;引号&quot; &#39;单引号&#39;</p>'), html)
+  assert.ok(html.includes('<p class="text">PRD 在 <a href="https://doc.example.com/p?a=1&amp;b=2" target="_blank" rel="noopener noreferrer">https://doc.example.com/p?a=1&amp;b=2</a>。后续参考它</p>'), html)
+  assert.ok(html.includes('<li class="deprecated">\n<span class="num">2.</span>'), html)
+  assert.ok(html.includes('<p class="meta">置信度 0.3，id <code>r2</code>，<span class="flag">已废弃</span></p>'), html)
+  assert.ok(html.includes('<span class="num">1.</span>\n<p class="text">PRD 在'), html)
+  assert.doesNotMatch(html, /<script|<link|\bsrc=|@import|url\(/)
 })
 
 test('skill：四端都装到各自的个人 skill 目录，卸载时只删本插件的那一个', async (t) => {

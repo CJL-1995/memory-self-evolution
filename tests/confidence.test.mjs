@@ -45,7 +45,7 @@ test('强化和合并每个本地日合计最多加 0.1，封顶 1，无次数�
   const stored = (await h.records('project'))[0]
   assert.equal(stored.confidence, 1)
   assert.equal('gained' in stored, false)
-  assert.doesNotMatch(await fsp.readFile(path.join(h.root, 'memories.md'), 'utf8'), /观测|召回频率/)
+  assert.doesNotMatch(await fsp.readFile(path.join(h.root, 'memories.html'), 'utf8'), /观测|召回频率/)
 })
 
 test('旧正式记忆兼容读取，保留历史置信度，更新时清理 observations', async t => {

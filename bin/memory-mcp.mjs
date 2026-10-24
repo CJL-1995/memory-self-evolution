@@ -20,10 +20,10 @@ const AGENT = agentIdx >= 0 ? String(process.argv[agentIdx + 1] || '') : ''
 const TOOLS = [
   {
     name: 'memory_list',
-    description: '列出两组记忆的条数。rule 是无条件生效的规则与偏好，project 是按需召回的项目事实。用户要查看全部记忆时传 open=true，插件会刷新 memories.md 并用系统默认程序打开它。',
+    description: '列出两组记忆的条数。rule 是无条件生效的规则与偏好，project 是按需召回的项目事实。用户要查看全部记忆时传 open=true，插件会刷新 memories.html 并用系统默认浏览器打开它。',
     inputSchema: {
       type: 'object',
-      properties: { open: { type: 'boolean', description: '为 true 时刷新并打开 memories.md，供用户查看全部记忆' } },
+      properties: { open: { type: 'boolean', description: '为 true 时刷新并在浏览器里打开 memories.html，供用户查看全部记忆' } },
       additionalProperties: false,
     },
   },

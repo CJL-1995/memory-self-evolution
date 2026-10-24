@@ -58,7 +58,7 @@ npm run uninstall
 
 插件仓库保留。它会删掉安装时落下的向量模型、各端里本插件的 hook、MCP 注册和 skill。其他 hook、MCP 和 skill 不动。只想去掉某一端时用 `node tools/uninstall.mjs --only claude`，这时向量模型、配置和其它客户端都不动。
 
-`~/.memory-self-evolution/` 目录保留。里面只删 `config.json`、`side-secret.json`、`session-secret` 和 `side/`，其余都不动：记忆 `rule.jsonl` 和 `project.jsonl`、向量索引 `embeddings.jsonl`、给人核对的快照 `memories.md`、回收站 `trash.jsonl`、日检记录 `decay-state.json`、评测用例 `verify-cases.json`。重新安装时再跑 `npm run setup`，模型会重新下载，配置和本地密钥会在需要时重新生成。卸完后重启各客户端，MCP 才会从已经打开的会话里消失。
+`~/.memory-self-evolution/` 目录保留。里面只删 `config.json`、`side-secret.json`、`session-secret` 和 `side/`，其余都不动：记忆 `rule.jsonl` 和 `project.jsonl`、向量索引 `embeddings.jsonl`、给人核对的快照 `memories.html`、回收站 `trash.jsonl`、日检记录 `decay-state.json`、评测用例 `verify-cases.json`。重新安装时再跑 `npm run setup`，模型会重新下载，配置和本地密钥会在需要时重新生成。卸完后重启各客户端，MCP 才会从已经打开的会话里消失。
 
 ## 怎么让它记住东西
 
@@ -88,7 +88,7 @@ node bin/memory.mjs rule add "所有异常处理处都需要添加日志"
 
 | 操作 | 主模型调用 | 结果 |
 |---|---|---|
-| 查看全部 | `memory_list`，`open=true` | 刷新 `memories.md` 并用系统默认程序打开 |
+| 查看全部 | `memory_list`，`open=true` | 刷新 `memories.html` 并用系统默认浏览器打开。旧版本留下的 `memories.md` 不再更新，生成新快照时会删掉 |
 | 删除 | `memory_update`，`delete`，一条用 `id`，多条用 `ids` | 从分组文件、向量索引和快照里去掉，进回收站。多条时一次确认、一次调用；不存在的 id 跳过，其余照常删除，一个都不存在时报错 |
 | 合并 | `memory_update`，`merge`，`id`、`id2`、`text` | 保留 `id`，正文换成你给的 `text` 并重算向量；`id2` 进回收站；置信度取两条中较高的 |
 | 改写 | `memory_update`，`replace`，`id`、`text` | 正文换成 `text` 并重算向量，置信度不变 |
@@ -174,7 +174,7 @@ npm run build-background                      # 重新生成背景均值，换�
 
 | 工具 | 作用 |
 |---|---|
-| `memory_list` | 两组记忆的条数；带 `open=true` 时刷新并打开 `memories.md` |
+| `memory_list` | 两组记忆的条数；带 `open=true` 时刷新并在浏览器里打开 `memories.html` |
 | `memory_read` | 按置信度返回某一组的前 50 条记忆，已废弃的也列出并标注，目前无分页 |
 | `memory_update` | 你明确要求时删除、合并或改写已有记忆，见「整理记忆」 |
 | `memory_resolve` | 统一处理 sessionID 对应的新增、强化、合并、替换或不落成决策 |
