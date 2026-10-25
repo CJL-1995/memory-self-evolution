@@ -38,6 +38,15 @@ test('召回配置的默认值：每类上限3，rule下限0.22，project下限0
   assert.equal(settings.recallMinScoreProject, 0.29)
 })
 
+test('showRecall默认关闭，可用updateSetting打开，非布尔值被拒绝', async () => {
+  assert.equal((await (await freshSettings()).loadSettings()).showRecall, false)
+  assert.equal((await (await freshSettings({ showRecall: 'yes' })).loadSettings()).showRecall, false)
+  const settings = await freshSettings()
+  assert.equal((await settings.updateSetting('showRecall', 'on')).ok, true)
+  assert.equal(JSON.parse(await fsp.readFile(configFile, 'utf8')).showRecall, true)
+  assert.equal((await settings.updateSetting('showRecall', 'maybe')).ok, false)
+})
+
 test('recallTopK可在config.json中改为正整数，改完重新加载即生效，非法值回退为3', async () => {
   assert.equal((await (await freshSettings({ recallTopK: 5, recallMinScoreProject: 0.33 })).loadSettings()).recallTopK, 5)
   assert.equal((await (await freshSettings({ recallTopK: 5, recallMinScoreProject: 0.33 })).loadSettings()).recallMinScoreProject, 0.33)

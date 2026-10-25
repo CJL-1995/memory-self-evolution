@@ -193,6 +193,7 @@ npm run build-background                      # 重新生成背景均值，换�
 | `recallMinScore` | `0.22` | `rule` 的召回下限，`-1` 关闭。实际保留线是 `max(该值, rule 的 top1 × 0.6)`，再截到 `recallTopK` |
 | `recallMinScoreProject` | `0.29` | `project` 的召回下限，规则同上，用 `project` 自己的 top1 算保留线。比 `rule` 高，是为了不让无关输入带出项目事实 |
 | `recallMinMargin` | `-1` | 对第二名的领先幅度下限，默认关闭 |
+| `showRecall` | `false` | 每轮召回到记忆时，把召回的条目直接展示给你，和注入给模型的逐字相同，不占模型的输出。目前只有 Claude Code 支持（走 hook 输出的 `systemMessage`），子任务里的召回不展示。改完从下一轮输入开始生效 |
 | `confirm` | `true` | 写盘前是否弹确认。关掉后后台直接写入，`stop` 只展示结果。改完从下一轮输入开始生效，不用重启客户端 |
 | `sideWaitMs` | `12000` | 回答结束后，`stop` 等待旁路结果的毫秒数 |
 | `decayDays` | `30` | 闲置满多少天实际扣一次置信度（`0.05`），必须是正整数，写错时按 30 处理。日检每天只跑一次，改动从次日首次会话开始生效 |

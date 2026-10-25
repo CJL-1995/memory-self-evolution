@@ -117,7 +117,9 @@ function decoys(owner, session) {
   ]
 }
 
-async function combo(t, agent, flavorName) {
+// settings 叠在每次调用的配置之下，用来验证某个配置打开后这几端的输出仍和快照相同。
+async function combo(t, agent, flavorName, settings = {}) {
+  const run = (home, payload, patch = {}, state = {}) => runHook(t, home, agent, payload, { ...settings, ...patch }, state)
   const flavor = FLAVORS[flavorName]
   const owner = resolvedAgent(agent, flavorName)
   const payload = (kind, prompt) => ({
@@ -126,19 +128,19 @@ async function combo(t, agent, flavorName) {
   const result = {}
 
   const ready = await newHome(t)
-  result.sessionStart = await runHook(t, ready.home, agent, payload('start'))
-  result.prompt = await runHook(t, ready.home, agent, payload('prompt', '以后回答我都用中文'), {}, { hits: ['r1'] })
-  result.promptQuestionAnswer = await runHook(t, ready.home, agent, payload('prompt', '<question_answer><answers>不落成</answers></question_answer>'))
-  result.promptTooShort = await runHook(t, ready.home, agent, payload('prompt', '好的'))
+  result.sessionStart = await run(ready.home, payload('start'))
+  result.prompt = await run(ready.home, payload('prompt', '以后回答我都用中文'), {}, { hits: ['r1'] })
+  result.promptQuestionAnswer = await run(ready.home, payload('prompt', '<question_answer><answers>不落成</answers></question_answer>'))
+  result.promptTooShort = await run(ready.home, payload('prompt', '好的'))
   result.promptSide = await sideState(ready)
 
   const noApi = await newHome(t)
-  result.sessionStartNoApi = await runHook(t, noApi.home, agent, payload('start'), { sideApiModel: '' })
-  result.promptNoApi = await runHook(t, noApi.home, agent, payload('prompt', '记住：以后回答我都用中文'), { sideApiModel: '' })
+  result.sessionStartNoApi = await run(noApi.home, payload('start'), { sideApiModel: '' })
+  result.promptNoApi = await run(noApi.home, payload('prompt', '记住：以后回答我都用中文'), { sideApiModel: '' })
   result.promptNoApiSide = await sideState(noApi)
 
   const idle = await newHome(t)
-  result.stopIdle = await runHook(t, idle.home, agent, payload('stop'))
+  result.stopIdle = await run(idle.home, payload('stop'))
 
   const confirm = await newHome(t, {
     jobs: [
@@ -147,11 +149,11 @@ async function combo(t, agent, flavorName) {
       ...decoys(owner, flavor.session),
     ],
   })
-  result.stopConfirm = await runHook(t, confirm.home, agent, payload('stop'), { confirm: true })
+  result.stopConfirm = await run(confirm.home, payload('stop'), { confirm: true })
   result.stopConfirmSide = await sideState(confirm)
-  result.stopConfirmNextPrompt = await runHook(t, confirm.home, agent, payload('prompt', bubbleOf(result.stopConfirm.out)), { confirm: true })
+  result.stopConfirmNextPrompt = await run(confirm.home, payload('prompt', bubbleOf(result.stopConfirm.out)), { confirm: true })
   result.stopConfirmSideAfterPrompt = await sideState(confirm)
-  result.stopConfirmAgain = await runHook(t, confirm.home, agent, payload('stop'), { confirm: true })
+  result.stopConfirmAgain = await run(confirm.home, payload('stop'), { confirm: true })
 
   const direct = await newHome(t, {
     jobs: [
@@ -160,10 +162,10 @@ async function combo(t, agent, flavorName) {
       ...decoys(owner, flavor.session),
     ],
   })
-  result.stopDirect = await runHook(t, direct.home, agent, payload('stop'), { confirm: false })
+  result.stopDirect = await run(direct.home, payload('stop'), { confirm: false })
   result.stopDirectSide = await sideState(direct)
   result.stopDirectRules = await ruleState(direct)
-  result.stopDirectNextPrompt = await runHook(t, direct.home, agent, payload('prompt', bubbleOf(result.stopDirect.out)), { confirm: false })
+  result.stopDirectNextPrompt = await run(direct.home, payload('prompt', bubbleOf(result.stopDirect.out)), { confirm: false })
   result.stopDirectSideAfterPrompt = await sideState(direct)
   return result
 }
@@ -199,6 +201,10 @@ for (const agent of AGENTS) {
   for (const flavorName of Object.keys(FLAVORS)) {
     const key = `agent=${agent || '(none)'} input=${flavorName}`
     test(`宿主输出快照 ${key}`, async (t) => check(key, await combo(t, agent, flavorName)))
+    // showRecall 只在 Claude Code 上展示召回清单，打开后这几端的输出必须和快照逐字相同。
+    test(`宿主输出快照 ${key} showRecall=true`, { skip: UPDATE }, async (t) => {
+      assert.deepEqual(await combo(t, agent, flavorName, { showRecall: true }), expected[key])
+    })
   }
 }
 

@@ -72,7 +72,7 @@ const TOOLS = [
   },
   {
     name: 'memory_config',
-    description: '查看或修改记忆系统配置。不传参数即查看全部；传 key 与 value 则修改。可调项含 recallTopK（rule 和 project 每轮各自最多召回几条，默认 3）、recallMinScore（rule 的召回下限）与 recallMinScoreProject（project 的召回下限），各自与同类 top1×0.6 取更高者作为保留线；recallMinMargin（领先幅度门控，-1 为关闭）、confirm（写盘前是否弹确认）、decayDays（闲置满多少天扣一次置信度，正整数，默认 30）、enabled、sideApiBase、sideApiModel。sideApiBase 和 sideApiModel 没有缺省值，旁路必填。旁路 API 密钥不在这里，放在 side-secret.json 的 apiKey，同样必填。',
+    description: '查看或修改记忆系统配置。不传参数即查看全部；传 key 与 value 则修改。可调项含 recallTopK（rule 和 project 每轮各自最多召回几条，默认 3）、recallMinScore（rule 的召回下限）与 recallMinScoreProject（project 的召回下限），各自与同类 top1×0.6 取更高者作为保留线；recallMinMargin（领先幅度门控，-1 为关闭）、showRecall（召回到记忆时直接展示给用户，目前只有 Claude Code 支持，默认关闭）、confirm（写盘前是否弹确认）、decayDays（闲置满多少天扣一次置信度，正整数，默认 30）、enabled、sideApiBase、sideApiModel。sideApiBase 和 sideApiModel 没有缺省值，旁路必填。旁路 API 密钥不在这里，放在 side-secret.json 的 apiKey，同样必填。',
     inputSchema: {
       type: 'object',
       properties: {

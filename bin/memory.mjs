@@ -18,7 +18,7 @@
 
 import { GROUPS, READ_LIMIT } from '../lib/core/config.mjs'
 import { fmtConfidence, readAllGroups, readGroup } from '../lib/core/store.mjs'
-import { renderRecall, renderSessionStart } from '../lib/core/render.mjs'
+import { renderRecallParts, renderSessionStart } from '../lib/core/render.mjs'
 import { listTrash, persistMemory, restoreMemory } from '../lib/core/writer.mjs'
 import { describeSettings, loadSettings, updateSetting } from '../lib/core/settings.mjs'
 import { CONFIRM_MARK, hiddenNoticeForPrompt, isUserNotice, maybeStartSideJob, runSideJob, sedimentBlocker, sedimentOffNotice, takeSideFollowup } from '../lib/core/sidepath.mjs'
@@ -99,13 +99,17 @@ async function runHook(argv) {
     }
   }
 
-  const recalled = kind === 'session-start' ? '' : await renderRecall([promptText])
+  const recalled = kind === 'session-start' ? { text: '', notice: '' } : await renderRecallParts([promptText])
   const hidden = kind === 'prompt' ? await hiddenNoticeForPrompt(agent, promptText, payload) : ''
   const text = kind === 'session-start'
     ? await renderSessionStart({ boundary: host.sessionStartBoundary, maxChars: host.injectionLimit })
-    : [hidden, reminder, recalled].filter(Boolean).join('\n\n')
+    : [hidden, reminder, recalled.text].filter(Boolean).join('\n\n')
 
-  process.stdout.write(JSON.stringify(text ? host.wrapInjection(event, text) : {}, null, 0))
+  const output = text ? host.wrapInjection(event, text) : {}
+  // 召回清单只展示主会话的，子任务里的召回不展示。
+  const background = Boolean(host.isBackground && host.isBackground(payload))
+  if (recalled.notice && host.showToUser && !background) Object.assign(output, host.showToUser(recalled.notice))
+  process.stdout.write(JSON.stringify(output, null, 0))
 }
 
 async function runList() {
