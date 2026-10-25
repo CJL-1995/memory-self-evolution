@@ -835,8 +835,40 @@ test('旁路接口配齐时，每轮输入提醒主模型不要自己管记忆�
   assert.equal(h.state.spawns.length, 1)
 })
 
+test('Cursor、CodeBuddy、WorkBuddy 的召回也用判别那套过滤：点选答复、插件自己的续轮、过短和粘贴的长内容不召回', async t => {
+  const base = await createMemoryHarness(t)
+  await base.seed('rule', [memory('r1', { text: '回答一律使用中文。' })])
+  let turn = 0
+  const payloads = {
+    cursor: text => ({ hook_event_name: 'beforeSubmitPrompt', conversation_id: 'conv-1', generation_id: `g-${++turn}`, prompt: text }),
+    codebuddy: text => ({ hook_event_name: 'UserPromptSubmit', session_id: 'sess-1', user_prompt: text }),
+    workbuddy: text => ({ hook_event_name: 'UserPromptSubmit', session_id: 'sess-1', prompt: text }),
+  }
+  for (const [agent, payload] of Object.entries(payloads)) {
+    // 每次调用是一个新的 hook 进程：新的夹具、同一个用户目录。
+    const queriesOf = async text => {
+      const h = await createMemoryHarness(t, { home: base.home, argv: ['hook', '--agent', agent] })
+      h.settings.sideWaitMs = 0
+      h.state.hits = ['r1']
+      await runHook(h, payload(text))
+      return [...h.state.recallQueries]
+    }
+    for (const text of [
+      '<question_answer><answers>不落成</answers></question_answer>',
+      'memory-self-evolution 捕捉到了新的记忆：\n- 回答一律使用中文。',
+      '请按下面的指令处理\n\nMEMORY_CONFIRM_V1 sessionID：s_x',
+      '好的',
+      '这段需求写得很长。'.repeat(60),
+    ]) {
+      assert.deepEqual(await queriesOf(text), [], `${agent} ${text.slice(0, 20)}`)
+    }
+    assert.deepEqual(await queriesOf('线上配置在哪里'), ['线上配置在哪里'], agent)
+    assert.deepEqual(await queriesOf('这个报错以后怎么处理\n```\nTypeError: x is null\n```'), ['这个报错以后怎么处理'], agent)
+  }
+})
+
 for (const [name, change, expected] of [
-  ['旁路接口没配齐', h => { h.settings.sideApiModel = '' }, /还没有配齐旁路判别接口.*sideApiBase、sideApiModel.*side-secret\.json.*npm run setup/],
+  ['旁路接口没配齐', h => { h.settings.sideApiModel = '' },/还没有配齐旁路判别接口.*sideApiBase、sideApiModel.*side-secret\.json.*npm run setup/],
   ['只缺 apiKey', h => fsp.rm(path.join(h.root, 'side-secret.json')), /还没有配齐旁路判别接口/],
   ['旧配置还停在阻塞模式', h => { h.settings.sideJudge = false }, /阻塞模式已经移除.*setup\.mjs" sidepath.*会把用户原话发给配置的模型接口/],
 ]) {

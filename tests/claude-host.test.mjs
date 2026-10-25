@@ -23,7 +23,7 @@ async function runHook(t, base, agent, payload, patch = {}, state = {}) {
   h.stdin.emit('end')
   await running
   const out = JSON.parse(h.output.join(''))
-  return { out, text: out.hookSpecificOutput ? out.hookSpecificOutput.additionalContext : '', spawns: h.state.spawns.length, errors: h.errors }
+  return { out, text: out.hookSpecificOutput ? out.hookSpecificOutput.additionalContext : '', spawns: h.state.spawns.length, queries: [...h.state.recallQueries], errors: h.errors }
 }
 
 const prompt = (text, extra = {}) => ({
@@ -93,12 +93,45 @@ test('showRecall 打开时 Claude 用 systemMessage 展示召回的记忆；默�
   assert.equal((await ask({}, { showRecall: true }, { hits: [] })).out.systemMessage, undefined)
   const sub = await ask({ agent_id: 'agent-1', agent_type: 'Explore' }, { showRecall: true })
   assert.equal(sub.out.systemMessage, undefined)
-  assert.match(sub.text, /线上配置放在 config\/prod\.yaml/)
+  assert.doesNotMatch(sub.text, /线上配置放在 config\/prod\.yaml/)
 
   const cursor = await runHook(t, base, 'cursor', { hook_event_name: 'beforeSubmitPrompt', conversation_id: 'conv-1', generation_id: 'g-1', prompt: '线上配置在哪' }, { showRecall: true }, hits)
   assert.deepEqual(Object.keys(cursor.out), ['additional_context'])
   const codebuddy = await runHook(t, base, 'codebuddy', { hook_event_name: 'UserPromptSubmit', session_id: 'sess-1', user_prompt: '线上配置在哪' }, { showRecall: true }, hits)
   assert.deepEqual(Object.keys(codebuddy.out), ['hookSpecificOutput'])
+})
+
+test('Claude 召回和判别用同一套过滤：客户端送进来的指令、斜杠命令、子任务、过短和粘贴的长内容都不召回', async (t) => {
+  const base = await createMemoryHarness(t)
+  await base.seed('rule', [memory('r1', { text: '回答一律使用中文。' })])
+  let id = 0
+  const ask = (text, extra = {}) => runHook(t, base, 'claude', prompt(text, { prompt_id: `p-${++id}`, ...extra }), { showRecall: true }, { hits: ['r1'] })
+
+  // 桌面端 Create PR 按钮送进来的是展开后的英文指令，实测会带出 6 条无关记忆。
+  const createPr = '<create-pr-command>\n## Overview\n\nCreate a pull request for the changes in this session, ready for review (not a draft).\n</create-pr-command>'
+  for (const [text, extra] of [
+    [createPr],
+    ['<task-notification>后台任务完成了</task-notification>'],
+    ['/code-review 检查液态玻璃适配'],
+    ['线上配置在哪里呢', { agent_id: 'agent-1', agent_type: 'Explore' }],
+    ['好的'],
+    ['这段需求写得很长。'.repeat(60)],
+  ]) {
+    const out = await ask(text, extra)
+    assert.deepEqual(out.queries, [], text.slice(0, 30))
+    assert.doesNotMatch(out.text, /自动召回/)
+    assert.equal(out.out.systemMessage, undefined)
+    assert.equal(out.spawns, 0)
+  }
+  // 没召回就不加置信度。
+  assert.equal((await base.records()).find((mem) => mem.id === 'r1').confidence, 0.5)
+
+  // 粘贴的代码块去掉后再召回，召回和送判的是同一段文字。
+  const pasted = await ask('这个报错以后怎么处理\n```\nTypeError: x is null\n```')
+  assert.deepEqual(pasted.queries, ['这个报错以后怎么处理'])
+  assert.match(pasted.text, /回答一律使用中文/)
+  assert.equal(pasted.spawns, 1)
+  assert.deepEqual((await sideJobs(base)).map((job) => job.prompt), ['这个报错以后怎么处理'])
 })
 
 test('Claude 只读文档里写明的字段，子任务、斜杠命令和客户端送进来的通知都不送去判别', async (t) => {

@@ -21,7 +21,7 @@ import { fmtConfidence, readAllGroups, readGroup } from '../lib/core/store.mjs'
 import { renderRecallParts, renderSessionStart } from '../lib/core/render.mjs'
 import { listTrash, persistMemory, restoreMemory } from '../lib/core/writer.mjs'
 import { describeSettings, loadSettings, updateSetting } from '../lib/core/settings.mjs'
-import { CONFIRM_MARK, hiddenNoticeForPrompt, isUserNotice, maybeStartSideJob, runSideJob, sedimentBlocker, sedimentOffNotice, takeSideFollowup } from '../lib/core/sidepath.mjs'
+import { CONFIRM_MARK, hiddenNoticeForPrompt, isUserNotice, maybeStartSideJob, runSideJob, sedimentBlocker, sedimentOffNotice, takeSideFollowup, userInputFor } from '../lib/core/sidepath.mjs'
 import { agentForEvent, eventKind, hostOf } from '../lib/hosts/index.mjs'
 
 function readStdin() {
@@ -99,16 +99,16 @@ async function runHook(argv) {
     }
   }
 
-  const recalled = kind === 'session-start' ? { text: '', notice: '' } : await renderRecallParts([promptText])
+  // 召回和旁路判别用同一套过滤，见 userInputFor。
+  const recallInput = kind === 'prompt' ? userInputFor(promptText, agent, payload) : { skip: kind }
+  const recalled = recallInput.skip ? { text: '', notice: '' } : await renderRecallParts([recallInput.text])
   const hidden = kind === 'prompt' ? await hiddenNoticeForPrompt(agent, promptText, payload) : ''
   const text = kind === 'session-start'
     ? await renderSessionStart({ boundary: host.sessionStartBoundary, maxChars: host.injectionLimit })
     : [hidden, reminder, recalled.text].filter(Boolean).join('\n\n')
 
   const output = text ? host.wrapInjection(event, text) : {}
-  // 召回清单只展示主会话的，子任务里的召回不展示。
-  const background = Boolean(host.isBackground && host.isBackground(payload))
-  if (recalled.notice && host.showToUser && !background) Object.assign(output, host.showToUser(recalled.notice))
+  if (recalled.notice && host.showToUser) Object.assign(output, host.showToUser(recalled.notice))
   process.stdout.write(JSON.stringify(output, null, 0))
 }
 
