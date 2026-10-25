@@ -13,9 +13,10 @@ import { INSTALL_HOSTS, selectHosts } from '../tools/hosts/index.mjs'
 const RESOLVE_TOOL = 'mcp__memory-self-evolution__memory_resolve'
 
 // 每次调用是一个新的 hook 进程：新的夹具、同一个用户目录。
-async function runHook(t, base, agent, payload, patch = {}) {
+async function runHook(t, base, agent, payload, patch = {}, state = {}) {
   const h = await createMemoryHarness(t, { home: base.home, argv: ['hook', '--agent', agent] })
   Object.assign(h.settings, { sideWaitMs: 0, ...patch })
+  Object.assign(h.state, state)
   const running = h.load('bin/memory.mjs')
   for (let i = 0; i < 1000 && !h.stdin.listenerCount('end'); i++) await delay(1)
   h.stdin.emit('data', JSON.stringify(payload))
@@ -67,6 +68,37 @@ test('Claude 每轮输入：提醒只约束插件，按 prompt_id 区分同一�
 
   const jobs = await sideJobs(base)
   assert.deepEqual(jobs.map((job) => [job.agent, job.sessionKey, job.generationKey]).sort(), [['claude', 'session-a', 'prompt-1'], ['claude', 'session-a', 'prompt-2']])
+})
+
+test('showRecall 打开时 Claude 用 systemMessage 展示召回的记忆；默认关闭，没召回、子任务和另外三端都不展示', async (t) => {
+  const base = await createMemoryHarness(t)
+  await base.seed('rule', [memory('r1', { text: '回答一律使用中文。' })])
+  await base.seed('project', [memory('p1', { text: '线上配置放在 config/prod.yaml。', category: 'project' })])
+  const hits = { hits: ['r1', 'p1'] }
+  let id = 0
+  const ask = (extra = {}, patch = {}, state = hits) => runHook(t, base, 'claude', prompt('线上配置在哪', { prompt_id: `p-${++id}`, ...extra }), patch, state)
+
+  const off = await ask()
+  assert.equal(off.out.systemMessage, undefined)
+  assert.match(off.text, /线上配置放在 config\/prod\.yaml/)
+
+  // 展示的条目和注入给模型的逐字相同，注入本身不变。
+  const on = await ask({}, { showRecall: true })
+  const injected = on.text.split('\n').filter((line) => line.startsWith('- '))
+  assert.equal(injected.length, 2)
+  assert.match(injected[0], /^- 回答一律使用中文。（置信度 [\d.]+，相关度 0\.90）$/)
+  assert.equal(on.out.systemMessage, ['memory-self-evolution 本轮召回 2 条记忆', '规则：', injected[0], '项目事实：', injected[1]].join('\n'))
+  assert.equal(on.out.hookSpecificOutput.hookEventName, 'UserPromptSubmit')
+
+  assert.equal((await ask({}, { showRecall: true }, { hits: [] })).out.systemMessage, undefined)
+  const sub = await ask({ agent_id: 'agent-1', agent_type: 'Explore' }, { showRecall: true })
+  assert.equal(sub.out.systemMessage, undefined)
+  assert.match(sub.text, /线上配置放在 config\/prod\.yaml/)
+
+  const cursor = await runHook(t, base, 'cursor', { hook_event_name: 'beforeSubmitPrompt', conversation_id: 'conv-1', generation_id: 'g-1', prompt: '线上配置在哪' }, { showRecall: true }, hits)
+  assert.deepEqual(Object.keys(cursor.out), ['additional_context'])
+  const codebuddy = await runHook(t, base, 'codebuddy', { hook_event_name: 'UserPromptSubmit', session_id: 'sess-1', user_prompt: '线上配置在哪' }, { showRecall: true }, hits)
+  assert.deepEqual(Object.keys(codebuddy.out), ['hookSpecificOutput'])
 })
 
 test('Claude 只读文档里写明的字段，子任务、斜杠命令和客户端送进来的通知都不送去判别', async (t) => {
