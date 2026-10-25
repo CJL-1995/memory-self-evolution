@@ -13,7 +13,8 @@ export async function createMemoryHarness(t, options = {}) {
   const root = path.join(home, '.memory-self-evolution')
   await fsp.mkdir(root, { recursive: true })
   const errors = []
-  const state = { hits: [], recallError: null, writeError: false, failRenameTo: '', failRead: '', reads: new Map(), embeddedTexts: [], vectorRefreshes: 0, droppedVectors: [], spawns: [], spawnExitCode: 0, fetch: null }
+  // recallQueries 记下每次召回拿去打分的文字，用来核对召回前的过滤。
+  const state = { hits: [], recallQueries: [], recallError: null, writeError: false, failRenameTo: '', failRead: '', reads: new Map(), embeddedTexts: [], vectorRefreshes: 0, droppedVectors: [], spawns: [], spawnExitCode: 0, fetch: null }
   const clock = { now: options.now ? new Date(options.now).getTime() : null }
   class TestDate extends Date {
     constructor(...args) { super(...(args.length ? args : [clock.now ?? Date.now()])) }
@@ -84,7 +85,8 @@ export async function createMemoryHarness(t, options = {}) {
         ensureVectors: async (_, index) => index,
         refreshVector: async () => { state.vectorRefreshes++ },
         dropVectors: async (ids) => { state.droppedVectors.push(...ids); return ids.length },
-        recall: async (_, pool) => {
+        recall: async (texts, pool) => {
+          state.recallQueries.push(...texts)
           if (state.recallError) throw state.recallError
           return state.hits.map(id => ({ memory: pool.find(mem => mem.id === id), score: 0.9 })).filter(hit => hit.memory)
         },
